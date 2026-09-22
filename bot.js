@@ -10,19 +10,13 @@ function initBot() {
 
   // Команда /start
   bot.start(async (ctx) => {
-    const userName = ctx.from.first_name || 'Путник';
-    const welcomeText = `🌙 Приветствую тебя, ${userName}.\n\n` +
-      `Ночь спустилась на землю, укутывая все вокруг тишиной и мерцанием звезд.\n\n` +
-      `Здесь ты найдешь самые нежные и согревающие пожелания спокойной ночи, ` +
-      `успокаивающий процедурный эмбиент и звездный генератор открыток.\n\n` +
-      `Нажми кнопку ниже, чтобы погрузиться в ночную атмосферу:`;
+    const welcomeText = `✨ Привет, любимая.\n\n` +
+      `Я сделал для тебя этот маленький ночной уголок, чтобы пожелать самых сладких и нежных снов.\n\n` +
+      `Открой, когда будешь ложиться спать 🌙`;
 
     const keyboard = Markup.inlineKeyboard([
       [
-        Markup.button.webApp('✨ Открыть ночной мир', config.WEBAPP_URL)
-      ],
-      [
-        Markup.button.callback('🎲 Случайное пожелание', 'random_wish')
+        Markup.button.webApp('🌙 Открыть для тебя', config.WEBAPP_URL)
       ]
     ]);
 
@@ -88,7 +82,7 @@ function initBot() {
       await bot.telegram.setChatMenuButton({
         menu_button: {
           type: 'web_app',
-          text: '🌙 Ночь',
+          text: '🌙 Для тебя',
           web_app: {
             url: config.WEBAPP_URL
           }

@@ -5,8 +5,8 @@ class NightAudioEngine {
   constructor() {
     this.ctx = null;
     this.isPlaying = false;
-    this.currentPreset = 'crickets';
-    this.volume = 0.4;
+    this.currentPreset = 'cosmic';
+    this.volume = 0.35;
     this.masterGain = null;
     this.activeNodes = [];
     this.cricketInterval = null;
