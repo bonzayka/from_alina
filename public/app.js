@@ -276,27 +276,71 @@
   }
 
   // ==========================================
-  // 5. Управление фоновой ночной музыкой
+  // 5. Управление фоновой музыкой C418
   // ==========================================
+  const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
   const audioIcon = document.getElementById('audioIcon');
   const audioLabel = document.getElementById('audioLabel');
 
+  if (bgMusic) {
+    bgMusic.volume = 0.5;
+  }
+
+  function playMusic() {
+    if (bgMusic && bgMusic.paused) {
+      bgMusic.play().then(() => {
+        if (audioToggleBtn) audioToggleBtn.classList.add('playing');
+        if (audioIcon) audioIcon.textContent = '🔊';
+        if (audioLabel) audioLabel.textContent = 'C418 звучит';
+      }).catch(() => {
+        // Браузер ожидает взаимодействия с пользователем
+      });
+    }
+  }
+
+  function pauseMusic() {
+    if (bgMusic && !bgMusic.paused) {
+      bgMusic.pause();
+      if (audioToggleBtn) audioToggleBtn.classList.remove('playing');
+      if (audioIcon) audioIcon.textContent = '🎵';
+      if (audioLabel) audioLabel.textContent = 'C418 - Danny';
+    }
+  }
+
+  // Запуск музыки при первом касании страницы
+  let userInteracted = false;
+  function handleFirstInteraction() {
+    if (!userInteracted) {
+      userInteracted = true;
+      playMusic();
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    }
+  }
+
+  document.addEventListener('click', handleFirstInteraction);
+  document.addEventListener('touchstart', handleFirstInteraction);
+
+  // Попытка автозапуска при загрузке
+  setTimeout(() => {
+    playMusic();
+  }, 400);
+
   if (audioToggleBtn) {
-    audioToggleBtn.addEventListener('click', () => {
+    audioToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userInteracted = true;
       triggerHaptic('light');
-      if (window.NightAudio) {
-        const isPlaying = window.NightAudio.toggle();
-        if (isPlaying) {
-          audioToggleBtn.classList.add('playing');
-          if (audioIcon) audioIcon.textContent = '🔊';
-          if (audioLabel) audioLabel.textContent = 'Музыка звучит';
-          showToast('Тихая ночная музыка включена', '🌙');
-        } else {
-          audioToggleBtn.classList.remove('playing');
-          if (audioIcon) audioIcon.textContent = '🎵';
-          if (audioLabel) audioLabel.textContent = 'Музыка ночи';
-        }
+
+      if (!bgMusic) return;
+
+      if (bgMusic.paused) {
+        playMusic();
+        showToast('Играет C418 - Danny', '🎵');
+      } else {
+        pauseMusic();
+        showToast('Музыка на паузе', '⏸️');
       }
     });
   }
