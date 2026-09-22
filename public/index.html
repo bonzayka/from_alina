@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#060814">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Спокойной ночи: Созвездия снов</title>
+  
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Google Fonts: Outfit & Cormorant Garamond -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Интерактивный холст ночного неба -->
+  <canvas id="nightCanvas"></canvas>
+
+  <div class="app-container">
+    <!-- Верхняя панель: статус ночи и эмбиент -->
+    <header class="top-nav">
+      <div class="night-time-badge" id="nightTimeBadge">
+        <span class="moon-phase-icon">🌙</span>
+        <span class="time-text" id="liveClock">00:00</span>
+        <span class="time-sub">Тихая ночь</span>
+      </div>
+
+      <div class="audio-control-widget" id="audioWidget">
+        <button class="audio-btn" id="audioToggleBtn" title="Включить ночной звук">
+          <span class="audio-icon" id="audioIcon">🔈</span>
+          <span class="sound-wave-anim" id="soundWaves">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="audio-label" id="audioLabel">Звук ночи</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Выпадающая панель настройки звуков -->
+    <div class="audio-panel glass-card" id="audioPanel">
+      <div class="audio-panel-header">
+        <span class="panel-title">🌙 Звуковая атмосфера для сна</span>
+        <button class="close-panel-btn" id="closeAudioPanel">✕</button>
+      </div>
+      <div class="sound-presets">
+        <button class="preset-chip active" data-preset="crickets">🦗 Сверчки и сад</button>
+        <button class="preset-chip" data-preset="rain">🌧️ Ночной дождь</button>
+        <button class="preset-chip" data-preset="cosmic">🌌 Космос 432 Гц</button>
+        <button class="preset-chip" data-preset="bells">🔔 Хрустальный звон</button>
+      </div>
+      <div class="volume-slider-row">
+        <span>Громкость:</span>
+        <input type="range" id="volumeSlider" min="0" max="100" value="40">
+        <span id="volumeValue">40%</span>
+      </div>
+    </div>
+
+    <!-- Главный ночной экран -->
+    <main class="main-content">
+      <!-- Герой с реалистичной луной -->
+      <section class="hero-section">
+        <div class="moon-wrapper" id="interactiveMoon">
+          <div class="moon-sphere">
+            <div class="moon-texture"></div>
+            <div class="moon-halo"></div>
+            <div class="moon-crater c1"></div>
+            <div class="moon-crater c2"></div>
+            <div class="moon-crater c3"></div>
+            <div class="moon-glow"></div>
+          </div>
+          <div class="stars-orbit"></div>
+        </div>
+
+        <h1 class="main-title">Спокойной ночи</h1>
+        <p class="subtitle" id="dynamicNightQuote">Пусть тишина подарит покой, а созвездия принесут самые сладкие сны.</p>
+      </section>
+
+      <!-- Навигация по вкладкам -->
+      <nav class="nav-tabs glass-card">
+        <button class="tab-btn active" data-tab="wishes">
+          <span class="tab-icon">✨</span>
+          <span class="tab-text">Пожелания</span>
+        </button>
+        <button class="tab-btn" data-tab="generator">
+          <span class="tab-icon">💌</span>
+          <span class="tab-text">Открытка</span>
+        </button>
+        <button class="tab-btn" data-tab="breathing">
+          <span class="tab-icon">🌿</span>
+          <span class="tab-text">Дыхание</span>
+        </button>
+        <button class="tab-btn" data-tab="shredder">
+          <span class="tab-icon">🌌</span>
+          <span class="tab-text">Шкатулка</span>
+        </button>
+      </nav>
+
+      <!-- Вкладка 1: Карточки пожеланий -->
+      <section class="tab-content active" id="tab-wishes">
+        <!-- Фильтры категорий -->
+        <div class="categories-scroll" id="categoriesBar">
+          <!-- Генерируется из JS -->
+        </div>
+
+        <!-- Главная карточка ночного пожелания -->
+        <div class="wish-card-wrapper">
+          <div class="wish-card glass-card" id="activeWishCard">
+            <div class="card-shimmer"></div>
+            <div class="card-top-info">
+              <span class="card-badge" id="wishBadge">✨ Ночное созвездие</span>
+              <button class="fav-toggle-btn" id="favToggleBtn" title="Добавить в избранное">
+                <span id="favIcon">🤍</span>
+              </button>
+            </div>
+
+            <div class="quote-sign start">“</div>
+            <div class="card-body">
+              <h3 class="wish-title" id="wishTitle">Звездное одеяло</h3>
+              <p class="wish-text" id="wishText">
+                Пусть ночь бережно укроет тебя одеялом из далеких созвездий. Спи сладко, зная, что мои мысли и тепло сейчас рядом с тобой.
+              </p>
+              <div class="wish-meta">
+                <span class="wish-author" id="wishAuthor">Ночной шепот</span>
+                <div class="wish-tags" id="wishTags"></div>
+              </div>
+            </div>
+            <div class="quote-sign end">”</div>
+          </div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="card-actions-grid">
+          <button class="action-btn secondary" id="prevWishBtn">
+            <span class="btn-icon">←</span>
+            <span>Назад</span>
+          </button>
+          <button class="action-btn primary" id="nextWishBtn">
+            <span class="btn-icon">🔄</span>
+            <span>Другое</span>
+          </button>
+          <button class="action-btn secondary" id="copyWishBtn">
+            <span class="btn-icon">📋</span>
+            <span>Копировать</span>
+          </button>
+          <button class="action-btn share" id="shareWishBtn">
+            <span class="btn-icon">📤</span>
+            <span>В Telegram</span>
+          </button>
+        </div>
+
+        <!-- Избранные пожелания -->
+        <div class="saved-wishes-section" id="savedWishesSection">
+          <h4 class="section-subheading">⭐ Сохраненные пожелания (<span id="savedCount">0</span>)</h4>
+          <div class="saved-wishes-list" id="savedWishesList">
+            <p class="empty-hint">Нажмите на сердечко, чтобы сохранить любимые слова на память.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Вкладка 2: Конструктор персональной открытки -->
+      <section class="tab-content" id="tab-generator">
+        <div class="generator-container glass-card">
+          <h2 class="section-title">💌 Создать ночную открытку</h2>
+          <p class="section-desc">Напишите имя дорогого человека и выберите атмосферу пожелания.</p>
+
+          <div class="form-group">
+            <label for="recipientInput">Кому адресовано:</label>
+            <input type="text" id="recipientInput" class="custom-input" placeholder="Любимой, Саше, Маме, Моему солнцу..." maxlength="40">
+          </div>
+
+          <div class="form-group">
+            <label>Настроение пожелания:</label>
+            <div class="mood-selector" id="moodSelector">
+              <button class="mood-chip active" data-mood="romantic">❤️ Нежное и романтичное</button>
+              <button class="mood-chip" data-mood="cozy">🧸 Теплое и уютное</button>
+              <button class="mood-chip" data-mood="stars">✨ Звездное и волшебное</button>
+              <button class="mood-chip" data-mood="deep">🌿 Тихое и глубокое</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Добавить детали (выберите по желанию):</label>
+            <div class="traits-selector" id="traitsSelector">
+              <button class="trait-chip" data-trait="tea">☕ Чашка сонного чая</button>
+              <button class="trait-chip active" data-trait="hugs">🤗 Крепкие объятия</button>
+              <button class="trait-chip active" data-trait="dreams">🌌 Сказочные сны</button>
+              <button class="trait-chip" data-trait="peace">🕊️ Полная тишина</button>
+              <button class="trait-chip" data-trait="pillow">🛏️ Мягкая подушка</button>
+            </div>
+          </div>
+
+          <button class="generate-btn" id="generateCardBtn">
+            <span class="btn-sparkle">✨</span>
+            <span>Сотворить пожелание</span>
+          </button>
+
+          <!-- Превью сгенерированной открытки -->
+          <div class="generated-preview glass-card" id="generatedPreview" style="display: none;">
+            <div class="preview-header">
+              <span class="preview-badge">🌙 Ваша открытка готова</span>
+            </div>
+            <div class="preview-body" id="previewBody">
+              <!-- Сюда вставляется результат -->
+            </div>
+            <div class="preview-actions">
+              <button class="action-btn primary" id="copyGeneratedBtn">📋 Скопировать</button>
+              <button class="action-btn share" id="shareGeneratedBtn">📤 Отправить в чат</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Вкладка 3: Дыхание 4-7-8 для быстрого засыпания -->
+      <section class="tab-content" id="tab-breathing">
+        <div class="breathing-container glass-card">
+          <h2 class="section-title">🌿 Дыхание для глубокого сна</h2>
+          <p class="section-desc">Техника 4-7-8 мягко замедляет пульс, расслабляет мышцы и помогает уснуть за пару минут.</p>
+
+          <div class="breath-visualizer-wrap">
+            <div class="breath-outer-ring" id="breathOuterRing"></div>
+            <div class="breath-inner-circle" id="breathCircle">
+              <span class="breath-phase-text" id="breathPhaseText">Начать</span>
+              <span class="breath-timer-text" id="breathTimerText">Нажмите старт</span>
+            </div>
+          </div>
+
+          <div class="breath-stats">
+            <div class="stat-item">
+              <span class="stat-num">4 сек</span>
+              <span class="stat-name">Вдох носом</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">7 сек</span>
+              <span class="stat-name">Задержка</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">8 сек</span>
+              <span class="stat-name">Плавный выдох</span>
+            </div>
+          </div>
+
+          <div class="breathing-controls">
+            <button class="action-btn primary large" id="breathToggleBtn">
+              <span id="breathBtnIcon">▶️</span>
+              <span id="breathBtnText">Запустить дыхание</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Вкладка 4: Шкатулка ночного спокойствия (растворение тревог) -->
+      <section class="tab-content" id="tab-shredder">
+        <div class="shredder-container glass-card">
+          <h2 class="section-title">🌌 Шкатулка спокойствия</h2>
+          <p class="section-desc">Оставьте здесь все тяжелые мысли, тревоги и суету сегодняшнего дня. Они растают среди звезд.</p>
+
+          <div class="thought-input-wrapper" id="thoughtInputWrapper">
+            <textarea id="thoughtInput" class="custom-textarea" placeholder="Что беспокоит вас сегодня? Напишите сюда все лишнее..." rows="4"></textarea>
+            
+            <button class="shred-btn" id="shredThoughtBtn">
+              <span>Отпустить в звезды</span>
+              <span class="shred-icon">🌠</span>
+            </button>
+          </div>
+
+          <div class="shred-result glass-card" id="shredResult" style="display: none;">
+            <div class="result-star-icon">✨</div>
+            <h3 class="result-title">Мысли развеяны в звездную пыль</h3>
+            <p class="result-text">Все тревоги угасли в ночной безмятежности. Ваш разум чист и спокоен. Ложитесь отдыхать с легким сердцем.</p>
+            <button class="action-btn secondary" id="resetShredBtn">Написать еще</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Подвал с ночным благословением -->
+    <footer class="app-footer">
+      <div class="footer-moon-line">
+        <span class="line-star">✦</span>
+        <span class="line-text">Спите сладко под защитой ночи</span>
+        <span class="line-star">✦</span>
+      </div>
+      <p class="footer-note">Telegram WebApp для самых теплых и добрых сновидений</p>
+    </footer>
+  </div>
+
+  <!-- Уведомление (Toast) -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Скрипты -->
+  <script src="wishes.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
