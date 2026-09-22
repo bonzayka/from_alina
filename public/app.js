@@ -562,7 +562,7 @@
   });
 
   function buildPersonalizedCard() {
-    const rawName = (recipientInput && recipientInput.value.trim()) || 'Дорогой человек';
+    const rawName = (recipientInput && recipientInput.value.trim()) || 'Моя любимая';
     const activeTraits = Array.from(traitChips)
       .filter(c => c.classList.contains('active'))
       .map(c => c.textContent.trim());
@@ -573,30 +573,30 @@
 
     switch (currentMood) {
       case 'romantic':
-        intro = `Мое главное созвездие, ${rawName}! ✨`;
-        body = `Пусть эта тихая ночь бережно укроет тебя одеялом из звезд. Я мысленно обнимаю тебя и целую перед сном. Пусть каждая звезда дарит тебе мое тепло.`;
-        outro = `Сладких и волшебных снов, люблю тебя безмерно! ❤️`;
+        intro = `Мое самое дорогое созвездие, ${rawName}! ✨`;
+        body = `Пусть эта тихая ночь бережно укроет тебя одеялом из звезд. Я мысленно обнимаю тебя крепко-крепко и целую перед сном. Ты самое прекрасное, что есть в моей жизни.`;
+        outro = `Сладких и волшебных снов, люблю тебя всем сердцем! ❤️`;
         break;
       case 'cozy':
-        intro = `Теплый привет на ночь для ${rawName} 🧸`;
-        body = `День подошел к концу, и сейчас самое время укутаться в мягкий плед, расслабиться и послушать бархатную тишину. Весь мир подождет до утра.`;
-        outro = `Уютной ночи и крепкого, целебного сна! 🌙`;
+        intro = `Уютного сна для ${rawName} 🧸`;
+        body = `Ты сегодня большая умница, а сейчас пора сладко отдыхать. Укутайся в теплое одеяло, устройся поудобнее на подушке и послушай тишину. Весь мир подождет до утра.`;
+        outro = `Крепких и целебных сновидений, моя радость! 🌙`;
         break;
       case 'stars':
         intro = `Звездная сказка для ${rawName} 🌌`;
-        body = `Закрывай глаза и отправляйся в путешествие по созвездиям. Пусть тебе приснятся удивительные дали, ласковый шепот волн и сияние луны.`;
-        outro = `Пусть утро начнется с улыбки и вдохновения! 💫`;
+        body = `Закрывай глазки и отправляйся в самые чудесные сны. Пусть эта ночь принесет тебе только тепло, волшебство и безмятежный покой.`;
+        outro = `Спи сладко до самого утра! 💫`;
         break;
       case 'deep':
-        intro = `Спокойствие и тишина для ${rawName} 🌿`;
-        body = `Отпусти всю дневную суету и напряжение. Сделай медленный вдох и позволь телу полностью расслабиться. Ночь хранит твой драгоценный покой.`;
-        outro = `Глубокого сна и абсолютной безмятежности. 🕊️`;
+        intro = `Крепкие объятия на ночь для ${rawName} 🥰`;
+        body = `Если бы я был рядом прямо сейчас, я бы нежно прижал тебя к себе, гладил по волосам и оберегал твой покой всю ночь напролет.`;
+        outro = `Целую в носик и мысленно обнимаю. Доброй ночи! 🕊️`;
         break;
     }
 
     let traitsText = '';
     if (activeTraits.length > 0) {
-      traitsText = `\n\nМои ночные пожелания для тебя: ${activeTraits.join(', ')}.`;
+      traitsText = `\n\nДля тебя этой ночью: ${activeTraits.join(', ')}.`;
     }
 
     return `${intro}\n\n${body}${traitsText}\n\n${outro}`;
@@ -643,141 +643,6 @@
         const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(generatedTextCache)}`;
         window.open(shareUrl, '_blank');
       }
-    });
-  }
-
-  // ==========================================
-  // 7. Сфера дыхания 4-7-8 для сна
-  // ==========================================
-  const breathCircle = document.getElementById('breathCircle');
-  const breathPhaseText = document.getElementById('breathPhaseText');
-  const breathTimerText = document.getElementById('breathTimerText');
-  const breathToggleBtn = document.getElementById('breathToggleBtn');
-  const breathBtnIcon = document.getElementById('breathBtnIcon');
-  const breathBtnText = document.getElementById('breathBtnText');
-
-  let isBreathing = false;
-  let breathTimeout = null;
-  let breathInterval = null;
-
-  function runBreathCycle() {
-    if (!isBreathing) return;
-
-    // Фаза 1: Вдох (4 секунды)
-    breathCircle.className = 'breath-inner-circle inhale';
-    breathPhaseText.textContent = 'Вдох носом...';
-    let timeLeft = 4;
-    breathTimerText.textContent = `${timeLeft} сек`;
-    triggerHaptic('light');
-
-    breathInterval = setInterval(() => {
-      timeLeft--;
-      if (timeLeft > 0) breathTimerText.textContent = `${timeLeft} сек`;
-    }, 1000);
-
-    breathTimeout = setTimeout(() => {
-      clearInterval(breathInterval);
-      if (!isBreathing) return;
-
-      // Фаза 2: Задержка (7 секунд)
-      breathCircle.className = 'breath-inner-circle hold';
-      breathPhaseText.textContent = 'Задержка дыхания...';
-      timeLeft = 7;
-      breathTimerText.textContent = `${timeLeft} сек`;
-      triggerHaptic('light');
-
-      breathInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft > 0) breathTimerText.textContent = `${timeLeft} сек`;
-      }, 1000);
-
-      breathTimeout = setTimeout(() => {
-        clearInterval(breathInterval);
-        if (!isBreathing) return;
-
-        // Фаза 3: Выдох (8 секунд)
-        breathCircle.className = 'breath-inner-circle exhale';
-        breathPhaseText.textContent = 'Плавный выдох...';
-        timeLeft = 8;
-        breathTimerText.textContent = `${timeLeft} сек`;
-        triggerHaptic('light');
-
-        breathInterval = setInterval(() => {
-          timeLeft--;
-          if (timeLeft > 0) breathTimerText.textContent = `${timeLeft} сек`;
-        }, 1000);
-
-        breathTimeout = setTimeout(() => {
-          clearInterval(breathInterval);
-          if (isBreathing) runBreathCycle();
-        }, 8000);
-      }, 7000);
-    }, 4000);
-  }
-
-  function stopBreathing() {
-    isBreathing = false;
-    clearTimeout(breathTimeout);
-    clearInterval(breathInterval);
-    if (breathCircle) breathCircle.className = 'breath-inner-circle';
-    if (breathPhaseText) breathPhaseText.textContent = 'Начать';
-    if (breathTimerText) breathTimerText.textContent = 'Нажмите старт';
-    if (breathBtnIcon) breathBtnIcon.textContent = '▶️';
-    if (breathBtnText) breathBtnText.textContent = 'Запустить дыхание';
-  }
-
-  if (breathToggleBtn) {
-    breathToggleBtn.addEventListener('click', () => {
-      triggerHaptic('medium');
-      if (isBreathing) {
-        stopBreathing();
-      } else {
-        isBreathing = true;
-        if (breathBtnIcon) breathBtnIcon.textContent = '⏸️';
-        if (breathBtnText) breathBtnText.textContent = 'Остановить дыхание';
-        runBreathCycle();
-      }
-    });
-  }
-
-  // ==========================================
-  // 8. Шкатулка спокойствия: растворение мыслей
-  // ==========================================
-  const thoughtInput = document.getElementById('thoughtInput');
-  const shredThoughtBtn = document.getElementById('shredThoughtBtn');
-  const thoughtInputWrapper = document.getElementById('thoughtInputWrapper');
-  const shredResult = document.getElementById('shredResult');
-  const resetShredBtn = document.getElementById('resetShredBtn');
-
-  if (shredThoughtBtn) {
-    shredThoughtBtn.addEventListener('click', (e) => {
-      const text = thoughtInput ? thoughtInput.value.trim() : '';
-      if (!text) {
-        showToast('Напишите пару слов, которые хотите отпустить', '✍️');
-        return;
-      }
-
-      triggerHaptic('success');
-
-      // Анимация салюта из звездной пыли из позиции кнопки
-      const rect = shredThoughtBtn.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      spawnStardust(centerX, centerY, 50, '#c38fff');
-      spawnStardust(centerX, centerY, 40, '#72e5ff');
-      spawnStardust(centerX, centerY, 30, '#fed176');
-
-      if (thoughtInputWrapper) thoughtInputWrapper.style.display = 'none';
-      if (shredResult) shredResult.style.display = 'block';
-    });
-  }
-
-  if (resetShredBtn) {
-    resetShredBtn.addEventListener('click', () => {
-      triggerHaptic('light');
-      if (thoughtInput) thoughtInput.value = '';
-      if (shredResult) shredResult.style.display = 'none';
-      if (thoughtInputWrapper) thoughtInputWrapper.style.display = 'flex';
     });
   }
 

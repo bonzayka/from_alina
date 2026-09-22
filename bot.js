@@ -14,7 +14,7 @@ function initBot() {
     const welcomeText = `🌙 Приветствую тебя, ${userName}.\n\n` +
       `Ночь спустилась на землю, укутывая все вокруг тишиной и мерцанием звезд.\n\n` +
       `Здесь ты найдешь самые нежные и согревающие пожелания спокойной ночи, ` +
-      `успокаивающий процедурный эмбиент, дыхание для сна и звездный генератор открыток.\n\n` +
+      `успокаивающий процедурный эмбиент и звездный генератор открыток.\n\n` +
       `Нажми кнопку ниже, чтобы погрузиться в ночную атмосферу:`;
 
     const keyboard = Markup.inlineKeyboard([
@@ -22,8 +22,7 @@ function initBot() {
         Markup.button.webApp('✨ Открыть ночной мир', config.WEBAPP_URL)
       ],
       [
-        Markup.button.callback('🎲 Случайное пожелание', 'random_wish'),
-        Markup.button.callback('🌿 Дыхание для сна', 'breathing_info')
+        Markup.button.callback('🎲 Случайное пожелание', 'random_wish')
       ]
     ]);
 
@@ -50,24 +49,6 @@ function initBot() {
     ]);
 
     await ctx.reply(messageText, { parse_mode: 'Markdown', ...keyboard });
-  });
-
-  // Информация о дыхании
-  bot.action('breathing_info', async (ctx) => {
-    await ctx.answerCbQuery();
-    const infoText = `🌿 *Практика сна 4-7-8*\n\n` +
-      `1. Вдох носом на 4 счета.\n` +
-      `2. Задержка дыхания на 7 счетов.\n` +
-      `3. Плавный выдох через рот на 8 счетов.\n\n` +
-      `Интерактивная сфера дыхания доступна прямо в нашем WebApp с плавной медитативной анимацией:`;
-
-    const keyboard = Markup.inlineKeyboard([
-      [
-        Markup.button.webApp('✨ Запустить в WebApp', config.WEBAPP_URL)
-      ]
-    ]);
-
-    await ctx.reply(infoText, { parse_mode: 'Markdown', ...keyboard });
   });
 
   // Обработка данных, пришедших из WebApp
