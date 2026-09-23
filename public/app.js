@@ -331,7 +331,7 @@
     tongueBadge.addEventListener('click', (e) => {
       triggerHaptic('light');
       spawnNightBurst(e.clientX, e.clientY);
-      showToast('Мяу! Самый милый котеночек на свете :Р 🐾', '🐱');
+      showToast('твоя жопа = моя жопа :Р 🍑✨', '🐱');
     });
   }
 
@@ -349,12 +349,15 @@
   // ==========================================
   const defaultNotes = [
     'Спокойной ночи, котеночек мой любимый! Пусть эта ночь принесет тебе самый сладкий и безмятежный отдых.',
-    'Укутайся поудобнее в свое одеялко. Я мысленно обнимаю тебя и согреваю своим теплом.',
+    'Укутайся поудобнее в свое одеялко. Представь, что это я крепко и нежно обнимаю тебя, согревая своим теплом.',
     'Желаю тебе самых добрых и красивых сновидений, где оживают твои самые заветные мечты.',
     'Ты самое прекрасное чудо в моей жизни. Даже когда темно, ты освещаешь мое сердце.',
-    'Отпускай все мысли и заботы. Ты большая умница, а я всегда рядом с тобой.',
+    'Пусть между нами километры, мои мысли и сердце сейчас с тобой. Я буду охранять твой сон всю эту ночь.',
+    'Ты сегодня отлично потрудилась и заслужила самый сладкий отдых. Отдыхай, набирайся сил!',
     'Шлю тебе самый ласковый поцелуй перед сном в носик и щечки. Спи крепко!',
-    'Пусть звездочки за окном тихо охраняют твой безмятежный и сладкий сон.'
+    'Пусть за окном тихо мерцают звездочки, а в комнате будет тепло и спокойно.',
+    'Сладких снов, моя сонная радость. Закрывай красивые глазки, я мысленно рядом и нежно глажу тебя по волосам.',
+    'Спокойной ночи, мое счастье. Спасибо тебе за то, что освещаешь мою жизнь ярче миллиарда ночных звезд.'
   ];
 
   const wishesSource = (window.WISHES_DATABASE && window.WISHES_DATABASE.length > 0)
@@ -362,7 +365,6 @@
     : defaultNotes;
 
   let currentNoteIdx = 0;
-  const starButtons = document.querySelectorAll('.star-pick-btn');
   const noteText = document.getElementById('noteText');
   const noteCounter = document.getElementById('noteCounter');
   const nextNoteBtn = document.getElementById('nextNoteBtn');
@@ -370,14 +372,6 @@
   function selectNightNote(index) {
     currentNoteIdx = index % wishesSource.length;
     triggerHaptic('light');
-
-    starButtons.forEach((btn, i) => {
-      if (i === currentNoteIdx) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
 
     if (noteText) {
       noteText.style.opacity = '0.2';
@@ -391,16 +385,14 @@
     }
   }
 
-  starButtons.forEach((btn, idx) => {
-    btn.addEventListener('click', () => {
-      selectNightNote(idx);
-    });
-  });
-
   if (nextNoteBtn) {
-    nextNoteBtn.addEventListener('click', () => {
+    nextNoteBtn.addEventListener('click', (e) => {
+      triggerHaptic('light');
+      spawnNightBurst(e.clientX, e.clientY);
       let nextIdx = Math.floor(Math.random() * wishesSource.length);
-      if (nextIdx === currentNoteIdx) nextIdx = (nextIdx + 1) % wishesSource.length;
+      if (nextIdx === currentNoteIdx && wishesSource.length > 1) {
+        nextIdx = (nextIdx + 1) % wishesSource.length;
+      }
       selectNightNote(nextIdx);
     });
   }

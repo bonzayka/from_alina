@@ -635,10 +635,20 @@ body {
 }
 
 .tongue-caption {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.5;
   font-weight: 500;
   color: var(--accent-gold);
   letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.tongue-highlight {
+  margin-top: 5px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ff8fab;
+  text-shadow: 0 0 12px rgba(255, 143, 171, 0.45);
 }
 
 /* ================================================= */
@@ -759,22 +769,25 @@ body {
 .next-note-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  background: rgba(176, 136, 249, 0.16);
-  border: 1px solid rgba(198, 175, 255, 0.3);
+  gap: 10px;
+  padding: 12px 26px;
+  background: linear-gradient(135deg, rgba(176, 136, 249, 0.22) 0%, rgba(255, 143, 171, 0.18) 100%);
+  border: 1px solid rgba(198, 175, 255, 0.35);
   border-radius: 999px;
-  color: var(--text-main);
-  font-size: 14px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
   font-family: var(--font-ui);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 18px rgba(176, 136, 249, 0.18);
 }
 
-.next-note-btn:hover {
-  background: rgba(176, 136, 249, 0.28);
+.next-note-btn:hover, .next-note-btn:active {
+  background: linear-gradient(135deg, rgba(176, 136, 249, 0.38) 0%, rgba(255, 209, 102, 0.22) 100%);
   border-color: var(--accent-gold);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 22px rgba(255, 209, 102, 0.25);
 }
 
 /* ================================================= */

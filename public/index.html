@@ -106,11 +106,6 @@
       <!-- 1-я фото-секция: Первое нежное письмо -->
       <section class="story-section scroll-reveal">
         <div class="story-card glass-card">
-          <div class="card-badge">
-            <span class="card-num">Фото 1</span>
-            <span class="card-icon">💌</span>
-          </div>
-
           <div class="photo-wrapper">
             <img src="photo/1.jpg" alt="Мой любимый котеночек" class="story-photo" loading="lazy">
             <div class="photo-shimmer"></div>
@@ -131,11 +126,6 @@
       <!-- 2-я фото-секция: Тепло и забота -->
       <section class="story-section scroll-reveal">
         <div class="story-card glass-card">
-          <div class="card-badge">
-            <span class="card-num">Фото 2</span>
-            <span class="card-icon">🧸</span>
-          </div>
-
           <div class="photo-wrapper">
             <img src="photo/2.jpg" alt="Самая нежная" class="story-photo" loading="lazy">
             <div class="photo-shimmer"></div>
@@ -156,11 +146,6 @@
       <!-- 3-я фото-секция: Игривая фотка и строго под ней :Р -->
       <section class="story-section scroll-reveal">
         <div class="story-card glass-card">
-          <div class="card-badge">
-            <span class="card-num">Фото 3</span>
-            <span class="card-icon">🐱</span>
-          </div>
-
           <div class="photo-wrapper">
             <img src="photo/3.jpg" alt="Любимый котеночек" class="story-photo" loading="lazy">
             <div class="photo-shimmer"></div>
@@ -169,7 +154,10 @@
           <!-- Строго под 3-й фоткой расположено :Р по запросу -->
           <div class="tongue-badge-wrap" id="tongueBadge" title="Котеночек :Р">
             <span class="tongue-symbol">:Р</span>
-            <span class="tongue-caption">Твой самый любимый шкодный котеночек :Р</span>
+            <div class="tongue-caption">
+              <div>Твой самый любимый шкодный котеночек который любит вашу жоп</div>
+              <div class="tongue-highlight">твоя жопа = моя жопа :Р</div>
+            </div>
           </div>
 
           <div class="story-content">
@@ -191,28 +179,18 @@
             <span class="notes-title">Звездочки сладких снов</span>
             <span class="notes-sparkle">✦</span>
           </div>
-          <p class="notes-desc">Нажимай на звездочки, чтобы поймать нежные слова перед сном:</p>
-
-          <!-- Кнопки звездочек -->
-          <div class="stars-selector" id="starsSelector">
-            <button class="star-pick-btn active" data-index="0">⭐ 1</button>
-            <button class="star-pick-btn" data-index="1">⭐ 2</button>
-            <button class="star-pick-btn" data-index="2">⭐ 3</button>
-            <button class="star-pick-btn" data-index="3">⭐ 4</button>
-            <button class="star-pick-btn" data-index="4">⭐ 5</button>
-            <button class="star-pick-btn" data-index="5">⭐ 6</button>
-            <button class="star-pick-btn" data-index="6">⭐ 7</button>
-          </div>
+          <p class="notes-desc">Нажимай на кнопку, чтобы поймать нежные слова перед сном:</p>
 
           <!-- Отображение текущего пожелания -->
           <div class="note-display" id="noteDisplay">
             <div class="note-quote-sign">“</div>
             <p class="note-text" id="noteText">Спокойной ночи, котеночек мой любимый! Пусть эта ночь принесет тебе самый сладкий и безмятежный отдых.</p>
-            <div class="note-counter" id="noteCounter">Звездочка 1 из 7</div>
+            <div class="note-counter" id="noteCounter">Звездочка 1 из 10</div>
           </div>
 
           <div class="note-actions">
             <button class="next-note-btn" id="nextNoteBtn">
+              <span class="btn-star-icon">⭐</span>
               <span>Случайная звездочка</span>
               <span class="btn-arrow">✨</span>
             </button>
@@ -223,11 +201,6 @@
       <!-- Финальная фото-секция: под конец вставить фотку под конец -->
       <section class="story-section final-story-section scroll-reveal">
         <div class="story-card glass-card final-card">
-          <div class="card-badge">
-            <span class="card-num">Под конец</span>
-            <span class="card-icon">🌙</span>
-          </div>
-
           <div class="photo-wrapper final-photo-wrapper">
             <img src="photo/end.jpg" alt="Сладких снов" class="story-photo" loading="lazy">
             <div class="photo-shimmer"></div>
