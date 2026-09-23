@@ -1,4 +1,4 @@
-// Скрипт утренней персональной романтической страницы для любимой девушки
+// Скрипт ночной персональной романтической страницы "Спокойной ночи, котеночек мой любимый!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 (function () {
@@ -10,8 +10,8 @@
     try {
       tg.ready();
       tg.expand();
-      if (tg.setHeaderColor) tg.setHeaderColor('#100b18');
-      if (tg.setBackgroundColor) tg.setBackgroundColor('#100b18');
+      if (tg.setHeaderColor) tg.setHeaderColor('#080512');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#080512');
     } catch (e) {
       console.log('TG Init error:', e);
     }
@@ -31,7 +31,7 @@
   }
 
   // Всплывающее сообщение
-  function showToast(text, icon = '☀️') {
+  function showToast(text, icon = '🌙') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
     const toast = document.createElement('div');
@@ -40,132 +40,140 @@
     container.appendChild(toast);
     setTimeout(() => {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 3000);
+    }, 3200);
   }
 
   // ==========================================
-  // 1. Интерактивный утренний холст
+  // 1. Интерактивный холст ночного неба
   // ==========================================
-  const canvas = document.getElementById('morningCanvas');
-  const ctx = canvas.getContext('2d');
-  let width = (canvas.width = window.innerWidth);
-  let height = (canvas.height = window.innerHeight);
+  const canvas = document.getElementById('nightCanvas');
+  const ctx = canvas ? canvas.getContext('2d') : null;
+  let width = canvas ? (canvas.width = window.innerWidth) : 0;
+  let height = canvas ? (canvas.height = window.innerHeight) : 0;
 
   window.addEventListener('resize', () => {
+    if (!canvas) return;
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
-    initMotes();
+    initStars();
   });
 
-  const motes = [];
-  const sunbeams = [];
+  const stars = [];
+  const meteors = [];
   const floatingItems = [];
 
-  // Утренние золотистые пылинки и светящиеся искорки
-  function initMotes() {
-    motes.length = 0;
-    const count = Math.floor((width * height) / 4500);
+  // Звезды ночного неба
+  function initStars() {
+    stars.length = 0;
+    const count = Math.floor((width * height) / 3800);
+    const starColors = ['#ffffff', '#fff5db', '#e2d8ff', '#ffd166', '#ff8fab', '#74ebd5'];
+
     for (let i = 0; i < count; i++) {
-      motes.push({
+      stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 2 + 0.5,
-        baseAlpha: Math.random() * 0.6 + 0.25,
-        pulseSpeed: Math.random() * 0.025 + 0.008,
+        radius: Math.random() * 1.8 + 0.4,
+        baseAlpha: Math.random() * 0.7 + 0.25,
+        pulseSpeed: Math.random() * 0.03 + 0.008,
         pulsePhase: Math.random() * Math.PI * 2,
-        vy: -(Math.random() * 0.35 + 0.1),
-        vx: (Math.random() - 0.5) * 0.2,
-        color: ['#ffefa0', '#ffd166', '#ffb070', '#ffffff', '#ffe4f0'][Math.floor(Math.random() * 5)]
+        vy: -(Math.random() * 0.15 + 0.03),
+        vx: (Math.random() - 0.5) * 0.08,
+        color: starColors[Math.floor(Math.random() * starColors.length)]
       });
     }
   }
 
-  // Запуск пролетающего солнечного луча
-  function spawnSunbeam() {
-    sunbeams.push({
+  // Запуск падающей звезды (метеора)
+  function spawnMeteor() {
+    meteors.push({
       x: Math.random() * (width * 0.9),
-      y: -20,
-      length: Math.random() * 110 + 70,
-      speed: Math.random() * 6 + 4,
-      angle: Math.PI / 3 + (Math.random() - 0.5) * 0.25,
-      opacity: 0.9,
-      decay: Math.random() * 0.015 + 0.008
+      y: Math.random() * (height * 0.4),
+      length: Math.random() * 90 + 60,
+      speed: Math.random() * 7 + 5,
+      angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
+      opacity: 0.95,
+      decay: Math.random() * 0.02 + 0.012
     });
   }
 
   setInterval(() => {
-    if (Math.random() > 0.4) {
-      spawnSunbeam();
+    if (Math.random() > 0.35) {
+      spawnMeteor();
     }
-  }, 3500);
+  }, 3200);
 
-  // Создание утреннего салюта сердечек и солнышек
-  function spawnHeartsBurst() {
-    const symbols = ['☀️', '💖', '✨', '🌸', '💛', '🥰'];
-    for (let i = 0; i < 30; i++) {
+  // Салют ночных искорок, сердечек и котиков
+  function spawnNightBurst(originX, originY) {
+    const symbols = ['🌙', '💖', '✨', '🐱', '💤', '🧸', '⭐'];
+    const startX = originX !== undefined ? originX : width / 2;
+    const startY = originY !== undefined ? originY : height * 0.6;
+
+    for (let i = 0; i < 28; i++) {
       floatingItems.push({
-        x: Math.random() * width,
-        y: height + Math.random() * 30,
-        vx: (Math.random() - 0.5) * 2.6,
-        vy: -(Math.random() * 3.6 + 2.4),
+        x: startX + (Math.random() - 0.5) * 60,
+        y: startY + (Math.random() - 0.5) * 40,
+        vx: (Math.random() - 0.5) * 3.4,
+        vy: -(Math.random() * 3.8 + 2.0),
         size: Math.random() * 16 + 14,
         alpha: 1,
-        decay: Math.random() * 0.012 + 0.006,
+        decay: Math.random() * 0.014 + 0.007,
         symbol: symbols[Math.floor(Math.random() * symbols.length)]
       });
     }
   }
 
-  function render() {
+  function renderSky() {
+    if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
 
-    // Рисование утренних частиц света
-    for (let i = 0; i < motes.length; i++) {
-      const m = motes[i];
-      m.pulsePhase += m.pulseSpeed;
-      m.y += m.vy;
-      m.x += m.vx;
+    // Рисование мерцающих звезд
+    for (let i = 0; i < stars.length; i++) {
+      const s = stars[i];
+      s.pulsePhase += s.pulseSpeed;
+      s.y += s.vy;
+      s.x += s.vx;
 
-      if (m.y < -10) m.y = height + 10;
-      if (m.x < -10) m.x = width + 10;
-      if (m.x > width + 10) m.x = -10;
+      if (s.y < -5) s.y = height + 5;
+      if (s.x < -5) s.x = width + 5;
+      if (s.x > width + 5) s.x = -5;
 
-      const alpha = m.baseAlpha + Math.sin(m.pulsePhase) * 0.25;
-      ctx.fillStyle = m.color;
-      ctx.globalAlpha = Math.max(0.1, Math.min(1, alpha));
+      const alpha = s.baseAlpha + Math.sin(s.pulsePhase) * 0.3;
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = Math.max(0.08, Math.min(1, alpha));
       ctx.beginPath();
-      ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Солнечные лучи
+    // Рисование метеоров
     ctx.globalAlpha = 1;
-    for (let i = sunbeams.length - 1; i >= 0; i--) {
-      const sb = sunbeams[i];
-      const tailX = sb.x - Math.cos(sb.angle) * sb.length;
-      const tailY = sb.y - Math.sin(sb.angle) * sb.length;
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      const tailX = m.x - Math.cos(m.angle) * m.length;
+      const tailY = m.y - Math.sin(m.angle) * m.length;
 
-      const grad = ctx.createLinearGradient(tailX, tailY, sb.x, sb.y);
-      grad.addColorStop(0, 'rgba(255, 240, 180, 0)');
-      grad.addColorStop(1, `rgba(255, 200, 80, ${sb.opacity})`);
+      const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      grad.addColorStop(0.7, `rgba(226, 216, 255, ${m.opacity * 0.6})`);
+      grad.addColorStop(1, `rgba(255, 243, 196, ${m.opacity})`);
 
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.2;
       ctx.beginPath();
       ctx.moveTo(tailX, tailY);
-      ctx.lineTo(sb.x, sb.y);
+      ctx.lineTo(m.x, m.y);
       ctx.stroke();
 
-      sb.x += Math.cos(sb.angle) * sb.speed;
-      sb.y += Math.sin(sb.angle) * sb.speed;
-      sb.opacity -= sb.decay;
+      m.x += Math.cos(m.angle) * m.speed;
+      m.y += Math.sin(m.angle) * m.speed;
+      m.opacity -= m.decay;
 
-      if (sb.opacity <= 0) {
-        sunbeams.splice(i, 1);
+      if (m.opacity <= 0) {
+        meteors.splice(i, 1);
       }
     }
 
-    // Летающие утренние эмодзи и сердечки
+    // Летающие ночные символы и эмодзи
     for (let i = floatingItems.length - 1; i >= 0; i--) {
       const item = floatingItems[i];
       ctx.globalAlpha = Math.max(0, item.alpha);
@@ -182,81 +190,189 @@
       }
     }
 
-    requestAnimationFrame(render);
+    requestAnimationFrame(renderSky);
   }
 
-  initMotes();
-  render();
+  if (canvas && ctx) {
+    initStars();
+    renderSky();
+  }
 
   // ==========================================
-  // 2. Часы и интерактивное солнышко
+  // 2. Таймер обратного отсчета до 23:30 (МСК)
   // ==========================================
+  const countHoursEl = document.getElementById('countHours');
+  const countMinutesEl = document.getElementById('countMinutes');
+  const countSecondsEl = document.getElementById('countSeconds');
+  const timerHeadingEl = document.getElementById('timerHeading');
+  const timerSubEl = document.getElementById('timerSub');
+  const unlockEarlyBtn = document.getElementById('unlockEarlyBtn');
   const liveClock = document.getElementById('liveClock');
-  const currentDateText = document.getElementById('currentDateText');
 
-  function updateClock() {
+  let hasCelebratedUnlock = false;
+
+  function updateCountdown() {
     const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    if (liveClock) liveClock.textContent = `${h}:${m}`;
-  }
-  updateClock();
-  setInterval(updateClock, 1000);
+    // Время в Москве: UTC+3 (20:30 UTC = 23:30 MSK)
+    const nowUtc = now.getTime();
 
-  if (currentDateText) {
-    const options = { day: 'numeric', month: 'long' };
-    const dateStr = new Date().toLocaleDateString('ru-RU', options);
-    currentDateText.textContent = `Утро, ${dateStr}`;
+    // Целевая дата на сегодня в 20:30:00 UTC
+    let targetUtc = Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      20, 30, 0
+    );
+
+    let diff = targetUtc - nowUtc;
+
+    // Если 23:30 на сегодня уже прошло
+    if (diff <= 0) {
+      if (countHoursEl) countHoursEl.textContent = '00';
+      if (countMinutesEl) countMinutesEl.textContent = '00';
+      if (countSecondsEl) countSecondsEl.textContent = '00';
+
+      if (timerHeadingEl) {
+        timerHeadingEl.textContent = 'Волшебное время 23:30 наступило! ✨';
+      }
+      if (timerSubEl) {
+        timerSubEl.textContent = 'Послание открыто для самого любимого котеночка на свете 💖';
+      }
+      if (unlockEarlyBtn) {
+        unlockEarlyBtn.innerHTML = '<span class="unlock-icon">✨</span><span class="unlock-text">Сладких снов, любимая 💖</span>';
+      }
+
+      if (!hasCelebratedUnlock) {
+        hasCelebratedUnlock = true;
+        spawnNightBurst();
+      }
+      return;
+    }
+
+    // Если еще не наступило 23:30
+    const totalSeconds = Math.floor(diff / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (countHoursEl) countHoursEl.textContent = String(hours).padStart(2, '0');
+    if (countMinutesEl) countMinutesEl.textContent = String(minutes).padStart(2, '0');
+    if (countSecondsEl) countSecondsEl.textContent = String(seconds).padStart(2, '0');
+
+    if (liveClock) {
+      liveClock.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
   }
 
-  const sunWrapper = document.getElementById('interactiveSun');
-  if (sunWrapper) {
-    sunWrapper.addEventListener('click', () => {
-      triggerHaptic('medium');
-      spawnSunbeam();
-      spawnSunbeam();
-      spawnHeartsBurst();
-      showToast('Солнечный лучик заряжает тебя теплом! ☀️', '✨');
-    });
-  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 
-  // ==========================================
-  // 3. Кнопка "Почувствовать тепло и объятие"
-  // ==========================================
-  const hugBtn = document.getElementById('hugBtn');
-  if (hugBtn) {
-    hugBtn.addEventListener('click', () => {
+  // Кнопка ранней разблокировки поцелуем
+  if (unlockEarlyBtn) {
+    unlockEarlyBtn.addEventListener('click', (e) => {
       triggerHaptic('success');
-      spawnHeartsBurst();
-      showToast('Я крепко обнял тебя и поцеловал в щечку! ❤️', '🤗');
+      spawnNightBurst(e.clientX, e.clientY);
+      showToast('Секретный поцелуй принят! Открыто с любовью 💖', '💋');
+
+      // Плавный скролл к началу сказки
+      const mainContent = document.getElementById('mainContent');
+      if (mainContent) {
+        mainContent.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   }
 
   // ==========================================
-  // 4. Утренние мысли (Лучики хорошего дня)
+  // 3. Анимации при скролле (Intersection Observer)
   // ==========================================
-  const notesList = [
-    'Ты самое прекрасное и теплое солнышко в моей жизни.',
-    'Пусть сегодняшний день принесет тебе легкость, улыбки и море вдохновения.',
-    'Я безумно люблю твой звонкий смех и то, как ты освещаешь все вокруг.',
-    'Помни, что ты умница и со всем легко справишься. Я всегда рядом.',
-    'Пусть твой утренний кофе или чай будет самым вкусным и согревающим.',
-    'Шлю тебе утренний лучик любви и самый нежный поцелуй в носик.',
-    'Улыбнись прямо сейчас! Новый день ждет твоего сияния и красоты.'
+  const scrollElements = document.querySelectorAll('.scroll-reveal');
+
+  if ('IntersectionObserver' in window) {
+    const scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          // Легкий визуальный отклик
+          if (Math.random() > 0.6) {
+            spawnMeteor();
+          }
+        }
+      });
+    }, {
+      threshold: 0.12,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    scrollElements.forEach((el) => scrollObserver.observe(el));
+  } else {
+    // Резервный режим
+    scrollElements.forEach((el) => el.classList.add('revealed'));
+  }
+
+  // ==========================================
+  // 4. Интерактивная луна
+  // ==========================================
+  const moonWrapper = document.getElementById('interactiveMoon');
+  if (moonWrapper) {
+    moonWrapper.addEventListener('click', (e) => {
+      triggerHaptic('medium');
+      spawnMeteor();
+      spawnMeteor();
+      spawnNightBurst(e.clientX, e.clientY);
+      showToast('Звездочка желаний поймана! Загадай сладкий сон ✨', '🌙');
+    });
+  }
+
+  // ==========================================
+  // 5. Игровая отметка :Р строго под 3-м фото
+  // ==========================================
+  const tongueBadge = document.getElementById('tongueBadge');
+  if (tongueBadge) {
+    tongueBadge.addEventListener('click', (e) => {
+      triggerHaptic('light');
+      spawnNightBurst(e.clientX, e.clientY);
+      showToast('Мяу! Самый милый котеночек на свете :Р 🐾', '🐱');
+    });
+  }
+
+  // Касание к фотографиям с теплым откликом
+  const storyPhotos = document.querySelectorAll('.photo-wrapper');
+  storyPhotos.forEach((wrap) => {
+    wrap.addEventListener('click', (e) => {
+      triggerHaptic('light');
+      spawnNightBurst(e.clientX, e.clientY);
+    });
+  });
+
+  // ==========================================
+  // 6. Интерактивные звездочки сладких снов
+  // ==========================================
+  const defaultNotes = [
+    'Спокойной ночи, котеночек мой любимый! Пусть эта ночь принесет тебе самый сладкий и безмятежный отдых.',
+    'Укутайся поудобнее в свое одеялко. Я мысленно обнимаю тебя и согреваю своим теплом.',
+    'Желаю тебе самых добрых и красивых сновидений, где оживают твои самые заветные мечты.',
+    'Ты самое прекрасное чудо в моей жизни. Даже когда темно, ты освещаешь мое сердце.',
+    'Отпускай все мысли и заботы. Ты большая умница, а я всегда рядом с тобой.',
+    'Шлю тебе самый ласковый поцелуй перед сном в носик и щечки. Спи крепко!',
+    'Пусть звездочки за окном тихо охраняют твой безмятежный и сладкий сон.'
   ];
 
-  let currentNoteIndex = 0;
+  const wishesSource = (window.WISHES_DATABASE && window.WISHES_DATABASE.length > 0)
+    ? window.WISHES_DATABASE.map(w => w.text)
+    : defaultNotes;
+
+  let currentNoteIdx = 0;
   const starButtons = document.querySelectorAll('.star-pick-btn');
   const noteText = document.getElementById('noteText');
   const noteCounter = document.getElementById('noteCounter');
   const nextNoteBtn = document.getElementById('nextNoteBtn');
 
-  function selectNote(index) {
-    currentNoteIndex = index % notesList.length;
+  function selectNightNote(index) {
+    currentNoteIdx = index % wishesSource.length;
     triggerHaptic('light');
 
     starButtons.forEach((btn, i) => {
-      if (i === currentNoteIndex) {
+      if (i === currentNoteIdx) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -264,31 +380,45 @@
     });
 
     if (noteText) {
-      noteText.style.opacity = '0.3';
+      noteText.style.opacity = '0.2';
       setTimeout(() => {
-        noteText.textContent = notesList[currentNoteIndex];
-        if (noteCounter) noteCounter.textContent = `Лучик ${currentNoteIndex + 1} из ${notesList.length}`;
+        noteText.textContent = wishesSource[currentNoteIdx];
+        if (noteCounter) {
+          noteCounter.textContent = `Звездочка ${currentNoteIdx + 1} из ${wishesSource.length}`;
+        }
         noteText.style.opacity = '1';
-      }, 150);
+      }, 160);
     }
   }
 
-  starButtons.forEach((btn, index) => {
+  starButtons.forEach((btn, idx) => {
     btn.addEventListener('click', () => {
-      selectNote(index);
+      selectNightNote(idx);
     });
   });
 
   if (nextNoteBtn) {
     nextNoteBtn.addEventListener('click', () => {
-      let nextIdx = Math.floor(Math.random() * notesList.length);
-      if (nextIdx === currentNoteIndex) nextIdx = (nextIdx + 1) % notesList.length;
-      selectNote(nextIdx);
+      let nextIdx = Math.floor(Math.random() * wishesSource.length);
+      if (nextIdx === currentNoteIdx) nextIdx = (nextIdx + 1) % wishesSource.length;
+      selectNightNote(nextIdx);
     });
   }
 
   // ==========================================
-  // 5. Управление фоновой музыкой C418 - Mall
+  // 7. Кнопка ночных объятий перед сном
+  // ==========================================
+  const hugBtn = document.getElementById('hugBtn');
+  if (hugBtn) {
+    hugBtn.addEventListener('click', (e) => {
+      triggerHaptic('success');
+      spawnNightBurst(e.clientX, e.clientY);
+      showToast('Я крепко укутал тебя в одеялко и нежно поцеловал! ❤️', '🧸');
+    });
+  }
+
+  // ==========================================
+  // 8. Управление фоновой музыкой Oneheart - Apathy
   // ==========================================
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
@@ -296,47 +426,47 @@
   const audioLabel = document.getElementById('audioLabel');
 
   if (bgMusic) {
-    bgMusic.volume = 0.5;
+    bgMusic.volume = 0.55;
   }
 
-  function playMusic() {
+  function playOneheart() {
     if (bgMusic && bgMusic.paused) {
       bgMusic.play().then(() => {
         if (audioToggleBtn) audioToggleBtn.classList.add('playing');
         if (audioIcon) audioIcon.textContent = '🔊';
-        if (audioLabel) audioLabel.textContent = 'C418 - Mall звучит';
+        if (audioLabel) audioLabel.textContent = 'Oneheart звучит';
       }).catch(() => {
-        // Браузер ожидает взаимодействия с пользователем
+        // Ожидание взаимодействия с пользователем
       });
     }
   }
 
-  function pauseMusic() {
+  function pauseOneheart() {
     if (bgMusic && !bgMusic.paused) {
       bgMusic.pause();
       if (audioToggleBtn) audioToggleBtn.classList.remove('playing');
       if (audioIcon) audioIcon.textContent = '🎵';
-      if (audioLabel) audioLabel.textContent = 'C418 - Mall';
+      if (audioLabel) audioLabel.textContent = 'Oneheart - Apathy';
     }
   }
 
-  // Запуск музыки при первом касании страницы
+  // Воспроизведение при первом касании страницы
   let userInteracted = false;
-  function handleFirstInteraction() {
+  function handleInitialInteraction() {
     if (!userInteracted) {
       userInteracted = true;
-      playMusic();
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
+      playOneheart();
+      document.removeEventListener('click', handleInitialInteraction);
+      document.removeEventListener('touchstart', handleInitialInteraction);
     }
   }
 
-  document.addEventListener('click', handleFirstInteraction);
-  document.addEventListener('touchstart', handleFirstInteraction);
+  document.addEventListener('click', handleInitialInteraction);
+  document.addEventListener('touchstart', handleInitialInteraction);
 
-  // Попытка автозапуска при загрузке
+  // Попытка запуска при загрузке
   setTimeout(() => {
-    playMusic();
+    playOneheart();
   }, 400);
 
   if (audioToggleBtn) {
@@ -348,10 +478,10 @@
       if (!bgMusic) return;
 
       if (bgMusic.paused) {
-        playMusic();
-        showToast('Играет C418 - Mall', '🎵');
+        playOneheart();
+        showToast('Играет Oneheart - Apathy 🎵', '🌙');
       } else {
-        pauseMusic();
+        pauseOneheart();
         showToast('Музыка на паузе', '⏸️');
       }
     });

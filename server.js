@@ -1,4 +1,4 @@
-// Главный сервер приложения "С добрым утром, солнышко!"
+// Главный сервер приложения "Спокойной ночи, котеночек мой любимый!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 const path = require('path');
@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'good-morning-webapp',
+    service: 'good-night-webapp',
     timestamp: new Date().toISOString(),
     port: config.PORT
   });
