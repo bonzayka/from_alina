@@ -27,7 +27,6 @@
       <div class="night-time-badge" id="nightBadge">
         <span class="moon-mini-icon">🌙</span>
         <span class="time-text" id="liveClock">23:30</span>
-        <span class="time-sub">МСК</span>
       </div>
 
       <button class="music-toggle-btn" id="audioToggleBtn" title="Включить музыку Oneheart - Apathy">
@@ -42,14 +41,14 @@
       <audio id="bgMusic" src="oneheart.mp3" loop preload="auto"></audio>
     </header>
 
-    <!-- Виджет обратного отсчета до 23:30 (по МСК) -->
+    <!-- Виджет обратного отсчета до 23:30 -->
     <section class="timer-section scroll-reveal" id="timerSection">
       <div class="timer-card glass-card">
         <div class="timer-sparkle t-left">✨</div>
         <div class="timer-sparkle t-right">✨</div>
         <div class="timer-header">
           <span class="timer-badge">🌙 Сладкое время снов</span>
-          <h2 class="timer-title" id="timerHeading">Станет доступно в 23:30 (по МСК)</h2>
+          <h2 class="timer-title" id="timerHeading">Станет доступно в 23:30</h2>
           <p class="timer-subtitle" id="timerSub">Обратный отсчет до нашего сокровенного часа спокойной ночи:</p>
         </div>
 
@@ -71,18 +70,18 @@
           </div>
         </div>
 
-        <!-- Кнопка быстрого открытия / подсказка -->
+        <!-- Статус автоматического открытия -->
         <div class="timer-actions">
-          <button class="unlock-btn" id="unlockEarlyBtn">
-            <span class="unlock-icon">💋</span>
-            <span class="unlock-text">Открыть прямо сейчас поцелуем</span>
-          </button>
+          <div class="lock-status-notice" id="lockStatusNotice">
+            <span class="lock-status-icon" id="lockStatusIcon">🔒</span>
+            <span class="lock-status-text" id="lockStatusText">Страница откроется автоматически ровно в 23:30</span>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Основной ночной романтический контент -->
-    <main class="main-content" id="mainContent">
+    <main class="main-content content-hidden" id="mainContent">
       <!-- Интерактивная луна -->
       <section class="moon-section scroll-reveal">
         <div class="moon-wrapper" id="interactiveMoon" title="Коснись луны, чтобы поймать звездочку желаний">
@@ -237,7 +236,7 @@
     </main>
 
     <!-- Подвал -->
-    <footer class="app-footer">
+    <footer class="app-footer content-hidden" id="siteFooter">
       <p class="footer-blessing">Сладких снов, котеночек мой любимый. Я всегда с тобой.</p>
       <div class="footer-stars">🌙 ✦ 💤 ✦ ✨</div>
     </footer>

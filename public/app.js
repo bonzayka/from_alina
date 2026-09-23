@@ -199,24 +199,106 @@
   }
 
   // ==========================================
-  // 2. Таймер обратного отсчета до 23:30 (МСК)
+  // 2. Таймер обратного отсчета до 23:30
   // ==========================================
   const countHoursEl = document.getElementById('countHours');
   const countMinutesEl = document.getElementById('countMinutes');
   const countSecondsEl = document.getElementById('countSeconds');
   const timerHeadingEl = document.getElementById('timerHeading');
   const timerSubEl = document.getElementById('timerSub');
-  const unlockEarlyBtn = document.getElementById('unlockEarlyBtn');
+  const lockStatusNotice = document.getElementById('lockStatusNotice');
+  const lockStatusText = document.getElementById('lockStatusText');
+  const lockStatusIcon = document.getElementById('lockStatusIcon');
+  const mainContentEl = document.getElementById('mainContent');
+  const siteFooterEl = document.getElementById('siteFooter');
   const liveClock = document.getElementById('liveClock');
 
   let hasCelebratedUnlock = false;
 
+  function setUnlockedState() {
+    document.body.classList.remove('is-locked');
+    if (mainContentEl) {
+      mainContentEl.classList.remove('content-hidden');
+      mainContentEl.classList.add('content-revealed');
+    }
+    if (siteFooterEl) {
+      siteFooterEl.classList.remove('content-hidden');
+      siteFooterEl.classList.add('content-revealed');
+    }
+
+    if (countHoursEl) countHoursEl.textContent = '00';
+    if (countMinutesEl) countMinutesEl.textContent = '00';
+    if (countSecondsEl) countSecondsEl.textContent = '00';
+
+    if (timerHeadingEl) {
+      timerHeadingEl.textContent = 'Волшебное время 23:30 наступило! ✨';
+    }
+    if (timerSubEl) {
+      timerSubEl.textContent = 'Послание открыто для самого любимого котеночка на свете 💖';
+    }
+    if (lockStatusNotice) {
+      lockStatusNotice.classList.add('unlocked');
+    }
+    if (lockStatusIcon) {
+      lockStatusIcon.textContent = '✨';
+    }
+    if (lockStatusText) {
+      lockStatusText.textContent = 'Доступ открыт! Сладких снов, любимая 💖';
+    }
+    if (liveClock) {
+      liveClock.textContent = '23:30';
+    }
+
+    if (!hasCelebratedUnlock) {
+      hasCelebratedUnlock = true;
+      triggerHaptic('success');
+      spawnNightBurst(window.innerWidth / 2, window.innerHeight / 3);
+      setTimeout(() => spawnNightBurst(window.innerWidth / 3, window.innerHeight / 2), 300);
+      setTimeout(() => spawnNightBurst((2 * window.innerWidth) / 3, window.innerHeight / 2), 600);
+      showToast('Ура! 23:30 наступило! Страница открыта с любовью 💖', '✨');
+    }
+  }
+
+  function setLockedState(hours, minutes, seconds) {
+    document.body.classList.add('is-locked');
+    if (mainContentEl) {
+      mainContentEl.classList.add('content-hidden');
+      mainContentEl.classList.remove('content-revealed');
+    }
+    if (siteFooterEl) {
+      siteFooterEl.classList.add('content-hidden');
+      siteFooterEl.classList.remove('content-revealed');
+    }
+
+    if (countHoursEl) countHoursEl.textContent = String(hours).padStart(2, '0');
+    if (countMinutesEl) countMinutesEl.textContent = String(minutes).padStart(2, '0');
+    if (countSecondsEl) countSecondsEl.textContent = String(seconds).padStart(2, '0');
+
+    if (timerHeadingEl) {
+      timerHeadingEl.textContent = 'Станет доступно в 23:30';
+    }
+    if (timerSubEl) {
+      timerSubEl.textContent = 'Обратный отсчет до нашего сокровенного часа спокойной ночи:';
+    }
+    if (lockStatusNotice) {
+      lockStatusNotice.classList.remove('unlocked');
+    }
+    if (lockStatusIcon) {
+      lockStatusIcon.textContent = '🔒';
+    }
+    if (lockStatusText) {
+      lockStatusText.textContent = 'Страница откроется автоматически ровно в 23:30';
+    }
+    if (liveClock) {
+      liveClock.textContent = '23:30';
+    }
+  }
+
   function updateCountdown() {
     const now = new Date();
-    // Время в Москве: UTC+3 (20:30 UTC = 23:30 MSK)
     const nowUtc = now.getTime();
 
-    // Целевая дата на сегодня в 20:30:00 UTC
+    // Целевая дата на сегодня в 20:30:00 UTC (= 23:30 по времени Москвы, UTC+3)
     let targetUtc = Date.UTC(
       now.getUTCFullYear(),
       now.getUTCMonth(),
@@ -226,26 +308,9 @@
 
     let diff = targetUtc - nowUtc;
 
-    // Если 23:30 на сегодня уже прошло
+    // Если 23:30 уже наступило
     if (diff <= 0) {
-      if (countHoursEl) countHoursEl.textContent = '00';
-      if (countMinutesEl) countMinutesEl.textContent = '00';
-      if (countSecondsEl) countSecondsEl.textContent = '00';
-
-      if (timerHeadingEl) {
-        timerHeadingEl.textContent = 'Волшебное время 23:30 наступило! ✨';
-      }
-      if (timerSubEl) {
-        timerSubEl.textContent = 'Послание открыто для самого любимого котеночка на свете 💖';
-      }
-      if (unlockEarlyBtn) {
-        unlockEarlyBtn.innerHTML = '<span class="unlock-icon">✨</span><span class="unlock-text">Сладких снов, любимая 💖</span>';
-      }
-
-      if (!hasCelebratedUnlock) {
-        hasCelebratedUnlock = true;
-        spawnNightBurst();
-      }
+      setUnlockedState();
       return;
     }
 
@@ -255,32 +320,11 @@
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    if (countHoursEl) countHoursEl.textContent = String(hours).padStart(2, '0');
-    if (countMinutesEl) countMinutesEl.textContent = String(minutes).padStart(2, '0');
-    if (countSecondsEl) countSecondsEl.textContent = String(seconds).padStart(2, '0');
-
-    if (liveClock) {
-      liveClock.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
+    setLockedState(hours, minutes, seconds);
   }
 
   updateCountdown();
   setInterval(updateCountdown, 1000);
-
-  // Кнопка ранней разблокировки поцелуем
-  if (unlockEarlyBtn) {
-    unlockEarlyBtn.addEventListener('click', (e) => {
-      triggerHaptic('success');
-      spawnNightBurst(e.clientX, e.clientY);
-      showToast('Секретный поцелуй принят! Открыто с любовью 💖', '💋');
-
-      // Плавный скролл к началу сказки
-      const mainContent = document.getElementById('mainContent');
-      if (mainContent) {
-        mainContent.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  }
 
   // ==========================================
   // 3. Анимации при скролле (Intersection Observer)

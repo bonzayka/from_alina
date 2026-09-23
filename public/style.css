@@ -211,7 +211,7 @@ body {
 }
 
 /* ================================================= */
-/* Карточка таймера обратного отсчета до 23:30 (МСК) */
+/* Карточка таймера обратного отсчета до 23:30       */
 /* ================================================= */
 .timer-section {
   margin-bottom: 28px;
@@ -330,38 +330,86 @@ body {
   50% { opacity: 1; transform: scale(1.1); }
 }
 
-/* Кнопка быстрого открытия поцелуем */
+/* Статус автоматического открытия */
 .timer-actions {
   display: flex;
   justify-content: center;
 }
 
-.unlock-btn {
+.lock-status-notice {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, rgba(255, 143, 171, 0.22) 0%, rgba(176, 136, 249, 0.25) 100%);
-  border: 1px solid rgba(255, 143, 171, 0.4);
-  color: #fff;
-  padding: 10px 20px;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(35, 18, 62, 0.7);
+  border: 1px solid rgba(198, 175, 255, 0.3);
+  color: var(--accent-lavender);
+  padding: 11px 24px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
   font-family: var(--font-ui);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(255, 143, 171, 0.15);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  transition: all 0.4s ease;
 }
 
-.unlock-btn:hover, .unlock-btn:active {
-  transform: translateY(-2px) scale(1.02);
-  background: linear-gradient(135deg, rgba(255, 143, 171, 0.35) 0%, rgba(176, 136, 249, 0.4) 100%);
-  border-color: rgba(255, 209, 102, 0.6);
-  box-shadow: 0 6px 20px rgba(255, 143, 171, 0.3);
-}
-
-.unlock-icon {
+.lock-status-icon {
   font-size: 16px;
+  display: inline-block;
+  animation: lockPulse 2s ease-in-out infinite;
+}
+
+@keyframes lockPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+.lock-status-notice.unlocked {
+  background: rgba(255, 209, 102, 0.15);
+  border-color: rgba(255, 209, 102, 0.45);
+  color: var(--accent-gold);
+}
+
+/* Полное скрытие контента до 23:30 */
+.content-hidden {
+  display: none !important;
+}
+
+body.is-locked .main-content,
+body.is-locked .app-footer {
+  display: none !important;
+}
+
+body.is-locked .timer-section {
+  min-height: calc(85vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0;
+  padding: 24px 0;
+}
+
+body.is-locked .timer-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 38px 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 45px rgba(176, 136, 249, 0.25);
+  border: 1px solid rgba(198, 175, 255, 0.35);
+}
+
+@keyframes unlockReveal {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-revealed {
+  animation: unlockReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ================================================= */
