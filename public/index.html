@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#060814">
+  <meta name="theme-color" content="#1b1226">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Для тебя на эту ночь</title>
+  <title>С добрым утром, солнышко!</title>
   
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Google Fonts: Cormorant Garamond (элегантный, живой, книжный) и Outfit -->
+  <!-- Google Fonts: Cormorant Garamond и Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -18,126 +18,127 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Интерактивный холст ночного неба со звездами -->
-  <canvas id="nightCanvas"></canvas>
+  <!-- Интерактивный холст утреннего рассвета с лучами и искорками -->
+  <canvas id="morningCanvas"></canvas>
 
   <div class="app-container">
-    <!-- Верхняя панель: статус ночи и кнопка музыки -->
+    <!-- Верхняя панель: статус утра и кнопка музыки -->
     <header class="top-nav">
-      <div class="night-time-badge">
-        <span class="moon-icon">🌙</span>
-        <span class="time-text" id="liveClock">00:00</span>
-        <span class="time-sub">Тихая ночь</span>
+      <div class="morning-time-badge">
+        <span class="sun-mini-icon">☀️</span>
+        <span class="time-text" id="liveClock">08:00</span>
+        <span class="time-sub">Светлое утро</span>
       </div>
 
-      <button class="music-toggle-btn" id="audioToggleBtn" title="Включить музыку C418">
+      <button class="music-toggle-btn" id="audioToggleBtn" title="Включить музыку C418 - Mall">
         <span class="music-icon" id="audioIcon">🎵</span>
-        <span class="music-label" id="audioLabel">C418 - Danny</span>
+        <span class="music-label" id="audioLabel">C418 - Mall</span>
       </button>
-      <audio id="bgMusic" src="c418.mp3" loop preload="auto"></audio>
+      <audio id="bgMusic" src="mall.mp3" loop preload="auto"></audio>
     </header>
 
     <!-- Основной романтический контент -->
     <main class="main-content">
-      <!-- Интерактивная луна -->
-      <section class="moon-section">
-        <div class="moon-wrapper" id="interactiveMoon" title="Коснись луны, чтобы загадать желание">
-          <div class="moon-sphere">
-            <div class="moon-halo"></div>
-            <div class="moon-crater c1"></div>
-            <div class="moon-crater c2"></div>
-            <div class="moon-crater c3"></div>
-            <div class="moon-glow"></div>
+      <!-- Интерактивное утреннее солнышко -->
+      <section class="sun-section">
+        <div class="sun-wrapper" id="interactiveSun" title="Коснись солнышка, чтобы поймать лучик тепла">
+          <div class="sun-sphere">
+            <div class="sun-corona"></div>
+            <div class="sun-ray-ring"></div>
+            <div class="sun-face-glow"></div>
+            <div class="sun-sparkle s1"></div>
+            <div class="sun-sparkle s2"></div>
+            <div class="sun-sparkle s3"></div>
           </div>
         </div>
-        <p class="moon-hint">Коснись луны, чтобы полетела звезда ✨</p>
+        <p class="sun-hint">Коснись солнышка, чтобы зарядиться теплом ✨</p>
 
-        <h1 class="main-title">Спокойной ночи, любимая</h1>
-        <p class="subtitle">Я сделал этот маленький ночной уголок специально для тебя, чтобы перед сном ты улыбнулась и почувствовала мое тепло.</p>
+        <h1 class="main-title">С добрым утром, солнышко!</h1>
+        <p class="subtitle">Я сделал этот теплый уголок специально для тебя, чтобы твой день начался с искренней улыбки, заботы и вдохновения.</p>
       </section>
 
-      <!-- Личное ночное письмо -->
+      <!-- Личное утреннее письмо -->
       <section class="letter-section">
         <div class="letter-card glass-card">
           <div class="letter-header">
-            <span class="letter-date" id="currentDateText">Этой ночью</span>
+            <span class="letter-date" id="currentDateText">Этим утром</span>
             <span class="letter-heart">💌</span>
           </div>
 
           <div class="letter-content">
-            <p class="letter-greeting">Моя самая любимая и нежная девочка,</p>
+            <p class="letter-greeting">Доброе утро, моя самая любимая и нежная девочка!</p>
             <p>
-              Когда наступает ночь и город затихает, я всегда думаю о тебе. Спасибо тебе за то, что ты есть в моей жизни, за твою улыбку и за то тепло, которое ты мне даришь.
+              Пусть это утро начнется с мягких лучей солнца, аромата любимого кофе или чая и твоего прекрасного настроения.
             </p>
             <p>
-              Пусть эта ночь бережно укроет тебя одеялом из звезд, а сон будет сладким, глубоким и спокойным. Отпусти всю усталость сегодняшнего дня и просто отдыхай.
+              Знай, что с первых секунд нового дня я думаю о тебе. Твоя улыбка делает мой мир ярче и теплее. Ты самое чудесное и дорогое, что есть в моей жизни.
             </p>
             <p>
-              Знай, что я всегда рядом с тобой, даже если между нами расстояние. Я мысленно обнимаю тебя крепко-крепко и целую в носик перед сном.
+              Пусть все сегодняшние дела решаются легко и без спешки. Ни о чем не тревожься: ты большая умница, у тебя все обязательно получится, а я всегда рядом с тобой.
             </p>
-            <p class="letter-sign">Сладких снов, мое счастье ❤️</p>
+            <p class="letter-sign">Прекрасного и светлого тебе дня, радость моя! ❤️</p>
           </div>
 
           <!-- Кнопка почувствовать тепло -->
           <div class="hug-action-wrap">
             <button class="hug-btn" id="hugBtn">
-              <span class="hug-btn-icon">💖</span>
-              <span class="hug-btn-text">Почувствовать объятие</span>
+              <span class="hug-btn-icon">☀️</span>
+              <span class="hug-btn-text">Почувствовать тепло и объятие</span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Интерактивные ночные записки (Звездные послания) -->
+      <!-- Интерактивные утренние мысли (Лучики хорошего дня) -->
       <section class="notes-section">
         <div class="notes-card glass-card">
           <div class="notes-header">
             <span class="notes-sparkle">✦</span>
-            <span class="notes-title">Ночные мысли для тебя</span>
+            <span class="notes-title">Лучики хорошего дня</span>
             <span class="notes-sparkle">✦</span>
           </div>
-          <p class="notes-desc">Нажимай на звезды, чтобы открывать маленькие теплые записки:</p>
+          <p class="notes-desc">Нажимай на лучики, чтобы открывать маленькие теплые пожелания:</p>
 
-          <!-- Интерактивные звездочки для выбора -->
+          <!-- Интерактивные кнопки лучиков -->
           <div class="stars-selector" id="starsSelector">
-            <button class="star-pick-btn active" data-index="0">⭐ 1</button>
-            <button class="star-pick-btn" data-index="1">⭐ 2</button>
-            <button class="star-pick-btn" data-index="2">⭐ 3</button>
-            <button class="star-pick-btn" data-index="3">⭐ 4</button>
-            <button class="star-pick-btn" data-index="4">⭐ 5</button>
-            <button class="star-pick-btn" data-index="5">⭐ 6</button>
-            <button class="star-pick-btn" data-index="6">⭐ 7</button>
+            <button class="star-pick-btn active" data-index="0">☀️ 1</button>
+            <button class="star-pick-btn" data-index="1">☀️ 2</button>
+            <button class="star-pick-btn" data-index="2">☀️ 3</button>
+            <button class="star-pick-btn" data-index="3">☀️ 4</button>
+            <button class="star-pick-btn" data-index="4">☀️ 5</button>
+            <button class="star-pick-btn" data-index="5">☀️ 6</button>
+            <button class="star-pick-btn" data-index="6">☀️ 7</button>
           </div>
 
-          <!-- Отображение текущей записки -->
+          <!-- Отображение текущего пожелания -->
           <div class="note-display" id="noteDisplay">
             <div class="note-quote-sign">“</div>
-            <p class="note-text" id="noteText">Ты самое прекрасное и теплое, что случилось в моей жизни.</p>
-            <div class="note-counter" id="noteCounter">Записка 1 из 7</div>
+            <p class="note-text" id="noteText">Ты самое прекрасное и теплое солнышко в моей жизни.</p>
+            <div class="note-counter" id="noteCounter">Лучик 1 из 7</div>
           </div>
 
           <div class="note-actions">
             <button class="next-note-btn" id="nextNoteBtn">
-              <span>Случайная звездочка</span>
+              <span>Случайный лучик</span>
               <span class="btn-arrow">✨</span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Кнопка ответа перед сном -->
+      <!-- Кнопка ответа с добрым утром -->
       <section class="reply-section">
-        <a href="https://t.me/share/url?url=&text=%D0%A1%D0%BF%D0%BE%D0%BA%D0%BE%D0%B9%D0%BD%D0%BE%D0%B9%20%D0%BD%D0%BE%D1%87%D0%B8,%20%D0%BB%D1%8E%D0%B1%D0%B8%D0%BC%D1%8B%D0%B9!%20%D0%A1%D0%BF%D0%B0%D1%81%D0%B8%D0%B1%D0%BE%20%D0%B7%D0%B0%20%D1%82%D0%B5%D0%BF%D0%BB%D0%BE%D1%82%D1%83%20%D0%B8%20%D1%8D%D1%82%D1%83%20%D0%BD%D0%BE%D1%87%D1%8C%20%E2%9D%A4%EF%B8%8F" class="goodnight-reply-btn" id="replyBtn" target="_blank">
+        <a href="https://t.me/share/url?url=&text=%D0%A1%20%D0%B4%D0%BE%D0%B1%D1%80%D1%8B%D0%BC%20%D1%83%D1%82%D1%80%D0%BE%D0%BC%2C%20%D0%BB%D1%8E%D0%B1%D0%B8%D0%BC%D1%8B%D0%B9!%20%D0%A1%D0%BF%D0%B0%D1%81%D0%B8%D0%B1%D0%BE%20%D0%B7%D0%B0%20%D1%82%D0%B5%D0%BF%D0%BB%D0%BE%20%D0%B8%20%D1%82%D0%B0%D0%BA%D0%BE%D0%B5%20%D1%87%D1%83%D0%B4%D0%B5%D1%81%D0%BD%D0%BE%D0%B5%20%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%BE%20%D0%B4%D0%BD%D1%8F%20%E2%9D%A4%EF%B8%8F" class="goodmorning-reply-btn" id="replyBtn" target="_blank">
           <span class="reply-icon">💌</span>
-          <span>Ответить «Спокойной ночи»</span>
+          <span>Ответить «Доброе утро, любимый!»</span>
         </a>
       </section>
     </main>
 
     <!-- Подвал -->
     <footer class="app-footer">
-      <p class="footer-blessing">Спи сладко, радость моя. До самого утра.</p>
-      <div class="footer-stars">✦ ✦ ✦</div>
+      <p class="footer-blessing">Прекрасного, легкого и счастливого дня тебе, радость моя.</p>
+      <div class="footer-stars">☀️ ✦ ☀️ ✦ ☀️</div>
     </footer>
   </div>
 
@@ -145,6 +146,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Скрипты -->
+  <script src="wishes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

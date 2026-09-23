@@ -1,19 +1,22 @@
-/* Стилизация персональной страницы "Спокойной ночи, любимая" */
+/* Стилизация персональной страницы "С добрым утром, солнышко!" */
 /* Внимание: строго запрещены длинные тире (em-dash / en-dash) */
 
 :root {
-  --bg-deep: #040610;
-  --card-bg: rgba(15, 20, 42, 0.72);
-  --card-border: rgba(254, 209, 118, 0.2);
-  --card-glow: 0 12px 40px 0 rgba(0, 5, 20, 0.6);
+  --bg-deep: #100b18;
+  --bg-gradient: radial-gradient(circle at 50% -10%, #3d2138 0%, #201329 45%, #0f0a17 100%);
+  --card-bg: rgba(35, 22, 45, 0.72);
+  --card-border: rgba(255, 204, 128, 0.22);
+  --card-glow: 0 16px 45px 0 rgba(10, 5, 18, 0.65);
   
-  --text-main: #f5f7ff;
-  --text-muted: #a6b5db;
-  --text-dim: #6778a3;
+  --text-main: #fffaf0;
+  --text-muted: #d6c5df;
+  --text-dim: #9b87a8;
   
-  --accent-gold: #fed176;
+  --accent-gold: #ffc857;
+  --accent-sun: #ffa234;
   --accent-rose: #ff7597;
-  --accent-cyan: #7be0ff;
+  --accent-amber: #ff9f43;
+  --accent-sky: #ffdd93;
   
   --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
@@ -31,7 +34,9 @@
 
 body {
   font-family: var(--font-ui);
-  background-color: var(--bg-deep);
+  background: var(--bg-deep);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
   overflow-x: hidden;
@@ -40,8 +45,8 @@ body {
   -webkit-user-select: none;
 }
 
-/* Интерактивный холст ночного неба */
-#nightCanvas {
+/* Интерактивный холст утреннего рассвета */
+#morningCanvas {
   position: fixed;
   top: 0;
   left: 0;
@@ -63,11 +68,11 @@ body {
   padding: calc(16px + var(--safe-top)) 18px calc(24px + var(--safe-bottom)) 18px;
 }
 
-/* Стекломорфизм */
+/* Стекломорфизм утренних карточек */
 .glass-card {
   background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
   border: 1px solid var(--card-border);
   border-radius: 28px;
   box-shadow: var(--card-glow);
@@ -83,21 +88,27 @@ body {
   margin-bottom: 24px;
 }
 
-.night-time-badge {
+.morning-time-badge {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 15px;
+  background: rgba(255, 200, 100, 0.09);
+  border: 1px solid rgba(255, 200, 100, 0.2);
   border-radius: 999px;
   font-size: 13px;
   color: var(--text-muted);
 }
 
-.moon-icon {
-  font-size: 15px;
-  filter: drop-shadow(0 0 6px rgba(254, 209, 118, 0.6));
+.sun-mini-icon {
+  font-size: 16px;
+  filter: drop-shadow(0 0 6px rgba(255, 180, 50, 0.7));
+  animation: miniSpin 12s linear infinite;
+}
+
+@keyframes miniSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .time-text {
@@ -108,18 +119,19 @@ body {
 .time-sub {
   color: var(--accent-gold);
   font-size: 12px;
-  opacity: 0.9;
+  opacity: 0.95;
+  font-weight: 500;
 }
 
-/* Кнопка ночной музыки */
+/* Кнопка фоновой музыки C418 - Mall */
 .music-toggle-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(254, 209, 118, 0.08);
-  border: 1px solid rgba(254, 209, 118, 0.25);
+  background: rgba(255, 200, 87, 0.1);
+  border: 1px solid rgba(255, 200, 87, 0.3);
   border-radius: 999px;
-  padding: 8px 14px;
+  padding: 8px 15px;
   color: var(--accent-gold);
   font-size: 13px;
   font-weight: 500;
@@ -128,75 +140,115 @@ body {
 }
 
 .music-toggle-btn.playing {
-  background: rgba(254, 209, 118, 0.2);
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 16px rgba(254, 209, 118, 0.4);
+  background: rgba(255, 170, 50, 0.22);
+  border-color: var(--accent-sun);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(255, 170, 50, 0.45);
 }
 
-/* Секция с луной */
-.moon-section {
+/* Секция с утренним солнышком */
+.sun-section {
   text-align: center;
   margin-bottom: 28px;
 }
 
-.moon-wrapper {
+.sun-wrapper {
   position: relative;
-  width: 110px;
-  height: 110px;
-  margin: 0 auto 10px auto;
+  width: 124px;
+  height: 124px;
+  margin: 0 auto 12px auto;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
 
-.moon-wrapper:active {
+.sun-wrapper:active {
   transform: scale(0.92);
 }
 
-.moon-sphere {
+.sun-sphere {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fffdf8 0%, #ffeec7 40%, #e2c18d 80%, #99784f 100%);
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff1b8 25%, #ffb638 65%, #f26419 100%);
   box-shadow:
-    inset -10px -10px 25px rgba(20, 15, 10, 0.6),
-    0 0 35px rgba(254, 209, 118, 0.5),
-    0 0 70px rgba(254, 209, 118, 0.2);
+    inset -8px -8px 22px rgba(180, 50, 0, 0.45),
+    0 0 35px rgba(255, 180, 50, 0.65),
+    0 0 75px rgba(255, 140, 20, 0.35);
   position: relative;
-  overflow: hidden;
-  animation: floatMoon 5s ease-in-out infinite alternate;
+  animation: floatSun 4.5s ease-in-out infinite alternate;
 }
 
-@keyframes floatMoon {
+@keyframes floatSun {
   0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-7px) rotate(2deg); }
+  100% { transform: translateY(-8px) rotate(3deg); }
 }
 
-.moon-halo {
+.sun-corona {
   position: absolute;
-  top: -20%;
-  left: -20%;
-  width: 140%;
-  height: 140%;
+  top: -25%;
+  left: -25%;
+  width: 150%;
+  height: 150%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(254, 209, 118, 0.25) 0%, rgba(254, 209, 118, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 200, 80, 0.3) 0%, rgba(255, 140, 20, 0.12) 55%, rgba(255, 140, 20, 0) 75%);
+  pointer-events: none;
+  animation: pulseCorona 3s ease-in-out infinite alternate;
+}
+
+@keyframes pulseCorona {
+  0% { transform: scale(0.95); opacity: 0.75; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+.sun-ray-ring {
+  position: absolute;
+  top: -15%;
+  left: -15%;
+  width: 130%;
+  height: 130%;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 215, 110, 0.35);
+  pointer-events: none;
+  animation: spinRays 24s linear infinite;
+}
+
+@keyframes spinRays {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.sun-face-glow {
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
   pointer-events: none;
 }
 
-.moon-crater {
+.sun-sparkle {
   position: absolute;
+  background: #ffffff;
   border-radius: 50%;
-  background: rgba(140, 105, 65, 0.2);
-  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.3), inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 8px #ffffff;
+  animation: twinkleSparkle 2s infinite ease-in-out;
 }
 
-.moon-crater.c1 { width: 22px; height: 22px; top: 30%; left: 32%; }
-.moon-crater.c2 { width: 14px; height: 14px; top: 58%; left: 50%; }
-.moon-crater.c3 { width: 10px; height: 10px; top: 42%; left: 65%; }
+.sun-sparkle.s1 { width: 4px; height: 4px; top: 25%; left: 30%; animation-delay: 0s; }
+.sun-sparkle.s2 { width: 5px; height: 5px; top: 40%; left: 70%; animation-delay: 0.7s; }
+.sun-sparkle.s3 { width: 3px; height: 3px; top: 68%; left: 45%; animation-delay: 1.3s; }
 
-.moon-hint {
-  font-size: 12px;
+@keyframes twinkleSparkle {
+  0%, 100% { transform: scale(0.6); opacity: 0.4; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+.sun-hint {
+  font-size: 13px;
   color: var(--accent-gold);
-  opacity: 0.8;
+  opacity: 0.9;
   margin-bottom: 14px;
 }
 
@@ -205,7 +257,7 @@ body {
   font-size: 36px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #ffffff 30%, #fff2d6 70%, #fed176 100%);
+  background: linear-gradient(135deg, #ffffff 25%, #ffe6a3 65%, #ffa63d 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
@@ -219,15 +271,15 @@ body {
   margin: 0 auto;
 }
 
-/* Личное ночное письмо */
+/* Личное утреннее письмо */
 .letter-section {
   margin-bottom: 24px;
 }
 
 .letter-card {
   padding: 26px 22px;
-  border-color: rgba(254, 209, 118, 0.28);
-  background: linear-gradient(170deg, rgba(22, 28, 58, 0.82) 0%, rgba(14, 18, 40, 0.9) 100%);
+  border-color: rgba(255, 204, 128, 0.3);
+  background: linear-gradient(170deg, rgba(46, 26, 56, 0.85) 0%, rgba(28, 16, 38, 0.92) 100%);
 }
 
 .letter-header {
@@ -236,13 +288,13 @@ body {
   align-items: center;
   margin-bottom: 18px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(254, 209, 118, 0.15);
+  border-bottom: 1px solid rgba(255, 204, 128, 0.18);
 }
 
 .letter-date {
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   color: var(--accent-gold);
   font-weight: 600;
 }
@@ -261,7 +313,7 @@ body {
   font-family: var(--font-serif);
   font-size: 18px;
   line-height: 1.7;
-  color: #f7f9ff;
+  color: #fff9f0;
 }
 
 .letter-greeting {
@@ -283,7 +335,7 @@ body {
   margin-bottom: 0;
 }
 
-/* Кнопка почувствовать объятие */
+/* Кнопка почувствовать тепло */
 .hug-action-wrap {
   margin-top: 22px;
   padding-top: 18px;
@@ -295,7 +347,7 @@ body {
   padding: 14px 20px;
   border-radius: 18px;
   border: none;
-  background: linear-gradient(135deg, #ff7597 0%, #e0527b 100%);
+  background: linear-gradient(135deg, #ff8e53 0%, #ff5e7e 60%, #e04169 100%);
   color: #ffffff;
   font-family: var(--font-ui);
   font-size: 15px;
@@ -305,12 +357,12 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 6px 24px rgba(255, 117, 151, 0.35);
+  box-shadow: 0 8px 24px rgba(255, 110, 110, 0.4);
   transition: transform 0.2s, box-shadow 0.2s;
-  animation: softHeartbeat 3s infinite ease-in-out;
+  animation: softSunbeat 3.2s infinite ease-in-out;
 }
 
-@keyframes softHeartbeat {
+@keyframes softSunbeat {
   0%, 100% { transform: scale(1); }
   14% { transform: scale(1.02); }
   28% { transform: scale(1); }
@@ -323,17 +375,18 @@ body {
 }
 
 .hug-btn-icon {
-  font-size: 18px;
+  font-size: 19px;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
 }
 
-/* Интерактивные ночные записки */
+/* Интерактивные утренние лучики */
 .notes-section {
   margin-bottom: 24px;
 }
 
 .notes-card {
   padding: 24px 20px;
-  border-color: rgba(123, 224, 255, 0.2);
+  border-color: rgba(255, 210, 115, 0.24);
 }
 
 .notes-header {
@@ -372,10 +425,10 @@ body {
 }
 
 .star-pick-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--text-muted);
-  padding: 7px 12px;
+  padding: 7px 13px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
@@ -384,16 +437,16 @@ body {
 }
 
 .star-pick-btn.active {
-  background: rgba(254, 209, 118, 0.2);
+  background: rgba(255, 195, 80, 0.24);
   border-color: var(--accent-gold);
-  color: var(--accent-gold);
-  box-shadow: 0 0 14px rgba(254, 209, 118, 0.3);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 195, 80, 0.4);
   font-weight: 600;
 }
 
 .note-display {
-  background: rgba(10, 14, 32, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(22, 12, 32, 0.7);
+  border: 1px solid rgba(255, 210, 115, 0.15);
   border-radius: 20px;
   padding: 20px 18px;
   text-align: center;
@@ -407,7 +460,7 @@ body {
 .note-quote-sign {
   font-family: var(--font-serif);
   font-size: 32px;
-  color: rgba(254, 209, 118, 0.25);
+  color: rgba(255, 200, 87, 0.3);
   line-height: 0;
   margin-bottom: 6px;
 }
@@ -416,7 +469,7 @@ body {
   font-family: var(--font-serif);
   font-size: 19px;
   line-height: 1.5;
-  color: #fff;
+  color: #fffaf0;
   transition: opacity 0.2s;
 }
 
@@ -432,12 +485,13 @@ body {
 }
 
 .next-note-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 204, 128, 0.25);
   color: var(--text-main);
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 999px;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -447,7 +501,7 @@ body {
 
 .next-note-btn:active {
   transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Кнопка ответа */
@@ -456,7 +510,7 @@ body {
   text-align: center;
 }
 
-.goodnight-reply-btn {
+.goodmorning-reply-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -469,11 +523,11 @@ body {
   font-size: 15px;
   font-weight: 600;
   border-radius: 20px;
-  box-shadow: 0 6px 20px rgba(34, 158, 217, 0.35);
+  box-shadow: 0 8px 24px rgba(34, 158, 217, 0.38);
   transition: transform 0.2s;
 }
 
-.goodnight-reply-btn:active {
+.goodmorning-reply-btn:active {
   transform: scale(0.97);
 }
 
@@ -497,9 +551,9 @@ body {
 
 .footer-stars {
   color: var(--accent-gold);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 6px;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 /* Всплывающие уведомления */
@@ -516,7 +570,7 @@ body {
 }
 
 .toast {
-  background: rgba(20, 26, 56, 0.95);
+  background: rgba(36, 20, 48, 0.95);
   border: 1px solid var(--accent-gold);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);

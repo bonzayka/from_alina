@@ -1,4 +1,4 @@
-// Скрипт персональной романтической страницы для любимой девушки
+// Скрипт утренней персональной романтической страницы для любимой девушки
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 (function () {
@@ -10,8 +10,8 @@
     try {
       tg.ready();
       tg.expand();
-      if (tg.setHeaderColor) tg.setHeaderColor('#040610');
-      if (tg.setBackgroundColor) tg.setBackgroundColor('#040610');
+      if (tg.setHeaderColor) tg.setHeaderColor('#100b18');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#100b18');
     } catch (e) {
       console.log('TG Init error:', e);
     }
@@ -31,7 +31,7 @@
   }
 
   // Всплывающее сообщение
-  function showToast(text, icon = '💖') {
+  function showToast(text, icon = '☀️') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
     const toast = document.createElement('div');
@@ -44,9 +44,9 @@
   }
 
   // ==========================================
-  // 1. Интерактивное ночное небо
+  // 1. Интерактивный утренний холст
   // ==========================================
-  const canvas = document.getElementById('nightCanvas');
+  const canvas = document.getElementById('morningCanvas');
   const ctx = canvas.getContext('2d');
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
@@ -54,56 +54,60 @@
   window.addEventListener('resize', () => {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
-    initStars();
+    initMotes();
   });
 
-  const stars = [];
-  const shootingStars = [];
-  const floatingHearts = [];
+  const motes = [];
+  const sunbeams = [];
+  const floatingItems = [];
 
-  function initStars() {
-    stars.length = 0;
-    const count = Math.floor((width * height) / 3500);
+  // Утренние золотистые пылинки и светящиеся искорки
+  function initMotes() {
+    motes.length = 0;
+    const count = Math.floor((width * height) / 4500);
     for (let i = 0; i < count; i++) {
-      stars.push({
+      motes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 1.5 + 0.3,
-        baseAlpha: Math.random() * 0.7 + 0.3,
-        twinkleSpeed: Math.random() * 0.02 + 0.005,
-        twinklePhase: Math.random() * Math.PI * 2,
-        color: ['#ffffff', '#fff7e6', '#fed176', '#ffe0ea', '#dff2ff'][Math.floor(Math.random() * 5)]
+        radius: Math.random() * 2 + 0.5,
+        baseAlpha: Math.random() * 0.6 + 0.25,
+        pulseSpeed: Math.random() * 0.025 + 0.008,
+        pulsePhase: Math.random() * Math.PI * 2,
+        vy: -(Math.random() * 0.35 + 0.1),
+        vx: (Math.random() - 0.5) * 0.2,
+        color: ['#ffefa0', '#ffd166', '#ffb070', '#ffffff', '#ffe4f0'][Math.floor(Math.random() * 5)]
       });
     }
   }
 
-  function spawnShootingStar() {
-    shootingStars.push({
-      x: Math.random() * (width * 0.8),
-      y: Math.random() * (height * 0.4),
-      length: Math.random() * 90 + 60,
-      speed: Math.random() * 8 + 6,
-      angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
-      opacity: 1,
-      decay: Math.random() * 0.015 + 0.01
+  // Запуск пролетающего солнечного луча
+  function spawnSunbeam() {
+    sunbeams.push({
+      x: Math.random() * (width * 0.9),
+      y: -20,
+      length: Math.random() * 110 + 70,
+      speed: Math.random() * 6 + 4,
+      angle: Math.PI / 3 + (Math.random() - 0.5) * 0.25,
+      opacity: 0.9,
+      decay: Math.random() * 0.015 + 0.008
     });
   }
 
   setInterval(() => {
-    if (Math.random() > 0.45) {
-      spawnShootingStar();
+    if (Math.random() > 0.4) {
+      spawnSunbeam();
     }
-  }, 4000);
+  }, 3500);
 
-  // Создание летающих сердечек при объятии
+  // Создание утреннего салюта сердечек и солнышек
   function spawnHeartsBurst() {
-    const symbols = ['💖', '✨', '❤️', '🌸', '💫'];
-    for (let i = 0; i < 32; i++) {
-      floatingHearts.push({
+    const symbols = ['☀️', '💖', '✨', '🌸', '💛', '🥰'];
+    for (let i = 0; i < 30; i++) {
+      floatingItems.push({
         x: Math.random() * width,
-        y: height + Math.random() * 40,
-        vx: (Math.random() - 0.5) * 2.5,
-        vy: -(Math.random() * 3.5 + 2.5),
+        y: height + Math.random() * 30,
+        vx: (Math.random() - 0.5) * 2.6,
+        vy: -(Math.random() * 3.6 + 2.4),
         size: Math.random() * 16 + 14,
         alpha: 1,
         decay: Math.random() * 0.012 + 0.006,
@@ -115,70 +119,77 @@
   function render() {
     ctx.clearRect(0, 0, width, height);
 
-    // Рисование звезд
-    for (let i = 0; i < stars.length; i++) {
-      const s = stars[i];
-      s.twinklePhase += s.twinkleSpeed;
-      const alpha = s.baseAlpha + Math.sin(s.twinklePhase) * 0.35;
-      ctx.fillStyle = s.color;
+    // Рисование утренних частиц света
+    for (let i = 0; i < motes.length; i++) {
+      const m = motes[i];
+      m.pulsePhase += m.pulseSpeed;
+      m.y += m.vy;
+      m.x += m.vx;
+
+      if (m.y < -10) m.y = height + 10;
+      if (m.x < -10) m.x = width + 10;
+      if (m.x > width + 10) m.x = -10;
+
+      const alpha = m.baseAlpha + Math.sin(m.pulsePhase) * 0.25;
+      ctx.fillStyle = m.color;
       ctx.globalAlpha = Math.max(0.1, Math.min(1, alpha));
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+      ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Падающие звезды
+    // Солнечные лучи
     ctx.globalAlpha = 1;
-    for (let i = shootingStars.length - 1; i >= 0; i--) {
-      const ss = shootingStars[i];
-      const tailX = ss.x - Math.cos(ss.angle) * ss.length;
-      const tailY = ss.y - Math.sin(ss.angle) * ss.length;
+    for (let i = sunbeams.length - 1; i >= 0; i--) {
+      const sb = sunbeams[i];
+      const tailX = sb.x - Math.cos(sb.angle) * sb.length;
+      const tailY = sb.y - Math.sin(sb.angle) * sb.length;
 
-      const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
-      grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-      grad.addColorStop(1, `rgba(254, 209, 118, ${ss.opacity})`);
+      const grad = ctx.createLinearGradient(tailX, tailY, sb.x, sb.y);
+      grad.addColorStop(0, 'rgba(255, 240, 180, 0)');
+      grad.addColorStop(1, `rgba(255, 200, 80, ${sb.opacity})`);
 
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(tailX, tailY);
-      ctx.lineTo(ss.x, ss.y);
+      ctx.lineTo(sb.x, sb.y);
       ctx.stroke();
 
-      ss.x += Math.cos(ss.angle) * ss.speed;
-      ss.y += Math.sin(ss.angle) * ss.speed;
-      ss.opacity -= ss.decay;
+      sb.x += Math.cos(sb.angle) * sb.speed;
+      sb.y += Math.sin(sb.angle) * sb.speed;
+      sb.opacity -= sb.decay;
 
-      if (ss.opacity <= 0) {
-        shootingStars.splice(i, 1);
+      if (sb.opacity <= 0) {
+        sunbeams.splice(i, 1);
       }
     }
 
-    // Летающие сердечки
-    for (let i = floatingHearts.length - 1; i >= 0; i--) {
-      const h = floatingHearts[i];
-      ctx.globalAlpha = Math.max(0, h.alpha);
-      ctx.font = `${h.size}px serif`;
+    // Летающие утренние эмодзи и сердечки
+    for (let i = floatingItems.length - 1; i >= 0; i--) {
+      const item = floatingItems[i];
+      ctx.globalAlpha = Math.max(0, item.alpha);
+      ctx.font = `${item.size}px serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(h.symbol, h.x, h.y);
+      ctx.fillText(item.symbol, item.x, item.y);
 
-      h.x += h.vx;
-      h.y += h.vy;
-      h.alpha -= h.decay;
+      item.x += item.vx;
+      item.y += item.vy;
+      item.alpha -= item.decay;
 
-      if (h.alpha <= 0 || h.y < -50) {
-        floatingHearts.splice(i, 1);
+      if (item.alpha <= 0 || item.y < -50) {
+        floatingItems.splice(i, 1);
       }
     }
 
     requestAnimationFrame(render);
   }
 
-  initStars();
+  initMotes();
   render();
 
   // ==========================================
-  // 2. Часы и интерактивная луна
+  // 2. Часы и интерактивное солнышко
   // ==========================================
   const liveClock = document.getElementById('liveClock');
   const currentDateText = document.getElementById('currentDateText');
@@ -195,42 +206,43 @@
   if (currentDateText) {
     const options = { day: 'numeric', month: 'long' };
     const dateStr = new Date().toLocaleDateString('ru-RU', options);
-    currentDateText.textContent = `Ночь, ${dateStr}`;
+    currentDateText.textContent = `Утро, ${dateStr}`;
   }
 
-  const moonWrapper = document.getElementById('interactiveMoon');
-  if (moonWrapper) {
-    moonWrapper.addEventListener('click', () => {
+  const sunWrapper = document.getElementById('interactiveSun');
+  if (sunWrapper) {
+    sunWrapper.addEventListener('click', () => {
       triggerHaptic('medium');
-      spawnShootingStar();
-      spawnShootingStar();
-      showToast('Загадай желание, звездочка уже летит!', '🌠');
+      spawnSunbeam();
+      spawnSunbeam();
+      spawnHeartsBurst();
+      showToast('Солнечный лучик заряжает тебя теплом! ☀️', '✨');
     });
   }
 
   // ==========================================
-  // 3. Кнопка "Почувствовать объятие"
+  // 3. Кнопка "Почувствовать тепло и объятие"
   // ==========================================
   const hugBtn = document.getElementById('hugBtn');
   if (hugBtn) {
     hugBtn.addEventListener('click', () => {
       triggerHaptic('success');
       spawnHeartsBurst();
-      showToast('Я крепко обнял тебя. Почувствуй мое тепло ❤️', '🤗');
+      showToast('Я крепко обнял тебя и поцеловал в щечку! ❤️', '🤗');
     });
   }
 
   // ==========================================
-  // 4. Ночные мысли (Звездные записки)
+  // 4. Утренние мысли (Лучики хорошего дня)
   // ==========================================
   const notesList = [
-    'Ты самое прекрасное и теплое, что случилось в моей жизни.',
-    'Я безумно люблю твою улыбку и то, как звонко ты смеешься.',
-    'Пусть тебе сегодня приснится самый красивый, добрый и сказочный сон.',
-    'Где бы мы ни находились, мое сердце и мои мысли всегда рядом с тобой.',
-    'Ты удивительная, нежная и самая лучшая девушка на всем белом свете.',
-    'Спи сладко и ни о чем не тревожься: я всегда на твоей стороне и поддержу тебя.',
-    'Если бы я был рядом прямо сейчас, я бы укрыл тебя одеялом, поцеловал в носик и не отпускал до утра.'
+    'Ты самое прекрасное и теплое солнышко в моей жизни.',
+    'Пусть сегодняшний день принесет тебе легкость, улыбки и море вдохновения.',
+    'Я безумно люблю твой звонкий смех и то, как ты освещаешь все вокруг.',
+    'Помни, что ты умница и со всем легко справишься. Я всегда рядом.',
+    'Пусть твой утренний кофе или чай будет самым вкусным и согревающим.',
+    'Шлю тебе утренний лучик любви и самый нежный поцелуй в носик.',
+    'Улыбнись прямо сейчас! Новый день ждет твоего сияния и красоты.'
   ];
 
   let currentNoteIndex = 0;
@@ -255,7 +267,7 @@
       noteText.style.opacity = '0.3';
       setTimeout(() => {
         noteText.textContent = notesList[currentNoteIndex];
-        if (noteCounter) noteCounter.textContent = `Записка ${currentNoteIndex + 1} из ${notesList.length}`;
+        if (noteCounter) noteCounter.textContent = `Лучик ${currentNoteIndex + 1} из ${notesList.length}`;
         noteText.style.opacity = '1';
       }, 150);
     }
@@ -276,7 +288,7 @@
   }
 
   // ==========================================
-  // 5. Управление фоновой музыкой C418
+  // 5. Управление фоновой музыкой C418 - Mall
   // ==========================================
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
@@ -292,7 +304,7 @@
       bgMusic.play().then(() => {
         if (audioToggleBtn) audioToggleBtn.classList.add('playing');
         if (audioIcon) audioIcon.textContent = '🔊';
-        if (audioLabel) audioLabel.textContent = 'C418 звучит';
+        if (audioLabel) audioLabel.textContent = 'C418 - Mall звучит';
       }).catch(() => {
         // Браузер ожидает взаимодействия с пользователем
       });
@@ -304,7 +316,7 @@
       bgMusic.pause();
       if (audioToggleBtn) audioToggleBtn.classList.remove('playing');
       if (audioIcon) audioIcon.textContent = '🎵';
-      if (audioLabel) audioLabel.textContent = 'C418 - Danny';
+      if (audioLabel) audioLabel.textContent = 'C418 - Mall';
     }
   }
 
@@ -337,7 +349,7 @@
 
       if (bgMusic.paused) {
         playMusic();
-        showToast('Играет C418 - Danny', '🎵');
+        showToast('Играет C418 - Mall', '🎵');
       } else {
         pauseMusic();
         showToast('Музыка на паузе', '⏸️');

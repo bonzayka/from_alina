@@ -1,4 +1,4 @@
-// Модуль Telegram-бота для проекта "Спокойной ночи"
+// Модуль Telegram-бота для проекта "С добрым утром, солнышко!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 const { Telegraf, Markup } = require('telegraf');
@@ -10,13 +10,13 @@ function initBot() {
 
   // Команда /start
   bot.start(async (ctx) => {
-    const welcomeText = `✨ Привет, любимая.\n\n` +
-      `Я сделал для тебя этот маленький ночной уголок, чтобы пожелать самых сладких и нежных снов.\n\n` +
-      `Открой, когда будешь ложиться спать 🌙`;
+    const welcomeText = `☀️ Привет, солнышко мое!\n\n` +
+      `Я создал для тебя этот теплый утренний уголок, чтобы твой день начался с искренней улыбки, заботы и отличного настроения.\n\n` +
+      `Открывай скорее, хорошего тебе дня! 🌸`;
 
     const keyboard = Markup.inlineKeyboard([
       [
-        Markup.button.webApp('🌙 Открыть для тебя', config.WEBAPP_URL)
+        Markup.button.webApp('☀️ Открыть утреннее послание', config.WEBAPP_URL)
       ]
     ]);
 
@@ -29,7 +29,7 @@ function initBot() {
     const randomIndex = Math.floor(Math.random() * WISHES.length);
     const wish = WISHES[randomIndex];
 
-    const messageText = `🌙 *${wish.title}*\n\n` +
+    const messageText = `☀️ *${wish.title}*\n\n` +
       `«${wish.text}»\n\n` +
       `_Автор: ${wish.author}_`;
 
@@ -55,16 +55,16 @@ function initBot() {
         if (parsed.type === 'custom_wish') {
           const replyText = `💌 *Получено персональное пожелание для: ${parsed.recipient}*\n\n` +
             `«${parsed.text}»\n\n` +
-            `_Сладких и волшебных снов!_ ✨`;
+            `_Прекрасного и радостного дня!_ ✨`;
 
           await ctx.reply(replyText, { parse_mode: 'Markdown' });
           return;
         }
 
         if (parsed.type === 'wish_shared') {
-          const replyText = `🌙 *Пожелание ночи*\n\n` +
+          const replyText = `☀️ *Утреннее пожелание*\n\n` +
             `«${parsed.text}»\n\n` +
-            `_Пусть эта ночь подарит самый глубокий отдых._ ✨`;
+            `_Пусть этот день подарит тебе море радости и улыбок!_ 🌸`;
 
           await ctx.reply(replyText, { parse_mode: 'Markdown' });
           return;
@@ -82,7 +82,7 @@ function initBot() {
       await bot.telegram.setChatMenuButton({
         menu_button: {
           type: 'web_app',
-          text: '🌙 Для тебя',
+          text: '☀️ С добрым утром',
           web_app: {
             url: config.WEBAPP_URL
           }
