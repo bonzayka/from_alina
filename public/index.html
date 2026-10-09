@@ -3,242 +3,327 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#090614">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Спокойной ночи, котеночек мой любимый 🌙</title>
-  
+  <meta name="theme-color" content="#fff0f5">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="description" content="Теплый и нежный уголок заботы для самого любимого солнышка. Поправляйся скорее!">
+  <title>Выздоравливай поскорее, солнышко! 🌸☀️</title>
+
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Google Fonts: Cormorant Garamond и Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Интерактивный холст ночного неба с мерцающими звездами и метеорами -->
-  <canvas id="nightCanvas"></canvas>
+  <!-- Интерактивный холст: кружащиеся лепестки сакуры, золотые лучики и сердечки -->
+  <canvas id="petalsCanvas"></canvas>
 
   <div class="app-container">
-    <!-- Верхняя панель: таймер-бейдж и кнопка музыки -->
+    <!-- Верхняя панель: статус заботы и кнопка музыки -->
     <header class="top-nav">
-      <div class="night-time-badge" id="nightBadge">
-        <span class="moon-mini-icon">🌙</span>
-        <span class="time-text" id="liveClock">23:30</span>
+      <div class="care-badge" id="careBadge" title="С любовью и заботой">
+        <span class="care-pulse-dot"></span>
+        <span class="care-icon">🌸</span>
+        <span class="care-text" id="careStatusText">Забота для солнышка</span>
       </div>
 
-      <button class="music-toggle-btn" id="audioToggleBtn" title="Включить музыку Oneheart - Apathy">
+      <button class="music-toggle-btn" id="audioToggleBtn" title="Включить уютную музыку">
         <span class="equalizer-bars">
           <span class="bar"></span>
           <span class="bar"></span>
           <span class="bar"></span>
         </span>
         <span class="music-icon" id="audioIcon">🎵</span>
-        <span class="music-label" id="audioLabel">Oneheart - Apathy</span>
+        <span class="music-label" id="audioLabel">Oneheart</span>
       </button>
       <audio id="bgMusic" src="oneheart.mp3" loop preload="auto"></audio>
     </header>
 
-    <!-- Виджет обратного отсчета до 23:30 -->
-    <section class="timer-section scroll-reveal" id="timerSection">
-      <div class="timer-card glass-card">
-        <div class="timer-sparkle t-left">✨</div>
-        <div class="timer-sparkle t-right">✨</div>
-        <div class="timer-header">
-          <span class="timer-badge">🌙 Сладкое время снов</span>
-          <h2 class="timer-title" id="timerHeading">Станет доступно в 23:30</h2>
-          <p class="timer-subtitle" id="timerSub">Обратный отсчет до нашего сокровенного часа спокойной ночи:</p>
+    <!-- Главная секция: Интерактивное солнышко и теплые слова -->
+    <section class="hero-section scroll-reveal">
+      <div class="hero-card glass-card">
+        <div class="hero-sparkle hs-left">✨</div>
+        <div class="hero-sparkle hs-right">🌸</div>
+
+        <!-- Интерактивное солнышко -->
+        <div class="sun-wrapper" id="interactiveSun" title="Коснись солнышка, чтобы поймать тепло">
+          <div class="sun-sphere">
+            <div class="sun-face">☀️</div>
+            <div class="sun-halo"></div>
+            <div class="sun-glow-pulse"></div>
+            <div class="sun-ray sr1"></div>
+            <div class="sun-ray sr2"></div>
+            <div class="sun-ray sr3"></div>
+            <div class="sun-ray sr4"></div>
+          </div>
+          <span class="sun-touch-hint">Коснись меня ✨</span>
         </div>
 
-        <!-- Табло обратного отсчета -->
-        <div class="countdown-display" id="countdownDisplay">
-          <div class="countdown-unit">
-            <span class="unit-val" id="countHours">00</span>
-            <span class="unit-label">Часов</span>
-          </div>
-          <span class="countdown-sep">:</span>
-          <div class="countdown-unit">
-            <span class="unit-val" id="countMinutes">00</span>
-            <span class="unit-label">Минут</span>
-          </div>
-          <span class="countdown-sep">:</span>
-          <div class="countdown-unit">
-            <span class="unit-val" id="countSeconds">00</span>
-            <span class="unit-label">Секунд</span>
-          </div>
-        </div>
+        <span class="hero-tag">💖 Лучик исцеляющей любви</span>
+        <h1 class="main-title">Моему любимому солнышку</h1>
+        <p class="subtitle">
+          Я создал этот нежный и светлый уголок специально для тебя, чтобы сквозь любые километры укутать тебя заботой, согреть горячим чаем и подарить самую теплую улыбку.
+        </p>
 
-        <!-- Статус автоматического открытия -->
-        <div class="timer-actions">
-          <div class="lock-status-notice" id="lockStatusNotice">
-            <span class="lock-status-icon" id="lockStatusIcon">🔒</span>
-            <span class="lock-status-text" id="lockStatusText">Страница откроется автоматически ровно в 23:30</span>
+        <!-- Индикатор заботы и любви -->
+        <div class="care-meter-box">
+          <div class="care-meter-header">
+            <span class="care-meter-title">Уровень заботы и любви:</span>
+            <span class="care-meter-val" id="careMeterVal">1000% ❤️</span>
           </div>
+          <div class="care-meter-bar">
+            <div class="care-meter-fill" id="careMeterFill"></div>
+          </div>
+          <p class="care-meter-note">Бесконечная поддержка прямо в твоё сердечко</p>
         </div>
       </div>
     </section>
 
-    <!-- Основной ночной романтический контент -->
-    <main class="main-content content-hidden" id="mainContent">
-      <!-- Интерактивная луна -->
-      <section class="moon-section scroll-reveal">
-        <div class="moon-wrapper" id="interactiveMoon" title="Коснись луны, чтобы поймать звездочку желаний">
-          <div class="moon-sphere">
-            <div class="moon-crater c1"></div>
-            <div class="moon-crater c2"></div>
-            <div class="moon-crater c3"></div>
-            <div class="moon-halo"></div>
-            <div class="moon-glow-pulse"></div>
-            <div class="moon-sparkle ms1"></div>
-            <div class="moon-sparkle ms2"></div>
-            <div class="moon-sparkle ms3"></div>
+    <!-- Интерактивная секция: Аптечка первой нежности -->
+    <section class="care-kit-section scroll-reveal">
+      <div class="section-heading-wrap">
+        <span class="sub-badge">🍵 Скорая помощь от любимого</span>
+        <h2 class="section-title">Аптечка первой нежности</h2>
+        <p class="section-desc">Нажимай на каждый предмет, чтобы принять порцию тепла:</p>
+      </div>
+
+      <div class="care-kit-grid">
+        <!-- Предмет 1: Чай с малиной -->
+        <div class="kit-card glass-card" id="kitTea" data-action="tea">
+          <div class="kit-icon-wrap">
+            <span class="kit-icon">🍵</span>
+            <span class="kit-steam">♨️</span>
+          </div>
+          <div class="kit-title">Чай с малиной</div>
+          <p class="kit-desc">Горячий, с лимоном и мятой для горлышка</p>
+          <div class="kit-btn-label">Выпить чай 🫖</div>
+        </div>
+
+        <!-- Предмет 2: Мягкий пледик -->
+        <div class="kit-card glass-card" id="kitPlaid" data-action="plaid">
+          <div class="kit-icon-wrap">
+            <span class="kit-icon">🧸</span>
+          </div>
+          <div class="kit-title">Пушистый пледик</div>
+          <p class="kit-desc">Самый мягкий кокон уюта и тепла</p>
+          <div class="kit-btn-label">Укутаться 🛏️</div>
+        </div>
+
+        <!-- Предмет 3: Витаминка нежности -->
+        <div class="kit-card glass-card" id="kitVitamin" data-action="vitamin">
+          <div class="kit-icon-wrap">
+            <span class="kit-icon">💊</span>
+          </div>
+          <div class="kit-title">Витаминка любви</div>
+          <p class="kit-desc">100% нежности и миллион поцелуев</p>
+          <div class="kit-btn-label">Принять ✨</div>
+        </div>
+
+        <!-- Предмет 4: Баночка мёда -->
+        <div class="kit-card glass-card" id="kitHoney" data-action="honey">
+          <div class="kit-icon-wrap">
+            <span class="kit-icon">🍯</span>
+          </div>
+          <div class="kit-title">Сладкий мёд</div>
+          <p class="kit-desc">Ароматная ложечка для скорейших сил</p>
+          <div class="kit-btn-label">Полакомиться 🍯</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1-я фото-секция: Отдых и покой -->
+    <section class="story-section scroll-reveal">
+      <div class="story-card glass-card">
+        <div class="photo-wrapper">
+          <img src="photo/1.jpg" alt="Мое любимое солнышко" class="story-photo" loading="lazy">
+          <div class="photo-shimmer"></div>
+          <div class="photo-corner-flower">🌸</div>
+        </div>
+
+        <div class="story-content">
+          <span class="story-tag">Время для себя 🤍</span>
+          <h3 class="story-heading">Отдыхай и ни о чем не думай...</h3>
+          <p>
+            Моя девочка, прямо сейчас отпусти все дела, заботы и переживания. Весь мир подождет! Твоя единственная важная задача сегодня - хорошенько выспаться, пить теплый морс и отдыхать.
+          </p>
+          <p>
+            Я мысленно сижу рядом с твоей кроваткой, тихонько глажу тебя по волосам и оберегаю твой покой.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2-я фото-секция: Ты прекрасна всегда -->
+    <section class="story-section scroll-reveal">
+      <div class="story-card glass-card">
+        <div class="photo-wrapper">
+          <img src="photo/2.jpg" alt="Самая прекрасная" class="story-photo" loading="lazy">
+          <div class="photo-shimmer"></div>
+          <div class="photo-corner-flower">🌷</div>
+        </div>
+
+        <div class="story-content">
+          <span class="story-tag">Самая родная 💖</span>
+          <h3 class="story-heading">Ты прекрасна в любой момент</h3>
+          <p>
+            Даже когда ты болеешь, шмыгаешь милым носиком и укутана как сладкая булочка в три одеяла, для меня ты остаешься самым красивым и чудесным созданием во всей вселенной.
+          </p>
+          <p>
+            Твой свет не угаснет ни на секунду. Набирайся сил, мое солнышко, твой организм со всем справится!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3-я фото-секция: Улыбка и строго под ней :Р -->
+    <section class="story-section scroll-reveal">
+      <div class="story-card glass-card">
+        <div class="photo-wrapper">
+          <img src="photo/3.jpg" alt="Любимый шкодный котеночек" class="story-photo" loading="lazy">
+          <div class="photo-shimmer"></div>
+          <div class="photo-corner-flower">✨</div>
+        </div>
+
+        <!-- Строго под 3-й фоткой расположено :Р по запросу -->
+        <div class="tongue-badge-wrap" id="tongueBadge" title="Котеночек :Р">
+          <span class="tongue-symbol">:Р</span>
+          <div class="tongue-caption">
+            <div>Твой самый любимый шкодный котеночек который любит вашу жоп</div>
+            <div class="tongue-highlight">твоя жопа = моя жопа :Р выздоравливай скорее!</div>
           </div>
         </div>
-        <p class="moon-hint">Коснись луны, чтобы загадать сонное желание ✨</p>
 
-        <h1 class="main-title">Спокойной ночи, котеночек мой любимый</h1>
-        <p class="subtitle">Я создал этот уютный уголок ночи специально для тебя, чтобы твой сон был самым безмятежным, теплым и сказочным.</p>
-      </section>
-
-      <!-- 1-я фото-секция: Первое нежное письмо -->
-      <section class="story-section scroll-reveal">
-        <div class="story-card glass-card">
-          <div class="photo-wrapper">
-            <img src="photo/1.jpg" alt="Мой любимый котеночек" class="story-photo" loading="lazy">
-            <div class="photo-shimmer"></div>
-          </div>
-
-          <div class="story-content">
-            <h3 class="story-heading">Вечернее затишье...</h3>
-            <p>
-              Когда наступает вечер и за окном гаснут последние огни, весь мир вокруг замирает. В этой нежной тишине все мои мысли обращены только к тебе, моя самая любимая девочка.
-            </p>
-            <p>
-              Каждое мгновение с тобой это настоящее сокровище. Спасибо тебе за твой свет, за твою улыбку и за то, как сильно ты меня вдохновляешь.
-            </p>
-          </div>
+        <div class="story-content">
+          <span class="story-tag">Лучшее лекарство 🐱</span>
+          <h3 class="story-heading">Улыбнись прямо сейчас!</h3>
+          <p>
+            Смех и хорошее настроение ускоряют выздоровление на 200%. Твой шкодный котеночек рядом, чтобы веселить тебя и поднимать боевой дух!
+          </p>
+          <p>
+            Улыбнись, солнышко, ведь твоя сияющая улыбка освещает весь мой мир!
+          </p>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- 2-я фото-секция: Тепло и забота -->
-      <section class="story-section scroll-reveal">
-        <div class="story-card glass-card">
-          <div class="photo-wrapper">
-            <img src="photo/2.jpg" alt="Самая нежная" class="story-photo" loading="lazy">
-            <div class="photo-shimmer"></div>
-          </div>
-
-          <div class="story-content">
-            <h3 class="story-heading">Ты согреваешь мое сердце</h3>
-            <p>
-              Хочу, чтобы прямо сейчас ты почувствовала, как я мысленно обнимаю тебя. Пусть уютно укутает одеяло, а все заботы и усталость прошедшего дня просто растворятся в ночи.
-            </p>
-            <p>
-              Ты у меня невероятная умница, добрая, красивая и такая родная. Я горжусь тобой каждую секунду и всегда рядом, что бы ни случилось.
-            </p>
-          </div>
+    <!-- Интерактивные лучики тепла (Генератор заботливых мыслей) -->
+    <section class="notes-section scroll-reveal">
+      <div class="notes-card glass-card">
+        <div class="notes-header">
+          <span class="notes-sparkle">✦</span>
+          <span class="notes-title">Лучики исцеляющего тепла</span>
+          <span class="notes-sparkle">✦</span>
         </div>
-      </section>
+        <p class="notes-desc">Нажимай на кнопку, чтобы поймать новую порцию заботы:</p>
 
-      <!-- 3-я фото-секция: Игривая фотка и строго под ней :Р -->
-      <section class="story-section scroll-reveal">
-        <div class="story-card glass-card">
-          <div class="photo-wrapper">
-            <img src="photo/3.jpg" alt="Любимый котеночек" class="story-photo" loading="lazy">
-            <div class="photo-shimmer"></div>
-          </div>
-
-          <!-- Строго под 3-й фоткой расположено :Р по запросу -->
-          <div class="tongue-badge-wrap" id="tongueBadge" title="Котеночек :Р">
-            <span class="tongue-symbol">:Р</span>
-            <div class="tongue-caption">
-              <div>Твой самый любимый шкодный котеночек который любит вашу жоп</div>
-              <div class="tongue-highlight">твоя жопа = моя жопа :Р</div>
-            </div>
-          </div>
-
-          <div class="story-content">
-            <p>
-              Обожаю твой смех, твои милые привычки и то, какая ты настоящая со мной. С тобой даже обычный день превращается в маленький праздник!
-            </p>
-            <p>
-              Улыбнись прямо сейчас перед сном, котеночек. Твоя улыбка это самое прекрасное, что есть на свете.
-            </p>
-          </div>
+        <!-- Отображение текущего пожелания -->
+        <div class="note-display" id="noteDisplay">
+          <div class="note-quote-sign">“</div>
+          <p class="note-text" id="noteText">Выздоравливай поскорее, солнышко! Пусть температура скорее спадет, слабость уйдет, а силы вернутся. Я посылаю тебе всю энергию и тепло своего сердца!</p>
+          <div class="note-counter" id="noteCounter">Лучик 1 из 12</div>
         </div>
-      </section>
 
-      <!-- Интерактивные мысли на ночь (Звездочки снов) -->
-      <section class="notes-section scroll-reveal">
-        <div class="notes-card glass-card">
-          <div class="notes-header">
-            <span class="notes-sparkle">✦</span>
-            <span class="notes-title">Звездочки сладких снов</span>
-            <span class="notes-sparkle">✦</span>
-          </div>
-          <p class="notes-desc">Нажимай на кнопку, чтобы поймать нежные слова перед сном:</p>
-
-          <!-- Отображение текущего пожелания -->
-          <div class="note-display" id="noteDisplay">
-            <div class="note-quote-sign">“</div>
-            <p class="note-text" id="noteText">Спокойной ночи, котеночек мой любимый! Пусть эта ночь принесет тебе самый сладкий и безмятежный отдых.</p>
-            <div class="note-counter" id="noteCounter">Звездочка 1 из 10</div>
-          </div>
-
-          <div class="note-actions">
-            <button class="next-note-btn" id="nextNoteBtn">
-              <span class="btn-star-icon">⭐</span>
-              <span>Случайная звездочка</span>
-              <span class="btn-arrow">✨</span>
-            </button>
-          </div>
+        <div class="note-actions">
+          <button class="next-note-btn" id="nextNoteBtn">
+            <span class="btn-star-icon">☀️</span>
+            <span>Поймать лучик тепла</span>
+            <span class="btn-arrow">✨</span>
+          </button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Финальная фото-секция: под конец вставить фотку под конец -->
-      <section class="story-section final-story-section scroll-reveal">
-        <div class="story-card glass-card final-card">
-          <div class="photo-wrapper final-photo-wrapper">
-            <img src="photo/end.jpg" alt="Сладких снов" class="story-photo" loading="lazy">
-            <div class="photo-shimmer"></div>
-          </div>
-
-          <div class="story-content final-content">
-            <h3 class="final-title">Сладких и волшебных снов, любимая...</h3>
-            <p>
-              Вот и наступило время спать. Закрывай глазки, отпускай все мысли. Пусть тебе приснится что-то удивительно красивое, доброе и сказочное.
-            </p>
-            <p>
-              Я мысленно укрываю тебя пушистым одеялком, целую в щечку, в носик и крепко прижимаю к себе. Ты самое дорогое, что у меня есть.
-            </p>
-            <p class="final-sign">Крепко люблю тебя. До самого утра ❤️</p>
-          </div>
-
-          <!-- Кнопка почувствовать ночные объятия -->
-          <div class="hug-action-wrap">
-            <button class="hug-btn" id="hugBtn">
-              <span class="hug-btn-icon">🌙</span>
-              <span class="hug-btn-text">Укутаться в одеялко и поймать поцелуй</span>
-            </button>
-          </div>
+    <!-- 4-я фото-секция: Я всегда рядом -->
+    <section class="story-section scroll-reveal">
+      <div class="story-card glass-card">
+        <div class="photo-wrapper">
+          <img src="photo/end.jpg" alt="Я рядом" class="story-photo" loading="lazy">
+          <div class="photo-shimmer"></div>
+          <div class="photo-corner-flower">🤍</div>
         </div>
-      </section>
 
-      <!-- Кнопка ответа спокойной ночи -->
-      <section class="reply-section scroll-reveal">
-        <a href="https://t.me/share/url?url=&text=%D0%A1%D0%BF%D0%BE%D0%BA%D0%BE%D0%B9%D0%BD%D0%BE%D0%B9%20%D0%BD%D0%BE%D1%87%D0%B8%2C%20%D0%BB%D1%8E%D0%B1%D0%B8%D0%BC%D1%8B%D0%B9!%20%D0%AF%20%D1%82%D0%BE%D0%B6%D0%B5%20%D1%82%D0%B5%D0%B1%D1%8F%20%D0%BE%D1%87%D0%B5%D0%BD%D1%8C%20%D0%BB%D1%8E%D0%B1%D0%BB%D1%8E%2C%20%D1%81%D0%BF%D0%B0%D1%81%D0%B8%D0%B1%D0%BE%20%D0%B7%D0%B0%20%D1%82%D0%B0%D0%BA%D1%83%D1%8E%20%D0%BA%D1%80%D0%B0%D1%81%D0%BE%D1%82%D1%83%20%E2%9D%A4%EF%B8%8F" class="goodnight-reply-btn" id="replyBtn" target="_blank">
-          <span class="reply-icon">💌</span>
-          <span>Ответить «Спокойной ночи, любимый! Люблю тебя ❤️»</span>
-        </a>
-      </section>
-    </main>
+        <div class="story-content">
+          <span class="story-tag">Рядышком сквозь расстояние 🕊️</span>
+          <h3 class="story-heading">Мысленно держу твою ручку</h3>
+          <p>
+            Закрой на секунду глазки и почувствуй, как я рядом: целую тебя в лобик, поправляю одеялко и тихонечко шепчу, как сильно я тебя люблю.
+          </p>
+          <p>
+            Скоро все неприятные симптомы пройдут, мы снова будем гулять, много смеяться и радоваться жизни вместе!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Кнопка согревающего объятия -->
+    <section class="hug-section scroll-reveal">
+      <div class="hug-card glass-card">
+        <div class="hug-header">
+          <span class="hug-icon-floating">🫂</span>
+          <h3 class="hug-title">Нужно срочное объятие?</h3>
+          <p class="hug-desc">Нажми на кнопочку, чтобы я мысленно крепко прижал тебя к себе:</p>
+        </div>
+
+        <div class="hug-action-wrap">
+          <button class="hug-btn" id="hugBtn">
+            <span class="hug-btn-icon">💖</span>
+            <span class="hug-btn-text">Почувствовать согревающее объятие</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ФИНАЛЬНАЯ КУЛЬМИНАЦИЯ: Надпись "Выздоравливай поскорее солнышко" -->
+    <section class="finale-section scroll-reveal" id="finaleSection">
+      <div class="finale-card glass-card">
+        <div class="finale-aura"></div>
+        <div class="finale-sun-icon">☀️</div>
+
+        <div class="finale-sparkles">
+          <span>🌸</span>
+          <span>✨</span>
+          <span>💖</span>
+          <span>✨</span>
+          <span>🌸</span>
+        </div>
+
+        <!-- ГЛАВНАЯ НАДПИСЬ ПО ЗАПРОСУ -->
+        <h2 class="finale-main-phrase">Выздоравливай поскорее, солнышко!</h2>
+
+        <div class="finale-divider">
+          <span class="f-line"></span>
+          <span class="f-star">☀️</span>
+          <span class="f-line"></span>
+        </div>
+
+        <div class="finale-letter">
+          <p>
+            Ты самое светлое, нежное и драгоценное чудо в моей жизни. Без твоего тепла весь мир кажется серым и прохладным.
+          </p>
+          <p>
+            Пей вкусный чай, кушай витаминки, отдыхай и набирайся сил. Я считаю каждую минуту до момента, когда ты поправишься и будешь снова улыбаться во весь рот!
+          </p>
+          <p class="finale-love-signature">Бесконечно и всем сердцем люблю тебя. Всегда рядом! ❤️</p>
+        </div>
+
+        <!-- Кнопка ответа для любимой -->
+        <div class="reply-wrap">
+          <a href="https://t.me/share/url?url=&text=%D0%A1%D0%BF%D0%B0%D1%81%D0%B8%D0%B1%D0%BE%2C%20%D0%BC%D0%BE%D1%91%20%D1%81%D0%BE%D0%BB%D0%BD%D1%8B%D1%88%D0%BA%D0%BE!%20%D0%9C%D0%BD%D0%B5%20%D1%83%D0%B6%D0%B5%20%D1%82%D0%B5%D0%BF%D0%BB%D0%B5%D0%B5%20%D0%B8%20%D1%8F%20%D1%83%D0%BB%D1%8B%D0%B1%D0%B0%D1%8E%D1%81%D1%8C%2C%20%D1%81%D0%BA%D0%BE%D1%80%D0%BE%20%D0%BF%D0%BE%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D1%8E%D1%81%D1%8C%20%E2%9D%A4%EF%B8%8F" class="reply-btn" id="replyBtn" target="_blank">
+            <span class="reply-icon">💌</span>
+            <span>Написать любимому: «Спасибо, моё солнышко! Мне уже теплее ❤️»</span>
+          </a>
+        </div>
+      </div>
+    </section>
 
     <!-- Подвал -->
-    <footer class="app-footer content-hidden" id="siteFooter">
-      <p class="footer-blessing">Сладких снов, котеночек мой любимый. Я всегда с тобой.</p>
-      <div class="footer-stars">🌙 ✦ 💤 ✦ ✨</div>
+    <footer class="app-footer scroll-reveal" id="siteFooter">
+      <p class="footer-blessing">С безграничной любовью и заботой специально для тебя 🌸</p>
+      <div class="footer-stars">☀️ ✦ 💖 ✦ 🌸 ✦ ✨</div>
     </footer>
   </div>
 

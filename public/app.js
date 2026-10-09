@@ -1,23 +1,25 @@
-// Скрипт ночной персональной романтической страницы "Спокойной ночи, котеночек мой любимый!"
+// Интерактивный скрипт страницы заботы "Выздоравливай поскорее, солнышко!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 (function () {
   'use strict';
 
-  // Инициализация Telegram WebApp
+  // ==========================================
+  // 1. Инициализация Telegram WebApp
+  // ==========================================
   const tg = window.Telegram ? window.Telegram.WebApp : null;
   if (tg) {
     try {
       tg.ready();
       tg.expand();
-      if (tg.setHeaderColor) tg.setHeaderColor('#080512');
-      if (tg.setBackgroundColor) tg.setBackgroundColor('#080512');
+      if (tg.setHeaderColor) tg.setHeaderColor('#fff0f5');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#fff0f5');
     } catch (e) {
       console.log('TG Init error:', e);
     }
   }
 
-  // Тактильный отклик
+  // Тактильный отклик (Haptic Feedback)
   function triggerHaptic(type = 'light') {
     if (tg && tg.HapticFeedback) {
       try {
@@ -30,8 +32,8 @@
     }
   }
 
-  // Всплывающее сообщение
-  function showToast(text, icon = '🌙') {
+  // Всплывающее уведомление (Toast)
+  function showToast(text, icon = '🌸') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
     const toast = document.createElement('div');
@@ -44,9 +46,9 @@
   }
 
   // ==========================================
-  // 1. Интерактивный холст ночного неба
+  // 2. Интерактивный холст: кружащиеся лепестки и искры
   // ==========================================
-  const canvas = document.getElementById('nightCanvas');
+  const canvas = document.getElementById('petalsCanvas');
   const ctx = canvas ? canvas.getContext('2d') : null;
   let width = canvas ? (canvas.width = window.innerWidth) : 0;
   let height = canvas ? (canvas.height = window.innerHeight) : 0;
@@ -55,131 +57,106 @@
     if (!canvas) return;
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
-    initStars();
+    initPetals();
   });
 
-  const stars = [];
-  const meteors = [];
+  const petals = [];
   const floatingItems = [];
 
-  // Звезды ночного неба
-  function initStars() {
-    stars.length = 0;
-    const count = Math.floor((width * height) / 3800);
-    const starColors = ['#ffffff', '#fff5db', '#e2d8ff', '#ffd166', '#ff8fab', '#74ebd5'];
+  // Инициализация лепестков сакуры и солнечных пылинок
+  function initPetals() {
+    petals.length = 0;
+    const count = Math.min(38, Math.floor((width * height) / 18000));
 
     for (let i = 0; i < count; i++) {
-      stars.push({
+      petals.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 1.8 + 0.4,
-        baseAlpha: Math.random() * 0.7 + 0.25,
-        pulseSpeed: Math.random() * 0.03 + 0.008,
-        pulsePhase: Math.random() * Math.PI * 2,
-        vy: -(Math.random() * 0.15 + 0.03),
-        vx: (Math.random() - 0.5) * 0.08,
-        color: starColors[Math.floor(Math.random() * starColors.length)]
+        size: Math.random() * 11 + 9,
+        vy: Math.random() * 0.9 + 0.45,
+        vx: Math.random() * 0.7 - 0.2,
+        swing: Math.random() * 2 + 1,
+        swingSpeed: Math.random() * 0.02 + 0.008,
+        swingPhase: Math.random() * Math.PI * 2,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.025,
+        color: Math.random() > 0.4 ? 'rgba(255, 182, 193, 0.75)' : 'rgba(255, 209, 220, 0.85)',
+        type: Math.random() > 0.2 ? 'petal' : 'sunbeam'
       });
     }
   }
 
-  // Запуск падающей звезды (метеора)
-  function spawnMeteor() {
-    meteors.push({
-      x: Math.random() * (width * 0.9),
-      y: Math.random() * (height * 0.4),
-      length: Math.random() * 90 + 60,
-      speed: Math.random() * 7 + 5,
-      angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
-      opacity: 0.95,
-      decay: Math.random() * 0.02 + 0.012
-    });
-  }
-
-  setInterval(() => {
-    if (Math.random() > 0.35) {
-      spawnMeteor();
-    }
-  }, 3200);
-
-  // Салют ночных искорок, сердечек и котиков
-  function spawnNightBurst(originX, originY) {
-    const symbols = ['🌙', '💖', '✨', '🐱', '💤', '🧸', '⭐'];
+  // Взрыв лепестков, сердечек и искорок при клике/касании
+  function spawnBlossomBurst(originX, originY) {
+    const symbols = ['🌸', '💖', '☀️', '✨', '🌷', '🤍', '🧸', '🍓'];
     const startX = originX !== undefined ? originX : width / 2;
-    const startY = originY !== undefined ? originY : height * 0.6;
+    const startY = originY !== undefined ? originY : height * 0.5;
 
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 22; i++) {
       floatingItems.push({
-        x: startX + (Math.random() - 0.5) * 60,
-        y: startY + (Math.random() - 0.5) * 40,
-        vx: (Math.random() - 0.5) * 3.4,
-        vy: -(Math.random() * 3.8 + 2.0),
-        size: Math.random() * 16 + 14,
+        x: startX + (Math.random() - 0.5) * 40,
+        y: startY + (Math.random() - 0.5) * 30,
+        vx: (Math.random() - 0.5) * 3.6,
+        vy: -(Math.random() * 3.6 + 1.8),
+        size: Math.random() * 14 + 16,
         alpha: 1,
-        decay: Math.random() * 0.014 + 0.007,
+        decay: Math.random() * 0.015 + 0.009,
         symbol: symbols[Math.floor(Math.random() * symbols.length)]
       });
     }
   }
 
-  function renderSky() {
+  // Анимационный цикл холста
+  function renderScene() {
     if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
 
-    // Рисование мерцающих звезд
-    for (let i = 0; i < stars.length; i++) {
-      const s = stars[i];
-      s.pulsePhase += s.pulseSpeed;
-      s.y += s.vy;
-      s.x += s.vx;
+    // Рисование кружащихся лепестков
+    for (let i = 0; i < petals.length; i++) {
+      const p = petals[i];
+      p.swingPhase += p.swingSpeed;
+      p.x += Math.sin(p.swingPhase) * p.swing + p.vx;
+      p.y += p.vy;
+      p.rotation += p.rotSpeed;
 
-      if (s.y < -5) s.y = height + 5;
-      if (s.x < -5) s.x = width + 5;
-      if (s.x > width + 5) s.x = -5;
-
-      const alpha = s.baseAlpha + Math.sin(s.pulsePhase) * 0.3;
-      ctx.fillStyle = s.color;
-      ctx.globalAlpha = Math.max(0.08, Math.min(1, alpha));
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Рисование метеоров
-    ctx.globalAlpha = 1;
-    for (let i = meteors.length - 1; i >= 0; i--) {
-      const m = meteors[i];
-      const tailX = m.x - Math.cos(m.angle) * m.length;
-      const tailY = m.y - Math.sin(m.angle) * m.length;
-
-      const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
-      grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-      grad.addColorStop(0.7, `rgba(226, 216, 255, ${m.opacity * 0.6})`);
-      grad.addColorStop(1, `rgba(255, 243, 196, ${m.opacity})`);
-
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.moveTo(tailX, tailY);
-      ctx.lineTo(m.x, m.y);
-      ctx.stroke();
-
-      m.x += Math.cos(m.angle) * m.speed;
-      m.y += Math.sin(m.angle) * m.speed;
-      m.opacity -= m.decay;
-
-      if (m.opacity <= 0) {
-        meteors.splice(i, 1);
+      if (p.y > height + 20) {
+        p.y = -20;
+        p.x = Math.random() * width;
       }
+      if (p.x > width + 20) p.x = -20;
+      if (p.x < -20) p.x = width + 20;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+
+      if (p.type === 'petal') {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(p.size / 2, -p.size / 2, p.size, 0, 0, p.size * 1.3);
+        ctx.bezierCurveTo(-p.size, 0, -p.size / 2, -p.size / 2, 0, 0);
+        ctx.fill();
+      } else {
+        // Солнечный лучик
+        ctx.fillStyle = 'rgba(255, 217, 102, 0.45)';
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
     }
 
-    // Летающие ночные символы и эмодзи
+    // Рисование летающих эмоциональных символов
     for (let i = floatingItems.length - 1; i >= 0; i--) {
       const item = floatingItems[i];
+      ctx.save();
       ctx.globalAlpha = Math.max(0, item.alpha);
       ctx.font = `${item.size}px serif`;
       ctx.textAlign = 'center';
       ctx.fillText(item.symbol, item.x, item.y);
+      ctx.restore();
 
       item.x += item.vx;
       item.y += item.vy;
@@ -190,239 +167,129 @@
       }
     }
 
-    requestAnimationFrame(renderSky);
+    requestAnimationFrame(renderScene);
   }
 
   if (canvas && ctx) {
-    initStars();
-    renderSky();
+    initPetals();
+    renderScene();
   }
 
   // ==========================================
-  // 2. Таймер обратного отсчета до 23:30
+  // 3. Интерактивное солнышко
   // ==========================================
-  const countHoursEl = document.getElementById('countHours');
-  const countMinutesEl = document.getElementById('countMinutes');
-  const countSecondsEl = document.getElementById('countSeconds');
-  const timerHeadingEl = document.getElementById('timerHeading');
-  const timerSubEl = document.getElementById('timerSub');
-  const lockStatusNotice = document.getElementById('lockStatusNotice');
-  const lockStatusText = document.getElementById('lockStatusText');
-  const lockStatusIcon = document.getElementById('lockStatusIcon');
-  const mainContentEl = document.getElementById('mainContent');
-  const siteFooterEl = document.getElementById('siteFooter');
-  const liveClock = document.getElementById('liveClock');
+  const sunWrapper = document.getElementById('interactiveSun');
+  const sunPhrases = [
+    'Ты моё самое яркое и любимое солнышко! ☀️💖',
+    'Я согрею тебя даже сквозь сотни километров! 🌸',
+    'Шлю тебе тысячу поцелуев в носик и лобик! ✨',
+    'Поправляйся скорее, радость моя ненаглядная! 🌷',
+    'Улыбнись, солнышко, твой котеночек всегда рядом! 🐱'
+  ];
 
-  let hasCelebratedUnlock = false;
-
-  function setUnlockedState() {
-    document.body.classList.remove('is-locked');
-    if (mainContentEl) {
-      mainContentEl.classList.remove('content-hidden');
-      mainContentEl.classList.add('content-revealed');
-    }
-    if (siteFooterEl) {
-      siteFooterEl.classList.remove('content-hidden');
-      siteFooterEl.classList.add('content-revealed');
-    }
-
-    if (countHoursEl) countHoursEl.textContent = '00';
-    if (countMinutesEl) countMinutesEl.textContent = '00';
-    if (countSecondsEl) countSecondsEl.textContent = '00';
-
-    if (timerHeadingEl) {
-      timerHeadingEl.textContent = 'Волшебное время 23:30 наступило! ✨';
-    }
-    if (timerSubEl) {
-      timerSubEl.textContent = 'Послание открыто для самого любимого котеночка на свете 💖';
-    }
-    if (lockStatusNotice) {
-      lockStatusNotice.classList.add('unlocked');
-    }
-    if (lockStatusIcon) {
-      lockStatusIcon.textContent = '✨';
-    }
-    if (lockStatusText) {
-      lockStatusText.textContent = 'Доступ открыт! Сладких снов, любимая 💖';
-    }
-    if (liveClock) {
-      liveClock.textContent = '23:30';
-    }
-
-    if (!hasCelebratedUnlock) {
-      hasCelebratedUnlock = true;
-      triggerHaptic('success');
-      spawnNightBurst(window.innerWidth / 2, window.innerHeight / 3);
-      setTimeout(() => spawnNightBurst(window.innerWidth / 3, window.innerHeight / 2), 300);
-      setTimeout(() => spawnNightBurst((2 * window.innerWidth) / 3, window.innerHeight / 2), 600);
-      showToast('Ура! 23:30 наступило! Страница открыта с любовью 💖', '✨');
-    }
-  }
-
-  function setLockedState(hours, minutes, seconds) {
-    document.body.classList.add('is-locked');
-    if (mainContentEl) {
-      mainContentEl.classList.add('content-hidden');
-      mainContentEl.classList.remove('content-revealed');
-    }
-    if (siteFooterEl) {
-      siteFooterEl.classList.add('content-hidden');
-      siteFooterEl.classList.remove('content-revealed');
-    }
-
-    if (countHoursEl) countHoursEl.textContent = String(hours).padStart(2, '0');
-    if (countMinutesEl) countMinutesEl.textContent = String(minutes).padStart(2, '0');
-    if (countSecondsEl) countSecondsEl.textContent = String(seconds).padStart(2, '0');
-
-    if (timerHeadingEl) {
-      timerHeadingEl.textContent = 'Станет доступно в 23:30';
-    }
-    if (timerSubEl) {
-      timerSubEl.textContent = 'Обратный отсчет до нашего сокровенного часа спокойной ночи:';
-    }
-    if (lockStatusNotice) {
-      lockStatusNotice.classList.remove('unlocked');
-    }
-    if (lockStatusIcon) {
-      lockStatusIcon.textContent = '🔒';
-    }
-    if (lockStatusText) {
-      lockStatusText.textContent = 'Страница откроется автоматически ровно в 23:30';
-    }
-    if (liveClock) {
-      liveClock.textContent = '23:30';
-    }
-  }
-
-  function updateCountdown() {
-    const now = new Date();
-    const nowUtc = now.getTime();
-
-    // Целевая дата на сегодня в 20:30:00 UTC (= 23:30 по времени Москвы, UTC+3)
-    let targetUtc = Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      20, 30, 0
-    );
-
-    let diff = targetUtc - nowUtc;
-
-    // Если 23:30 уже наступило
-    if (diff <= 0) {
-      setUnlockedState();
-      return;
-    }
-
-    // Если еще не наступило 23:30
-    const totalSeconds = Math.floor(diff / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    setLockedState(hours, minutes, seconds);
-  }
-
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-  // ==========================================
-  // 3. Анимации при скролле (Intersection Observer)
-  // ==========================================
-  const scrollElements = document.querySelectorAll('.scroll-reveal');
-
-  if ('IntersectionObserver' in window) {
-    const scrollObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          // Легкий визуальный отклик
-          if (Math.random() > 0.6) {
-            spawnMeteor();
-          }
-        }
-      });
-    }, {
-      threshold: 0.12,
-      rootMargin: '0px 0px -40px 0px'
-    });
-
-    scrollElements.forEach((el) => scrollObserver.observe(el));
-  } else {
-    // Резервный режим
-    scrollElements.forEach((el) => el.classList.add('revealed'));
-  }
-
-  // ==========================================
-  // 4. Интерактивная луна
-  // ==========================================
-  const moonWrapper = document.getElementById('interactiveMoon');
-  if (moonWrapper) {
-    moonWrapper.addEventListener('click', (e) => {
+  if (sunWrapper) {
+    sunWrapper.addEventListener('click', (e) => {
       triggerHaptic('medium');
-      spawnMeteor();
-      spawnMeteor();
-      spawnNightBurst(e.clientX, e.clientY);
-      showToast('Звездочка желаний поймана! Загадай сладкий сон ✨', '🌙');
+      spawnBlossomBurst(e.clientX, e.clientY);
+      const randomPhrase = sunPhrases[Math.floor(Math.random() * sunPhrases.length)];
+      showToast(randomPhrase, '☀️');
     });
   }
 
   // ==========================================
-  // 5. Игровая отметка :Р строго под 3-м фото
+  // 4. Интерактивная аптечка первой нежности
+  // ==========================================
+  const kitCards = document.querySelectorAll('.kit-card');
+  const kitMessages = {
+    tea: {
+      text: 'Горячий чай заварен! Пей не спеша, пусть горлышко не болит ❤️',
+      icon: '🍵',
+      btn: 'Чай выпит ✓'
+    },
+    plaid: {
+      text: 'Укутал тебя самым мягким пледиком! Теперь ты в уютном коконе 🧸',
+      icon: '🧸',
+      btn: 'В тепле ✓'
+    },
+    vitamin: {
+      text: 'Витаминка принята! 100% нежности уже исцеляют тебя 💖',
+      icon: '💊',
+      btn: 'Принято ✓'
+    },
+    honey: {
+      text: 'Сладкая ложечка мёда для твоего скорейшего выздоровления! 🍯',
+      icon: '🍯',
+      btn: 'Сладко ✓'
+    }
+  };
+
+  kitCards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      const action = card.getAttribute('data-action');
+      const data = kitMessages[action];
+      if (!data) return;
+
+      triggerHaptic('success');
+      spawnBlossomBurst(e.clientX, e.clientY);
+      showToast(data.text, data.icon);
+
+      card.classList.add('taken');
+      const label = card.querySelector('.kit-btn-label');
+      if (label) {
+        label.textContent = data.btn;
+      }
+    });
+  });
+
+  // ==========================================
+  // 5. Игровая плашка :Р строго под 3-м фото
   // ==========================================
   const tongueBadge = document.getElementById('tongueBadge');
   if (tongueBadge) {
     tongueBadge.addEventListener('click', (e) => {
       triggerHaptic('light');
-      spawnNightBurst(e.clientX, e.clientY);
-      showToast('твоя жопа = моя жопа :Р 🍑✨', '🐱');
+      spawnBlossomBurst(e.clientX, e.clientY);
+      showToast('твоя жопа = моя жопа :Р Выздоравливай скорее! 🍑✨', '🐱');
     });
   }
 
   // Касание к фотографиям с теплым откликом
-  const storyPhotos = document.querySelectorAll('.photo-wrapper');
-  storyPhotos.forEach((wrap) => {
+  const photoWrappers = document.querySelectorAll('.photo-wrapper');
+  photoWrappers.forEach((wrap) => {
     wrap.addEventListener('click', (e) => {
       triggerHaptic('light');
-      spawnNightBurst(e.clientX, e.clientY);
+      spawnBlossomBurst(e.clientX, e.clientY);
     });
   });
 
   // ==========================================
-  // 6. Интерактивные звездочки сладких снов
+  // 6. Интерактивные лучики исцеляющего тепла
   // ==========================================
-  const defaultNotes = [
-    'Спокойной ночи, котеночек мой любимый! Пусть эта ночь принесет тебе самый сладкий и безмятежный отдых.',
-    'Укутайся поудобнее в свое одеялко. Представь, что это я крепко и нежно обнимаю тебя, согревая своим теплом.',
-    'Желаю тебе самых добрых и красивых сновидений, где оживают твои самые заветные мечты.',
-    'Ты самое прекрасное чудо в моей жизни. Даже когда темно, ты освещаешь мое сердце.',
-    'Пусть между нами километры, мои мысли и сердце сейчас с тобой. Я буду охранять твой сон всю эту ночь.',
-    'Ты сегодня отлично потрудилась и заслужила самый сладкий отдых. Отдыхай, набирайся сил!',
-    'Шлю тебе самый ласковый поцелуй перед сном в носик и щечки. Спи крепко!',
-    'Пусть за окном тихо мерцают звездочки, а в комнате будет тепло и спокойно.',
-    'Сладких снов, моя сонная радость. Закрывай красивые глазки, я мысленно рядом и нежно глажу тебя по волосам.',
-    'Спокойной ночи, мое счастье. Спасибо тебе за то, что освещаешь мою жизнь ярче миллиарда ночных звезд.'
-  ];
-
-  const wishesSource = (window.WISHES_DATABASE && window.WISHES_DATABASE.length > 0)
+  const wishesList = (window.WISHES_DATABASE && window.WISHES_DATABASE.length > 0)
     ? window.WISHES_DATABASE.map(w => w.text)
-    : defaultNotes;
+    : [
+      'Выздоравливай поскорее, солнышко! Пусть температура скорее спадет, слабость уйдет, а силы вернутся. Я посылаю тебе всю энергию и тепло своего сердца!',
+      'Представь, что я сижу прямо рядом с твоей кроваткой, подаю кружку с чаем и нежно глажу тебя по волосам.',
+      'Даже когда ты болеешь, ты для меня самая прекрасная и любимая девочка на свете!',
+      'Закрывай глазки и почувствуй, как я крепко укрываю тебя пушистым пледом. Ты в полной безопасности.',
+      'Каждая клеточка твоего организма прямо сейчас наполняется здоровьем и силами!'
+    ];
 
-  let currentNoteIdx = 0;
+  let currentWishIdx = 0;
   const noteText = document.getElementById('noteText');
   const noteCounter = document.getElementById('noteCounter');
   const nextNoteBtn = document.getElementById('nextNoteBtn');
 
-  function selectNightNote(index) {
-    currentNoteIdx = index % wishesSource.length;
+  function changeWish(index) {
+    currentWishIdx = index % wishesList.length;
     triggerHaptic('light');
 
     if (noteText) {
       noteText.style.opacity = '0.2';
       setTimeout(() => {
-        noteText.textContent = wishesSource[currentNoteIdx];
+        noteText.textContent = wishesList[currentWishIdx];
         if (noteCounter) {
-          noteCounter.textContent = `Звездочка ${currentNoteIdx + 1} из ${wishesSource.length}`;
+          noteCounter.textContent = `Лучик ${currentWishIdx + 1} из ${wishesList.length}`;
         }
         noteText.style.opacity = '1';
       }, 160);
@@ -432,29 +299,52 @@
   if (nextNoteBtn) {
     nextNoteBtn.addEventListener('click', (e) => {
       triggerHaptic('light');
-      spawnNightBurst(e.clientX, e.clientY);
-      let nextIdx = Math.floor(Math.random() * wishesSource.length);
-      if (nextIdx === currentNoteIdx && wishesSource.length > 1) {
-        nextIdx = (nextIdx + 1) % wishesSource.length;
+      spawnBlossomBurst(e.clientX, e.clientY);
+      let nextIdx = Math.floor(Math.random() * wishesList.length);
+      if (nextIdx === currentWishIdx && wishesList.length > 1) {
+        nextIdx = (nextIdx + 1) % wishesList.length;
       }
-      selectNightNote(nextIdx);
+      changeWish(nextIdx);
     });
   }
 
   // ==========================================
-  // 7. Кнопка ночных объятий перед сном
+  // 7. Кнопка согревающего объятия
   // ==========================================
   const hugBtn = document.getElementById('hugBtn');
   if (hugBtn) {
     hugBtn.addEventListener('click', (e) => {
       triggerHaptic('success');
-      spawnNightBurst(e.clientX, e.clientY);
-      showToast('Я крепко укутал тебя в одеялко и нежно поцеловал! ❤️', '🧸');
+      spawnBlossomBurst(e.clientX, e.clientY);
+      setTimeout(() => spawnBlossomBurst(width / 3, height / 2), 200);
+      setTimeout(() => spawnBlossomBurst((2 * width) / 3, height / 2), 400);
+
+      showToast('Я крепко-крепко прижал тебя к себе и поцеловал! Скоро всё пройдет! 🫂❤️', '💖');
     });
   }
 
   // ==========================================
-  // 8. Управление фоновой музыкой Oneheart - Apathy
+  // 8. Плавное появление карточек при скролле
+  // ==========================================
+  const scrollElements = document.querySelectorAll('.scroll-reveal');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -30px 0px'
+    });
+    scrollElements.forEach(el => observer.observe(el));
+  } else {
+    scrollElements.forEach(el => el.classList.add('revealed'));
+  }
+
+  // ==========================================
+  // 9. Управление фоновой музыкой Oneheart - Apathy
   // ==========================================
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
@@ -465,45 +355,37 @@
     bgMusic.volume = 0.55;
   }
 
-  function playOneheart() {
+  function playMusic() {
     if (bgMusic && bgMusic.paused) {
       bgMusic.play().then(() => {
         if (audioToggleBtn) audioToggleBtn.classList.add('playing');
         if (audioIcon) audioIcon.textContent = '🔊';
         if (audioLabel) audioLabel.textContent = 'Oneheart звучит';
-      }).catch(() => {
-        // Ожидание взаимодействия с пользователем
-      });
+      }).catch(() => {});
     }
   }
 
-  function pauseOneheart() {
+  function pauseMusic() {
     if (bgMusic && !bgMusic.paused) {
       bgMusic.pause();
       if (audioToggleBtn) audioToggleBtn.classList.remove('playing');
       if (audioIcon) audioIcon.textContent = '🎵';
-      if (audioLabel) audioLabel.textContent = 'Oneheart - Apathy';
+      if (audioLabel) audioLabel.textContent = 'Oneheart';
     }
   }
 
-  // Воспроизведение при первом касании страницы
   let userInteracted = false;
-  function handleInitialInteraction() {
+  function handleInitialTap() {
     if (!userInteracted) {
       userInteracted = true;
-      playOneheart();
-      document.removeEventListener('click', handleInitialInteraction);
-      document.removeEventListener('touchstart', handleInitialInteraction);
+      playMusic();
+      document.removeEventListener('click', handleInitialTap);
+      document.removeEventListener('touchstart', handleInitialTap);
     }
   }
 
-  document.addEventListener('click', handleInitialInteraction);
-  document.addEventListener('touchstart', handleInitialInteraction);
-
-  // Попытка запуска при загрузке
-  setTimeout(() => {
-    playOneheart();
-  }, 400);
+  document.addEventListener('click', handleInitialTap);
+  document.addEventListener('touchstart', handleInitialTap);
 
   if (audioToggleBtn) {
     audioToggleBtn.addEventListener('click', (e) => {
@@ -514,13 +396,20 @@
       if (!bgMusic) return;
 
       if (bgMusic.paused) {
-        playOneheart();
-        showToast('Играет Oneheart - Apathy 🎵', '🌙');
+        playMusic();
+        showToast('Играет умиротворяющая музыка 🎵', '🌸');
       } else {
-        pauseOneheart();
+        pauseMusic();
         showToast('Музыка на паузе', '⏸️');
       }
     });
   }
+
+  // Клик в любом свободном месте порождает маленькие искорки
+  document.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.kit-card')) {
+      spawnBlossomBurst(e.clientX, e.clientY);
+    }
+  });
 
 })();
