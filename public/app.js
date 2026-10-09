@@ -88,7 +88,7 @@
 
   // Взрыв лепестков, сердечек и искорок при клике/касании
   function spawnBlossomBurst(originX, originY) {
-    const symbols = ['🌸', '💖', '☀️', '✨', '🌷', '🤍', '🧸', '🍓'];
+    const symbols = ['🌸', '💖', '☀️', '✨', '🌷', '🤍', '🧸', '🐾', '💋'];
     const startX = originX !== undefined ? originX : width / 2;
     const startY = originY !== undefined ? originY : height * 0.5;
 
@@ -138,7 +138,6 @@
         ctx.bezierCurveTo(-p.size, 0, -p.size / 2, -p.size / 2, 0, 0);
         ctx.fill();
       } else {
-        // Солнечный лучик
         ctx.fillStyle = 'rgba(255, 217, 102, 0.45)';
         ctx.beginPath();
         ctx.arc(0, 0, p.size * 0.4, 0, Math.PI * 2);
@@ -188,11 +187,21 @@
   ];
 
   if (sunWrapper) {
-    sunWrapper.addEventListener('click', (e) => {
+    const handleSunInteraction = (e) => {
       triggerHaptic('medium');
-      spawnBlossomBurst(e.clientX, e.clientY);
+      const clickX = e.clientX || window.innerWidth / 2;
+      const clickY = e.clientY || window.innerHeight / 3;
+      spawnBlossomBurst(clickX, clickY);
       const randomPhrase = sunPhrases[Math.floor(Math.random() * sunPhrases.length)];
       showToast(randomPhrase, '☀️');
+    };
+
+    sunWrapper.addEventListener('click', handleSunInteraction);
+    sunWrapper.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleSunInteraction(e);
+      }
     });
   }
 
@@ -224,13 +233,15 @@
   };
 
   kitCards.forEach((card) => {
-    card.addEventListener('click', (e) => {
+    const handleKitClick = (e) => {
       const action = card.getAttribute('data-action');
       const data = kitMessages[action];
       if (!data) return;
 
       triggerHaptic('success');
-      spawnBlossomBurst(e.clientX, e.clientY);
+      const clickX = e.clientX || window.innerWidth / 2;
+      const clickY = e.clientY || window.innerHeight / 2;
+      spawnBlossomBurst(clickX, clickY);
       showToast(data.text, data.icon);
 
       card.classList.add('taken');
@@ -238,18 +249,97 @@
       if (label) {
         label.textContent = data.btn;
       }
+    };
+
+    card.addEventListener('click', handleKitClick);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleKitClick(e);
+      }
     });
   });
 
   // ==========================================
-  // 5. Игровая плашка :Р строго под 3-м фото
+  // 5. Скрытый диалог (Котенок, у меня там битва...)
   // ==========================================
+  const secretToggleBtn = document.getElementById('secretToggleBtn');
+  const secretDialogBox = document.getElementById('secretDialogBox');
+  const secretArrow = document.getElementById('secretArrow');
+
+  if (secretToggleBtn && secretDialogBox) {
+    secretToggleBtn.addEventListener('click', (e) => {
+      triggerHaptic('medium');
+      const isHidden = secretDialogBox.classList.contains('hidden');
+      if (isHidden) {
+        secretDialogBox.classList.remove('hidden');
+        secretToggleBtn.setAttribute('aria-expanded', 'true');
+        if (secretArrow) secretArrow.textContent = '🐾';
+        spawnBlossomBurst(e.clientX, e.clientY);
+        showToast('Секретный диалог раскрыт! 🤫🐾', '💖');
+      } else {
+        secretDialogBox.classList.add('hidden');
+        secretToggleBtn.setAttribute('aria-expanded', 'false');
+        if (secretArrow) secretArrow.textContent = '✨';
+      }
+    });
+  }
+
+  // Интерактивное поглаживание котика
+  const petCatBtn = document.getElementById('petCatBtn');
+  const petCounterText = document.getElementById('petCounterText');
+  let petCount = 0;
+  const purrPhrases = [
+    'Мрррр... ещё гладь! 🐱✨',
+    'Котеночек растаял от нежности и мурчит! 💖',
+    'Битва в игре подождет, котеночек важнее! 🎮❌ 🐾✅',
+    'Каждое поглаживание снимает температуру! 🌸',
+    'Муррр... любимый гладит лучше всех! 🥰'
+  ];
+
+  if (petCatBtn && petCounterText) {
+    petCatBtn.addEventListener('click', (e) => {
+      petCount++;
+      triggerHaptic('light');
+      spawnBlossomBurst(e.clientX, e.clientY);
+      petCounterText.textContent = `Поглажено: ${petCount} раз(а) 💕 (Мур-мур! Температура -${(petCount * 0.2).toFixed(1)}°C!)`;
+      const randomPurr = purrPhrases[Math.floor(Math.random() * purrPhrases.length)];
+      showToast(randomPurr, '🐾');
+    });
+  }
+
+  // Игровая плашка :Р строго под 3-м фото
   const tongueBadge = document.getElementById('tongueBadge');
   if (tongueBadge) {
     tongueBadge.addEventListener('click', (e) => {
       triggerHaptic('light');
       spawnBlossomBurst(e.clientX, e.clientY);
       showToast('твоя жопа = моя жопа :Р Выздоравливай скорее! 🍑✨', '🐱');
+    });
+  }
+
+  // ==========================================
+  // 6. Волшебный компресс нежности
+  // ==========================================
+  const compressBtn = document.getElementById('compressBtn');
+  const tempVal = document.getElementById('tempVal');
+  const tempStatus = document.getElementById('tempStatus');
+
+  if (compressBtn) {
+    compressBtn.addEventListener('click', (e) => {
+      triggerHaptic('success');
+      spawnBlossomBurst(e.clientX, e.clientY);
+      setTimeout(() => spawnBlossomBurst(width / 3, height / 2), 200);
+
+      if (tempVal) {
+        tempVal.textContent = '36.6°C';
+        tempVal.style.color = '#ff477e';
+      }
+      if (tempStatus) {
+        tempStatus.textContent = 'Температура в норме 36.6°C! Уровень уюта: 100% 💖';
+      }
+
+      showToast('Волшебный компресс наложен! Температура 36.6°C! 💖', '🌸');
     });
   }
 
@@ -263,7 +353,7 @@
   });
 
   // ==========================================
-  // 6. Интерактивные лучики исцеляющего тепла
+  // 7. Интерактивные лучики исцеляющего тепла
   // ==========================================
   const wishesList = (window.WISHES_DATABASE && window.WISHES_DATABASE.length > 0)
     ? window.WISHES_DATABASE.map(w => w.text)
@@ -309,7 +399,7 @@
   }
 
   // ==========================================
-  // 7. Кнопка согревающего объятия
+  // 8. Кнопка согревающего объятия
   // ==========================================
   const hugBtn = document.getElementById('hugBtn');
   if (hugBtn) {
@@ -324,7 +414,7 @@
   }
 
   // ==========================================
-  // 8. Плавное появление карточек при скролле
+  // 9. Плавное появление карточек при скролле
   // ==========================================
   const scrollElements = document.querySelectorAll('.scroll-reveal');
   if ('IntersectionObserver' in window) {
@@ -344,7 +434,7 @@
   }
 
   // ==========================================
-  // 9. Управление фоновой музыкой Oneheart - Apathy
+  // 10. Управление фоновой музыкой Oneheart - Apathy
   // ==========================================
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
@@ -407,7 +497,7 @@
 
   // Клик в любом свободном месте порождает маленькие искорки
   document.addEventListener('click', (e) => {
-    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.kit-card')) {
+    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.kit-card') && !e.target.closest('.secret-dialog-toggle')) {
       spawnBlossomBurst(e.clientX, e.clientY);
     }
   });
