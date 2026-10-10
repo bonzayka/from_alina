@@ -1,4 +1,4 @@
-// Интерактивный скрипт страницы заботы "Выздоравливай поскорее, солнышко!"
+// Интерактивный скрипт утренней страницы "С добрым утречком, солнышко!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 (function () {
@@ -12,8 +12,8 @@
     try {
       tg.ready();
       tg.expand();
-      if (tg.setHeaderColor) tg.setHeaderColor('#fff0f5');
-      if (tg.setBackgroundColor) tg.setBackgroundColor('#fff0f5');
+      if (tg.setHeaderColor) tg.setHeaderColor('#fff5f7');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#fff5f7');
     } catch (e) {
       console.log('TG Init error:', e);
     }
@@ -33,7 +33,7 @@
   }
 
   // Всплывающее уведомление (Toast)
-  function showToast(text, icon = '🌸') {
+  function showToast(text, icon = '☀️') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
     const toast = document.createElement('div');
@@ -46,7 +46,7 @@
   }
 
   // ==========================================
-  // 2. Интерактивный холст: кружащиеся лепестки и искры
+  // 2. Интерактивный холст: лепестки и утренние лучи
   // ==========================================
   const canvas = document.getElementById('petalsCanvas');
   const ctx = canvas ? canvas.getContext('2d') : null;
@@ -86,9 +86,9 @@
     }
   }
 
-  // Взрыв лепестков, сердечек и искорок при клике/касании
+  // Взрыв лепестков, сердечек и утренних искр
   function spawnBlossomBurst(originX, originY) {
-    const symbols = ['🌸', '💖', '☀️', '✨', '🌷', '🤍', '🧸', '🐾', '💋'];
+    const symbols = ['☀️', '💖', '🌸', '✨', '☕', '🥐', '🍓', '💋', '💐'];
     const startX = originX !== undefined ? originX : width / 2;
     const startY = originY !== undefined ? originY : height * 0.5;
 
@@ -138,6 +138,7 @@
         ctx.bezierCurveTo(-p.size, 0, -p.size / 2, -p.size / 2, 0, 0);
         ctx.fill();
       } else {
+        // Солнечный лучик
         ctx.fillStyle = 'rgba(255, 217, 102, 0.45)';
         ctx.beginPath();
         ctx.arc(0, 0, p.size * 0.4, 0, Math.PI * 2);
@@ -175,15 +176,15 @@
   }
 
   // ==========================================
-  // 3. Интерактивное солнышко
+  // 3. Интерактивное утреннее солнышко
   // ==========================================
   const sunWrapper = document.getElementById('interactiveSun');
   const sunPhrases = [
-    'Ты моё самое яркое и любимое солнышко! ☀️💖',
-    'Я согрею тебя даже сквозь сотни километров! 🌸',
-    'Шлю тебе тысячу поцелуев в носик и лобик! ✨',
-    'Поправляйся скорее, радость моя ненаглядная! 🌷',
-    'Улыбнись, солнышко, твой котеночек всегда рядом! 🐱'
+    'С добрым утречком, моё любимое солнышко! ☀️💖',
+    'Просыпайся, соня! Твой котеночек уже думает о тебе! 🌸',
+    'Пусть этот день будет лёгким, сладким и удачным! ✨',
+    'Шлю утренний поцелуй прямо в носик! 💋',
+    'Улыбнись, радость моя, твой день начался! 🌷'
   ];
 
   if (sunWrapper) {
@@ -206,29 +207,29 @@
   }
 
   // ==========================================
-  // 4. Интерактивная аптечка первой нежности
+  // 4. Интерактивный завтрак в постель
   // ==========================================
   const kitCards = document.querySelectorAll('.kit-card');
   const kitMessages = {
-    tea: {
-      text: 'Горячий чай заварен! Пей не спеша, пусть горлышко не болит ❤️',
-      icon: '🍵',
-      btn: 'Чай выпит ✓'
+    coffee: {
+      text: 'Ароматный кофе выпит! Утренний заряд бодрости и тепла получен ☕❤️',
+      icon: '☕',
+      btn: 'Выпито ✓'
     },
-    plaid: {
-      text: 'Укутал тебя самым мягким пледиком! Теперь ты в уютном коконе 🧸',
-      icon: '🧸',
-      btn: 'В тепле ✓'
+    croissant: {
+      text: 'Круассанчик скушан! Сладкого и вкусного утра 🥐✨',
+      icon: '🥐',
+      btn: 'Скушано ✓'
     },
-    vitamin: {
-      text: 'Витаминка принята! 100% нежности уже исцеляют тебя 💖',
-      icon: '💊',
-      btn: 'Принято ✓'
-    },
-    honey: {
-      text: 'Сладкая ложечка мёда для твоего скорейшего выздоровления! 🍯',
-      icon: '🍯',
+    berry: {
+      text: 'Сладкая клубничка для твоих прекрасных губок 🍓💖',
+      icon: '🍓',
       btn: 'Сладко ✓'
+    },
+    kiss: {
+      text: 'Нежный поцелуй в носик получен! С добрым утречком, соня 💋🌸',
+      icon: '💋',
+      btn: 'Поцелована ✓'
     }
   };
 
@@ -260,91 +261,18 @@
     });
   });
 
-  // ==========================================
-  // 5. Скрытый диалог (Котенок, у меня там битва...)
-  // ==========================================
-  const secretToggleBtn = document.getElementById('secretToggleBtn');
-  const secretDialogBox = document.getElementById('secretDialogBox');
-  const secretArrow = document.getElementById('secretArrow');
-
-  if (secretToggleBtn && secretDialogBox) {
-    secretToggleBtn.addEventListener('click', (e) => {
-      triggerHaptic('medium');
-      const isHidden = secretDialogBox.classList.contains('hidden');
-      if (isHidden) {
-        secretDialogBox.classList.remove('hidden');
-        secretToggleBtn.setAttribute('aria-expanded', 'true');
-        if (secretArrow) secretArrow.textContent = '🐾';
-        spawnBlossomBurst(e.clientX, e.clientY);
-        showToast('Секретный диалог раскрыт! 🤫🐾', '💖');
-      } else {
-        secretDialogBox.classList.add('hidden');
-        secretToggleBtn.setAttribute('aria-expanded', 'false');
-        if (secretArrow) secretArrow.textContent = '✨';
-      }
-    });
-  }
-
-  // Интерактивное поглаживание котика
-  const petCatBtn = document.getElementById('petCatBtn');
-  const petCounterText = document.getElementById('petCounterText');
-  let petCount = 0;
-  const purrPhrases = [
-    'Мрррр... ещё гладь! 🐱✨',
-    'Котеночек растаял от нежности и мурчит! 💖',
-    'Битва в игре подождет, котеночек важнее! 🎮❌ 🐾✅',
-    'Каждое поглаживание снимает температуру! 🌸',
-    'Муррр... любимый гладит лучше всех! 🥰'
-  ];
-
-  if (petCatBtn && petCounterText) {
-    petCatBtn.addEventListener('click', (e) => {
-      petCount++;
-      triggerHaptic('light');
-      spawnBlossomBurst(e.clientX, e.clientY);
-      petCounterText.textContent = `Поглажено: ${petCount} раз(а) 💕 (Мур-мур! Температура -${(petCount * 0.2).toFixed(1)}°C!)`;
-      const randomPurr = purrPhrases[Math.floor(Math.random() * purrPhrases.length)];
-      showToast(randomPurr, '🐾');
-    });
-  }
-
   // Игровая плашка :Р строго под 3-м фото
   const tongueBadge = document.getElementById('tongueBadge');
   if (tongueBadge) {
     tongueBadge.addEventListener('click', (e) => {
       triggerHaptic('light');
       spawnBlossomBurst(e.clientX, e.clientY);
-      showToast('твоя жопа = моя жопа :Р Выздоравливай скорее! 🍑✨', '🐱');
+      showToast('твоя жопа = моя жопа :Р С добрым утречком! 🍑✨', '🐱');
     });
   }
 
-  // ==========================================
-  // 6. Волшебный компресс нежности
-  // ==========================================
-  const compressBtn = document.getElementById('compressBtn');
-  const tempVal = document.getElementById('tempVal');
-  const tempStatus = document.getElementById('tempStatus');
-
-  if (compressBtn) {
-    compressBtn.addEventListener('click', (e) => {
-      triggerHaptic('success');
-      spawnBlossomBurst(e.clientX, e.clientY);
-      setTimeout(() => spawnBlossomBurst(width / 3, height / 2), 200);
-
-      if (tempVal) {
-        tempVal.textContent = '36.6°C';
-        tempVal.style.color = '#ff477e';
-      }
-      if (tempStatus) {
-        tempStatus.textContent = 'Температура в норме 36.6°C! Уровень уюта: 100% 💖';
-      }
-
-      showToast('Волшебный компресс наложен! Температура 36.6°C! 💖', '🌸');
-    });
-  }
-
-  // Касание к фотографиям с теплым откликом
-  const photoWrappers = document.querySelectorAll('.photo-wrapper');
+  // Касание к фотографиям и видео с теплым откликом
+  const photoWrappers = document.querySelectorAll('.photo-wrapper, .video-wrapper');
   photoWrappers.forEach((wrap) => {
     wrap.addEventListener('click', (e) => {
       triggerHaptic('light');
@@ -353,16 +281,16 @@
   });
 
   // ==========================================
-  // 7. Интерактивные лучики исцеляющего тепла
+  // 5. Интерактивные лучики утреннего вдохновения
   // ==========================================
   const wishesList = (window.WISHES_DATABASE && window.WISHES_DATABASE.length > 0)
     ? window.WISHES_DATABASE.map(w => w.text)
     : [
-      'Выздоравливай поскорее, солнышко! Пусть температура скорее спадет, слабость уйдет, а силы вернутся. Я посылаю тебе всю энергию и тепло своего сердца!',
-      'Представь, что я сижу прямо рядом с твоей кроваткой, подаю кружку с чаем и нежно глажу тебя по волосам.',
-      'Даже когда ты болеешь, ты для меня самая прекрасная и любимая девочка на свете!',
-      'Закрывай глазки и почувствуй, как я крепко укрываю тебя пушистым пледом. Ты в полной безопасности.',
-      'Каждая клеточка твоего организма прямо сейчас наполняется здоровьем и силами!'
+      'С добрым утром, моё любимое солнышко! Просыпайся сладко, потянись в мягкой постельке и улыбнись новому прекрасному дню.',
+      'Представь, что я принес тебе в постель чашечку горячего кофе с пенкой и свежий круассан. Доброго утра, радость моя!',
+      'Шлю тебе самый нежный утренний поцелуй в теплый кончик носика, в щечки и в сонные глазки.',
+      'Каждое моё утро начинается с мыслей о тебе, и от этого на душе сразу становится тепло и радостно!',
+      'Пусть сегодня все дела решаются легко и беззаботно, а повод для улыбки находится каждую секунду!'
     ];
 
   let currentWishIdx = 0;
@@ -399,7 +327,7 @@
   }
 
   // ==========================================
-  // 8. Кнопка согревающего объятия
+  // 6. Кнопка утренних сонных обнимашек
   // ==========================================
   const hugBtn = document.getElementById('hugBtn');
   if (hugBtn) {
@@ -409,12 +337,12 @@
       setTimeout(() => spawnBlossomBurst(width / 3, height / 2), 200);
       setTimeout(() => spawnBlossomBurst((2 * width) / 3, height / 2), 400);
 
-      showToast('Я крепко-крепко прижал тебя к себе и поцеловал! Скоро всё пройдет! 🫂❤️', '💖');
+      showToast('Я крепко-крепко укутал тебя в одеялко и поцеловал! Доброго утречка! 🫂❤️', '💖');
     });
   }
 
   // ==========================================
-  // 9. Плавное появление карточек при скролле
+  // 7. Плавное появление карточек при скролле
   // ==========================================
   const scrollElements = document.querySelectorAll('.scroll-reveal');
   if ('IntersectionObserver' in window) {
@@ -434,12 +362,19 @@
   }
 
   // ==========================================
-  // 10. Управление фоновой музыкой Oneheart - Apathy
+  // 8. Управление фоновой музыкой Oneheart (Snowfall / Apathy)
   // ==========================================
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
   const audioIcon = document.getElementById('audioIcon');
   const audioLabel = document.getElementById('audioLabel');
+  const audioSwitchBtn = document.getElementById('audioSwitchBtn');
+
+  const oneheartTracks = [
+    { title: 'Oneheart - Snowfall', file: 'snowfall.mp3' },
+    { title: 'Oneheart - Apathy', file: 'oneheart.mp3' }
+  ];
+  let currentTrackIdx = 0;
 
   if (bgMusic) {
     bgMusic.volume = 0.55;
@@ -450,7 +385,7 @@
       bgMusic.play().then(() => {
         if (audioToggleBtn) audioToggleBtn.classList.add('playing');
         if (audioIcon) audioIcon.textContent = '🔊';
-        if (audioLabel) audioLabel.textContent = 'Oneheart звучит';
+        if (audioLabel) audioLabel.textContent = oneheartTracks[currentTrackIdx].title;
       }).catch(() => {});
     }
   }
@@ -460,7 +395,21 @@
       bgMusic.pause();
       if (audioToggleBtn) audioToggleBtn.classList.remove('playing');
       if (audioIcon) audioIcon.textContent = '🎵';
-      if (audioLabel) audioLabel.textContent = 'Oneheart';
+    }
+  }
+
+  function switchTrack() {
+    currentTrackIdx = (currentTrackIdx + 1) % oneheartTracks.length;
+    const track = oneheartTracks[currentTrackIdx];
+    triggerHaptic('medium');
+
+    if (bgMusic) {
+      const wasPlaying = !bgMusic.paused;
+      bgMusic.src = track.file;
+      bgMusic.load();
+      if (audioLabel) audioLabel.textContent = track.title;
+      playMusic();
+      showToast(`Играет ${track.title} 🎵`, '🌸');
     }
   }
 
@@ -487,7 +436,7 @@
 
       if (bgMusic.paused) {
         playMusic();
-        showToast('Играет умиротворяющая музыка 🎵', '🌸');
+        showToast(`Играет ${oneheartTracks[currentTrackIdx].title} 🎵`, '☀️');
       } else {
         pauseMusic();
         showToast('Музыка на паузе', '⏸️');
@@ -495,9 +444,17 @@
     });
   }
 
+  if (audioSwitchBtn) {
+    audioSwitchBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userInteracted = true;
+      switchTrack();
+    });
+  }
+
   // Клик в любом свободном месте порождает маленькие искорки
   document.addEventListener('click', (e) => {
-    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.kit-card') && !e.target.closest('.secret-dialog-toggle')) {
+    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'VIDEO' && !e.target.closest('.kit-card')) {
       spawnBlossomBurst(e.clientX, e.clientY);
     }
   });
