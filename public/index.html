@@ -5,30 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#fff5f7">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="description" content="Нежный утренний уголок для самого любимого солнышка. С добрым утром, радость моя!">
+  <meta name="description" content="Нежный утренний уголок для самого любимого солнышка. С добрым утречком, радость моя!">
   <title>С добрым утречком, солнышко! ☀️🌸</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Google Fonts: Cormorant Garamond и Outfit -->
+  <!-- Google Fonts: Cormorant Garamond и Plus Jakarta Sans / Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Индикатор прогресса чтения страницы -->
+  <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+
   <!-- Интерактивный холст: кружащиеся утренние лепестки, золотые лучики и сердечки -->
   <canvas id="petalsCanvas"></canvas>
 
   <div class="app-container">
-    <!-- Верхняя панель: статус утречка и кнопка спокойной музыки Oneheart -->
+    <!-- Верхняя панель: статус рассвета и компактный аудио-модуль Oneheart -->
     <header class="top-nav">
       <div class="care-badge" id="careBadge" title="Доброе утречко">
         <span class="care-pulse-dot"></span>
         <span class="care-icon">☀️</span>
-        <span class="care-text" id="careStatusText">С добрым утречком!</span>
+        <div class="care-badge-text">
+          <span class="care-status-title">Рассвет любви</span>
+          <span class="care-status-sub" id="liveTimeText">Доброе утречко</span>
+        </div>
       </div>
 
       <div class="music-controls-wrap">
@@ -39,22 +45,23 @@
             <span class="bar"></span>
           </span>
           <span class="music-icon" id="audioIcon">🎵</span>
-          <span class="music-label" id="audioLabel">Oneheart - Snowfall</span>
+          <span class="music-label" id="audioLabel">Snowfall</span>
         </button>
-        <button class="music-switch-btn" id="audioSwitchBtn" title="Сменить трек Oneheart (Snowfall / Apathy)" aria-label="Сменить трек">
+        <button class="music-switch-btn" id="audioSwitchBtn" title="Сменить трек Oneheart (Snowfall / Apathy)" aria-label="Сменить трек Oneheart">
           🔄
         </button>
       </div>
       <audio id="bgMusic" src="snowfall.mp3" loop preload="auto"></audio>
     </header>
 
-    <!-- Главная секция: Интерактивное утреннее солнышко и теплые слова -->
-    <section class="hero-section scroll-reveal">
+    <!-- 1. Главная секция: Интерактивный рассвет и утреннее признание -->
+    <section class="hero-section scroll-reveal" id="heroSection">
       <div class="hero-card glass-card">
+        <div class="hero-ambient-glow"></div>
         <div class="hero-sparkle hs-left">☀️</div>
         <div class="hero-sparkle hs-right">🌸</div>
 
-        <!-- Интерактивное солнышко -->
+        <!-- Интерактивное солнышко с живыми лучиками -->
         <div class="sun-wrapper" id="interactiveSun" title="Коснись солнышка, чтобы поймать тепло" role="button" tabindex="0" aria-label="Коснуться солнышка для утреннего заряда">
           <div class="sun-sphere">
             <div class="sun-face">☀️</div>
@@ -68,32 +75,45 @@
           <span class="sun-touch-hint">Поймай лучик ✨</span>
         </div>
 
-        <span class="hero-tag">🌸 Твой персональный рассвет</span>
+        <div class="hero-pill-tag">
+          <span class="tag-sparkle">✨</span>
+          <span>Твой персональный рассвет</span>
+        </div>
+
         <h1 class="main-title">С добрым утречком, моё солнышко!</h1>
         <p class="subtitle">
-          Просыпайся не спеша, сладко потянись в постельке и впусти в сердечко моё тепло. Я создал этот уютный уголок специально для тебя, чтобы твой день начался с улыбки, цветов и нежности!
+          Просыпайся не спеша, сладко потянись в постельке и впусти в сердечко моё тепло. Я создал этот интерактивный утренний уголок специально для тебя, чтобы твой день начался с улыбки, цветов и безграничной нежности.
         </p>
 
-        <!-- Индикатор утренней любви -->
+        <!-- Индикатор утреннего заряда -->
         <div class="care-meter-box">
           <div class="care-meter-header">
-            <span class="care-meter-title">Утренний заряд любви и нежности:</span>
+            <span class="care-meter-title">Заряд утренней нежности:</span>
             <span class="care-meter-val" id="careMeterVal">1000% ☀️❤️</span>
           </div>
           <div class="care-meter-bar">
             <div class="care-meter-fill" id="careMeterFill"></div>
           </div>
-          <p class="care-meter-note">Бесконечное тепло для самого прекрасного дня</p>
+          <div class="care-meter-footer">
+            <span class="meter-dot"></span>
+            <span>Бесконечное тепло для самого прекрасного дня</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Интерактивная секция: Завтрак в постель от любимого -->
-    <section class="care-kit-section scroll-reveal">
+    <!-- 2. Интерактивная секция: Завтрак в постель от любимого -->
+    <section class="care-kit-section scroll-reveal" id="breakfastSection">
       <div class="section-heading-wrap">
         <span class="sub-badge">☕ Утренний поднос заботы</span>
         <h2 class="section-title">Завтрак в постель для любимой</h2>
-        <p class="section-desc">Нажимай на каждое утреннее угощение, чтобы принять его:</p>
+        <p class="section-desc">Нажимай на каждое угощение, чтобы собрать идеальный утренний поднос:</p>
+      </div>
+
+      <!-- Счётчик собранного завтрака -->
+      <div class="breakfast-status-bar" id="breakfastStatusBar">
+        <span class="b-status-icon">🥐</span>
+        <span class="b-status-text" id="breakfastStatusText">Собрано угощений: 0 из 4 (Нажимай на карточки!)</span>
       </div>
 
       <div class="care-kit-grid">
@@ -140,110 +160,132 @@
       </div>
     </section>
 
-    <!-- 1-я фото-секция: "вооть такой букетик.jpg" -->
-    <section class="story-section scroll-reveal">
-      <div class="story-card glass-card">
-        <div class="photo-wrapper">
-          <img src="photo/вооть такой букетик.jpg" alt="Вооть такой букетик для тебя" class="story-photo" loading="lazy">
-          <div class="photo-shimmer"></div>
-          <div class="photo-corner-flower">💐</div>
-        </div>
-
-        <div class="story-content">
-          <span class="story-tag">Цветочный подарок 💐</span>
-          <h3 class="story-heading">Вооть такой букетик для тебя!</h3>
-          <p>
-            С добрым утречком, моя принцесса! Дарю тебе этот прекрасный букет цветов прямо с самого утра, чтобы твоя комната наполнилась уютом, а на личике засияла самая счастливая улыбка.
-          </p>
-          <p>
-            Пусть твой день будет таким же нежным, красивым и благоухающим, как эти цветы. Ты прекраснее всего на свете!
-          </p>
-        </div>
+    <!-- 3. Медиа-галерея в стиле Bento: Фотографии и Видео -->
+    <section class="gallery-section scroll-reveal" id="gallerySection">
+      <div class="section-heading-wrap">
+        <span class="sub-badge">📸 Галерея наших мгновений</span>
+        <h2 class="section-title">Воспоминания, которые греют</h2>
+        <p class="section-desc">Каждый кадр напоминает, как сильно я тебя люблю:</p>
       </div>
-    </section>
 
-    <!-- 2-я фото-секция: "ну мы.jpg" -->
-    <section class="story-section scroll-reveal">
-      <div class="story-card glass-card">
-        <div class="photo-wrapper">
-          <img src="photo/ну мы.jpg" alt="Ну мы с тобой" class="story-photo" loading="lazy">
-          <div class="photo-shimmer"></div>
-          <div class="photo-corner-flower">💖</div>
-        </div>
+      <!-- Bento-сетка медиа -->
+      <div class="bento-gallery">
+        <!-- Карточка 1: Букетик (Feature Card) -->
+        <div class="bento-card bento-feature glass-card">
+          <div class="photo-wrapper" data-src="photo/вооть такой букетик.jpg" data-caption="Вооть такой букетик для тебя!">
+            <img src="photo/вооть такой букетик.jpg" alt="Вооть такой букетик для тебя" class="story-photo" loading="lazy">
+            <div class="photo-shimmer"></div>
+            <div class="photo-corner-flower">💐</div>
+            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
+          </div>
 
-        <div class="story-content">
-          <span class="story-tag">Самые родные 💖</span>
-          <h3 class="story-heading">Ну мы с тобой...</h3>
-          <p>
-            Каждое моё утро начинается с мысли о тебе. Вспоминаю, как сладко ты потягиваешься в кроватке, как сонно щуришь глазки и какая ты искренняя и настоящая рядом со мной.
-          </p>
-          <p>
-            Мы с тобой - самое уютное, теплое и неделимое целое. Спасибо тебе за то, что ты есть у меня!
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3-я фото-секция: "я и ваша жоп.jpg" + озорная плашка :Р -->
-    <section class="story-section scroll-reveal">
-      <div class="story-card glass-card">
-        <div class="photo-wrapper">
-          <img src="photo/я и ваша жоп.jpg" alt="Я и ваша жоп :Р" class="story-photo" loading="lazy">
-          <div class="photo-shimmer"></div>
-          <div class="photo-corner-flower">🍑</div>
-        </div>
-
-        <div class="story-content">
-          <span class="story-tag">Утреннее озорство 🐱</span>
-          <h3 class="story-heading">Я и ваша жоп :Р</h3>
-          <p>
-            Твой самый любимый шкодный котеночек передает тебе пламенный утренний заряд бодрости! С утра обязательно нужно улыбнуться, чтобы весь день прошел на позитиве.
-          </p>
-          <p>
-            Обожаю твоё чувство юмора, твои милые привычки и всё-всё в тебе!
-          </p>
-
-          <!-- Строго под фото расположена игривая плашка :Р -->
-          <div class="tongue-badge-wrap" id="tongueBadge" title="Котеночек :Р" role="button" tabindex="0">
-            <span class="tongue-symbol">:Р</span>
-            <div class="tongue-caption">
-              <div>Твой самый любимый шкодный котеночек который любит вашу жоп</div>
-              <div class="tongue-highlight">твоя жопа = моя жопа :Р с добрым утречком!</div>
+          <div class="bento-content">
+            <span class="story-tag">Цветочный подарок 💐</span>
+            <h3 class="story-heading">Вооть такой букетик для тебя!</h3>
+            <p>
+              С добрым утречком, моя принцесса! Дарю тебе этот прекрасный букет прямо с самого утра, чтобы комната наполнилась ароматом весны, а на твоём личике расцвела счастливая улыбка.
+            </p>
+            <p>
+              Пусть твой день будет таким же ярким, нежным и красивым, как эти цветы!
+            </p>
+            <div class="card-inline-action">
+              <button class="flower-spray-btn" id="flowerSprayBtn">
+                <span>🌸</span>
+                <span>Вдохнуть цветочный аромат</span>
+                <span>✨</span>
+              </button>
             </div>
+          </div>
+        </div>
+
+        <!-- Карточка 2: Ну мы с тобой (Split Card) -->
+        <div class="bento-card glass-card">
+          <div class="photo-wrapper" data-src="photo/ну мы.jpg" data-caption="Ну мы с тобой 💖">
+            <img src="photo/ну мы.jpg" alt="Ну мы с тобой" class="story-photo" loading="lazy">
+            <div class="photo-shimmer"></div>
+            <div class="photo-corner-flower">💖</div>
+            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
+          </div>
+
+          <div class="bento-content">
+            <span class="story-tag">Самые родные 💖</span>
+            <h3 class="story-heading">Ну мы с тобой...</h3>
+            <p>
+              Каждое моё утро начинается с мысли о тебе. Вспоминаю, как сладко ты потягиваешься в кроватке, как сонно щуришь глазки и какая ты искренняя и родная рядом со мной.
+            </p>
+            <p>
+              Мы с тобой - самое уютное, теплое и неделимое целое. Спасибо тебе за тебя!
+            </p>
+          </div>
+        </div>
+
+        <!-- Карточка 3: Я и ваша жоп (Playful Card) -->
+        <div class="bento-card glass-card">
+          <div class="photo-wrapper" data-src="photo/я и ваша жоп.jpg" data-caption="Я и ваша жоп :Р">
+            <img src="photo/я и ваша жоп.jpg" alt="Я и ваша жоп :Р" class="story-photo" loading="lazy">
+            <div class="photo-shimmer"></div>
+            <div class="photo-corner-flower">🍑</div>
+            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
+          </div>
+
+          <div class="bento-content">
+            <span class="story-tag">Утреннее озорство 🐱</span>
+            <h3 class="story-heading">Я и ваша жоп :Р</h3>
+            <p>
+              Твой самый любимый шкодный котеночек передает тебе пламенный утренний заряд бодрости! С утра обязательно нужно улыбнуться, чтобы весь день прошел на волне позитива.
+            </p>
+
+            <!-- Интерактивная плашка :Р -->
+            <div class="tongue-badge-wrap" id="tongueBadge" title="Котеночек :Р" role="button" tabindex="0">
+              <span class="tongue-symbol">:Р</span>
+              <div class="tongue-caption">
+                <div>Твой самый любимый шкодный котеночек который любит вашу жоп</div>
+                <div class="tongue-highlight">твоя жопа = моя жопа :Р с добрым утречком!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 4: Видео (Cinema Card - БЕЗ надписи "под конец") -->
+        <div class="bento-card bento-cinema glass-card">
+          <div class="video-wrapper">
+            <video class="story-video" id="coupleVideo" src="photo/еще мы (под конец).mp4" playsinline loop muted autoplay controls></video>
+            <div class="video-overlay-badge">🎬 Живые моменты с тобой</div>
+            <button class="video-sound-toggle-btn" id="videoSoundBtn" title="Включить / выключить звук видео">
+              🔇 Включить звук
+            </button>
+          </div>
+
+          <div class="bento-content">
+            <span class="story-tag">Живые мгновения 🎬✨</span>
+            <h3 class="story-heading">А вот ещё мы с тобой...</h3>
+            <p>
+              Посмотри на это видео и улыбнись! В этих живых кадрах - наше настоящее счастье, искренний смех и любовь, которая согревает даже сквозь любые километры.
+            </p>
+            <p>
+              Пусть эти секунды зарядят тебя теплом и лёгкостью на весь день. Впереди у нас ещё миллион таких же сказочных историй!
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 4-я медиа-секция: ВИДЕО ПОД КОНЕЦ "еще мы (под конец).mp4" -->
-    <section class="story-section scroll-reveal">
-      <div class="story-card glass-card">
-        <div class="video-wrapper">
-          <video class="story-video" id="coupleVideo" src="photo/еще мы (под конец).mp4" playsinline loop muted autoplay controls></video>
-          <div class="video-overlay-badge">🎬 Живые моменты с тобой</div>
-        </div>
-
-        <div class="story-content">
-          <span class="story-tag">Память сердца 🎬✨</span>
-          <h3 class="story-heading">А вот ещё мы (под конец)...</h3>
-          <p>
-            Посмотри на это видео и улыбнись! В этих кадрах - наше настоящее счастье, искренний смех и любовь, которая греет даже сквозь километры.
-          </p>
-          <p>
-            Пусть эти живые моменты зарядят тебя радостью на весь день. Впереди у нас ещё миллион таких же сказочных историй!
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Поэтическая секция: Цитата из "Евгения Онегина" А. С. Пушкина -->
-    <section class="poetry-section scroll-reveal">
+    <!-- 4. Поэтическая секция: Запечатанное любовное письмо (А. С. Пушкин) -->
+    <section class="poetry-section scroll-reveal" id="poetrySection">
       <div class="poetry-card glass-card">
-        <div class="poetry-quill">🪶</div>
+        <div class="poetry-ambient-feather">🪶</div>
         <span class="poetry-sub">🌸 Строки о вечной любви</span>
         <h3 class="poetry-title">Внимать вам долго, понимать душой все ваше совершенство...</h3>
 
-        <div class="poetry-quote-box">
+        <!-- Интерактивный конверт с сургучной печатью -->
+        <div class="wax-envelope-wrap" id="waxEnvelopeWrap">
+          <button class="wax-seal-btn" id="waxSealBtn" aria-expanded="true">
+            <span class="wax-seal-icon">💌</span>
+            <span class="wax-seal-label">Сургучная печать любви (нажми, чтобы свернуть/раскрыть)</span>
+          </button>
+        </div>
+
+        <div class="poetry-quote-box" id="poetryQuoteBox">
           <div class="p-quote-mark">“</div>
           <p class="poetry-verse">
             Нет, поминутно видеть вас,<br>
@@ -260,17 +302,17 @@
 
         <div class="poetry-personal-note">
           <p>
-            Каждое утро я просыпаюсь с одной мыслью - ловить твою улыбку своими влюбленными глазами. Внимать душой всему твоему совершенству - это моё самое большое счастье.
+            Каждое утро я просыпаюсь с одной мыслью - ловить твою улыбку своими влюбленными глазами. Внимать душой всему твоему совершенству - это моё самое большое счастье на земле.
           </p>
-          <p>
+          <p class="poetry-highlight-line">
             Сияй сегодня ярче всех, моё прекрасное сокровище!
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Интерактивные лучики утреннего вдохновения (Генератор пожеланий) -->
-    <section class="notes-section scroll-reveal">
+    <!-- 5. Интерактивные лучики утреннего вдохновения (Генератор пожеланий) -->
+    <section class="notes-section scroll-reveal" id="wishesSection">
       <div class="notes-card glass-card">
         <div class="notes-header">
           <span class="notes-sparkle">✦</span>
@@ -296,12 +338,12 @@
       </div>
     </section>
 
-    <!-- Кнопка согревающих утренних обнимашек -->
+    <!-- 6. Кнопка согревающих утренних обнимашек -->
     <section class="hug-section scroll-reveal">
       <div class="hug-card glass-card">
         <div class="hug-header">
           <span class="hug-icon-floating">🫂</span>
-          <h3 class="hug-title">Хочется утренних обнимашек?</h3>
+          <h3 class="hug-title">Хочется сонных утренних обнимашек?</h3>
           <p class="hug-desc">Нажми на кнопочку, чтобы я мысленно укутал тебя одеялком и прижал к себе:</p>
         </div>
 
@@ -314,7 +356,7 @@
       </div>
     </section>
 
-    <!-- ФИНАЛЬНАЯ КУЛЬМИНАЦИЯ: Утреннее пожелание -->
+    <!-- 7. ФИНАЛЬНАЯ КУЛЬМИНАЦИЯ: Утреннее признание в любви -->
     <section class="finale-section scroll-reveal" id="finaleSection">
       <div class="finale-card glass-card">
         <div class="finale-aura"></div>
@@ -346,7 +388,6 @@
           </p>
           <p class="finale-love-signature">Бесконечно и всем сердцем люблю тебя. Прекрасного тебе дня! ❤️</p>
         </div>
-        <!-- Финал утренней открытки -->
       </div>
     </section>
 
@@ -355,6 +396,43 @@
       <p class="footer-blessing">С добрым утречком и бесконечной любовью специально для тебя 🌸</p>
       <div class="footer-stars">☀️ ✦ 💖 ✦ 🌸 ✦ ✨</div>
     </footer>
+  </div>
+
+  <!-- Плавающий док быстрой навигации (Floating App Dock) -->
+  <nav class="floating-dock" id="floatingDock" aria-label="Быстрая навигация">
+    <div class="dock-backdrop"></div>
+    <div class="dock-items">
+      <button class="dock-item active" data-target="#heroSection" title="Рассвет">
+        <span class="dock-icon">🌅</span>
+        <span class="dock-label">Утро</span>
+      </button>
+      <button class="dock-item" data-target="#breakfastSection" title="Завтрак">
+        <span class="dock-icon">☕</span>
+        <span class="dock-label">Завтрак</span>
+      </button>
+      <button class="dock-item" data-target="#gallerySection" title="Галерея">
+        <span class="dock-icon">📸</span>
+        <span class="dock-label">Моменты</span>
+      </button>
+      <button class="dock-item" data-target="#poetrySection" title="Письмо">
+        <span class="dock-icon">🪶</span>
+        <span class="dock-label">Письмо</span>
+      </button>
+      <button class="dock-item" data-target="#wishesSection" title="Лучики">
+        <span class="dock-icon">💖</span>
+        <span class="dock-label">Лучики</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Модальное окно просмотра фотографий (Lightbox) -->
+  <div class="lightbox-modal" id="lightboxModal" aria-hidden="true">
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    <div class="lightbox-content">
+      <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Закрыть">✕</button>
+      <img src="" alt="" class="lightbox-img" id="lightboxImg">
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
   </div>
 
   <!-- Всплывающие уведомления (Toast) -->
