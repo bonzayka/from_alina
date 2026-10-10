@@ -22,6 +22,12 @@
   <!-- Индикатор прогресса чтения страницы -->
   <div class="scroll-progress-bar" id="scrollProgressBar"></div>
 
+  <!-- Видео-фон с мягким блюром (Ambient Blurred Video Background) -->
+  <div class="ambient-video-bg" aria-hidden="true">
+    <video class="bg-video-element" id="bgVideo" src="photo/background.mp4" playsinline autoplay loop muted></video>
+    <div class="bg-video-overlay"></div>
+  </div>
+
   <!-- Интерактивный ночной холст: WebGL звездное небо, падающие метеоры и космическая пыль -->
   <canvas id="celestialCanvas"></canvas>
 
@@ -57,8 +63,6 @@
     <!-- 1. Главная секция: Интерактивная 3D Луна и портал сладких снов -->
     <section class="hero-section scroll-reveal" id="heroSection">
       <div class="hero-card glass-card">
-        <!-- Анимированный лазерный луч по границе (Border Beam) -->
-        <div class="border-beam"></div>
         <div class="hero-ambient-glow"></div>
         <div class="hero-sparkle hs-left">✨</div>
         <div class="hero-sparkle hs-right">💫</div>
@@ -103,12 +107,10 @@
 
         <!-- Кнопка быстрого звездопада -->
         <div class="hero-cta-wrap">
-          <button class="shimmer-action-btn" id="starShowerBtn">
-            <span class="btn-shimmer-spin"></span>
-            <span class="btn-shimmer-content">
-              <span>Зажечь падающую звезду</span>
-              <span class="btn-icon-fly">💫</span>
-            </span>
+          <button class="lunar-action-btn" id="starShowerBtn">
+            <span class="btn-lunar-icon">💫</span>
+            <span>Зажечь падающую звезду</span>
+            <span class="btn-lunar-spark">✨</span>
           </button>
         </div>
       </div>
@@ -187,121 +189,112 @@
       </div>
     </section>
 
-    <!-- 3. Живая медиа-галерея Bento: Наши воспоминания под лунным светом -->
+    <!-- 3. Живая медиа-галерея Bento: Наши новые истории и моменты -->
     <section class="gallery-section scroll-reveal" id="gallerySection">
       <div class="section-heading-wrap">
         <span class="sub-badge">📸 Память сердца</span>
         <h2 class="section-title">Наши моменты под светом звезд</h2>
-        <p class="section-desc">Каждый кадр хранит частичку нашего общего тепла и счастья:</p>
+        <p class="section-desc">Каждый кадр хранит частичку нашего общего тепла, улыбок и заботы:</p>
       </div>
 
       <div class="bento-gallery">
-        <!-- Карточка 1: Букет ночных роз (Feature Card) -->
+        <!-- Карточка 1: А это вы (Храбрый рыцарь) -->
         <div class="bento-card bento-feature glass-card">
           <div class="spotlight-layer"></div>
-          <div class="photo-wrapper" data-src="photo/вооть такой букетик.jpg" data-caption="Букет ночных роз и звезд для любимой">
-            <img src="photo/вооть такой букетик.jpg" alt="Букет цветов для любимой" class="story-photo" loading="lazy">
+          <div class="photo-wrapper" data-src="photo/а это вы.jpg" data-caption="Животик болит, но я держусь">
+            <img src="photo/а это вы.jpg" alt="А это вы" class="story-photo" loading="lazy">
+            <div class="photo-shimmer"></div>
+            <div class="photo-corner-flower">⚔️</div>
+            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
+          </div>
+
+          <div class="bento-content">
+            <span class="story-tag">Мой храбрый рыцарь ⚔️🌸</span>
+            <h3 class="story-heading">А это вы</h3>
+            <p>
+              Даже когда животик болит или день выдался непростым, ты всё равно держишься как настоящий рыцарь! Но ночью пора сложить все доспехи, расслабиться в мягкой постельке и позволить мне окружить тебя заботой и теплом.
+            </p>
+            <div class="story-actions">
+              <button class="spray-rose-btn" id="healTummyBtn">
+                <span>Погладить животик и согреть</span>
+                <span>☁️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 2: А это я (Сонный котик) -->
+        <div class="bento-card glass-card">
+          <div class="spotlight-layer"></div>
+          <div class="photo-wrapper" data-src="photo/а это я.jpg" data-caption="Не глаженный, не целованный">
+            <img src="photo/а это я.jpg" alt="А это я" class="story-photo" loading="lazy">
+            <div class="photo-shimmer"></div>
+            <div class="photo-corner-flower">🐱</div>
+            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
+          </div>
+
+          <div class="bento-content">
+            <span class="story-tag">Твой котеночек 🐱❤️</span>
+            <h3 class="story-heading">А это я</h3>
+            <p>
+              А это я перед сном: сидит такой маленький, беззащитный котик, не глаженный и не целованный! Срочно требуется ночная порция твоей нежности и поцелуев, чтобы сладко замурчать на ушко.
+            </p>
+            <div class="story-actions">
+              <button class="spray-rose-btn" id="petKittenBtn">
+                <span>Погладить и зацеловать котика</span>
+                <span>💋</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 3: Чил аут и копим свагу (Медитация) -->
+        <div class="bento-card glass-card">
+          <div class="spotlight-layer"></div>
+          <div class="photo-wrapper" data-src="photo/тоже ахуенная картинка.jpg" data-caption="Чил аут ребятки, копим свагу">
+            <img src="photo/тоже ахуенная картинка.jpg" alt="Чил аут ребятки, копим свагу" class="story-photo" loading="lazy">
+            <div class="photo-shimmer"></div>
+            <div class="photo-corner-flower">🧘‍♂️</div>
+            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
+          </div>
+
+          <div class="bento-content">
+            <span class="story-tag">Дзен и релакс 🧘‍♂️✨</span>
+            <h3 class="story-heading">Чил аут и копим свагу</h3>
+            <p>
+              Включаем режим максимального расслабления и ночного дзена. Все заботы растворяются в воздухе, а мы просто парим в уюте и копим свагу и силы для нового прекрасного дня!
+            </p>
+            <div class="story-actions">
+              <button class="spray-rose-btn" id="zenWaveBtn">
+                <span>Поймать волну дзена</span>
+                <span>🌌</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 4: Под сенью сакуры (Мир и покой) -->
+        <div class="bento-card glass-card">
+          <div class="spotlight-layer"></div>
+          <div class="photo-wrapper" data-src="photo/под конец.jpg" data-caption="Тихий вечер под сакурой">
+            <img src="photo/под конец.jpg" alt="Под сенью цветущей сакуры" class="story-photo" loading="lazy">
             <div class="photo-shimmer"></div>
             <div class="photo-corner-flower">🌸</div>
             <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
           </div>
 
           <div class="bento-content">
-            <span class="story-tag">Аромат нежности 🌸✨</span>
-            <h3 class="story-heading">Цветы, цветущие для тебя</h3>
+            <span class="story-tag">Мир и гармония 🌸🗡️</span>
+            <h3 class="story-heading">Под сенью цветущей сакуры</h3>
             <p>
-              Даже когда за окном опускается ночь, этот прекрасный букет напоминает о том, как ты прекрасна. Пусть его нежные лепестки мысленно наполнят твою комнату сказочным ароматом.
+              Меч сложен, битвы окончены, вокруг только нежный шелест розовых лепестков и мирный закат. Пусть твой сон будет таким же безмятежным, прекрасным и спокойным. Я всегда оберегаю твой покой.
             </p>
             <div class="story-actions">
-              <button class="spray-rose-btn" id="sprayRoseBtn">
-                <span>Осыпать лепестками</span>
-                <span>🌹</span>
+              <button class="spray-rose-btn" id="sakuraSprayBtn">
+                <span>Осыпать лепестками сакуры</span>
+                <span>🌸</span>
               </button>
             </div>
-          </div>
-        </div>
-
-        <!-- Карточка 2: Самые теплые объятия (Couple Card) -->
-        <div class="bento-card glass-card">
-          <div class="spotlight-layer"></div>
-          <div class="photo-wrapper" data-src="photo/ну мы.jpg" data-caption="Самые теплые объятия под одеялком">
-            <img src="photo/ну мы.jpg" alt="Самые теплые объятия" class="story-photo" loading="lazy">
-            <div class="photo-shimmer"></div>
-            <div class="photo-corner-flower">💖</div>
-            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
-          </div>
-
-          <div class="bento-content">
-            <span class="story-tag">Любовь и уют 🫂</span>
-            <h3 class="story-heading">Когда мы рядом - весь мир замирает</h3>
-            <p>
-              В твоих объятиях время останавливается. Хочется спрятаться с тобой от всего мира, слушать тишину ночи и бесконечно гладить твои волосики.
-            </p>
-
-            <!-- Интерактивная скрытая записка -->
-            <div class="secret-quote-wrapper">
-              <button class="secret-quote-btn" id="secretQuoteBtn" aria-expanded="false">
-                <span class="sq-icon">🗝️</span>
-                <span class="sq-label">Секретная ночная мысль (нажми сюда)</span>
-              </button>
-              <div class="secret-quote-content" id="secretQuoteContent">
-                <div class="sq-text">
-                  «Котеночек, у меня там битва, мне нужно идти. Нееет глааааадь!»
-                </div>
-                <div class="sq-sub">Потому что гладить тебя важнее всех битв во вселенной 🐱❤️</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Карточка 3: Я и ваша жоп (Playful Bedtime Card) -->
-        <div class="bento-card glass-card">
-          <div class="spotlight-layer"></div>
-          <div class="photo-wrapper" data-src="photo/я и ваша жоп.jpg" data-caption="Я и ваша жоп :Р">
-            <img src="photo/я и ваша жоп.jpg" alt="Я и ваша жоп :Р" class="story-photo" loading="lazy">
-            <div class="photo-shimmer"></div>
-            <div class="photo-corner-flower">🍑</div>
-            <button class="zoom-hint-btn" title="Увеличить фото">🔍</button>
-          </div>
-
-          <div class="bento-content">
-            <span class="story-tag">Сонное озорство 🐱</span>
-            <h3 class="story-heading">Я и ваша жоп :Р</h3>
-            <p>
-              Твой самый любимый сонный котеночек устроился поудобнее и шлет тебе сонный ночной привет! Перед сном обязательно нужно улыбнуться, чтобы сны были исключительно сладкими.
-            </p>
-
-            <!-- Интерактивная плашка :Р -->
-            <div class="tongue-badge-wrap" id="tongueBadge" title="Котеночек :Р" role="button" tabindex="0">
-              <span class="tongue-symbol">:Р</span>
-              <div class="tongue-caption">
-                <div>Твой самый любимый шкодный котеночек который любит вашу жоп</div>
-                <div class="tongue-highlight">твоя жопа = моя жопа :Р сладких снов!</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Карточка 4: Видео (Cinema Card - БЕЗ надписи "под конец") -->
-        <div class="bento-card bento-cinema glass-card">
-          <div class="spotlight-layer"></div>
-          <div class="video-wrapper">
-            <video class="story-video" id="coupleVideo" src="photo/еще мы (под конец).mp4" playsinline loop muted autoplay controls></video>
-            <div class="video-overlay-badge">🎬 Живые моменты с тобой</div>
-            <button class="video-sound-toggle-btn" id="videoSoundBtn" title="Включить / выключить звук видео">
-              🔇 Включить звук
-            </button>
-          </div>
-
-          <div class="bento-content">
-            <span class="story-tag">Живые мгновения 🎬✨</span>
-            <h3 class="story-heading">А вот ещё мы с тобой...</h3>
-            <p>
-              Посмотри на эти кадры перед сном. В них наше настоящее счастье, искренний смех и любовь, которая согревает даже сквозь любые километры и темноту.
-            </p>
-            <p>
-              Засыпай с улыбкой, зная, что впереди у нас ещё миллион таких же сказочных историй!
-            </p>
           </div>
         </div>
       </div>

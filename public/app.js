@@ -46,7 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 2. Интерактивный ночной холст: звезды, метеоры, космическая пыль
+  // 2. Фоновое видео (Ambient Background Video)
+  // ==========================================
+  const bgVideo = document.getElementById('bgVideo');
+  if (bgVideo) {
+    bgVideo.play().catch(() => {});
+  }
+
+  // ==========================================
+  // 3. Интерактивный ночной холст: звезды, метеоры, космическая пыль
   // ==========================================
   const canvas = document.getElementById('celestialCanvas');
   const ctx = canvas ? canvas.getContext('2d') : null;
@@ -219,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCelestial();
 
   // ==========================================
-  // 3. Индикатор прогресса скролла
+  // 4. Индикатор прогресса скролла
   // ==========================================
   const scrollProgressBar = document.getElementById('scrollProgressBar');
   window.addEventListener('scroll', () => {
@@ -231,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 
   // ==========================================
-  // 4. Часы в верхней панели (Live Time)
+  // 5. Часы в верхней панели (Live Time)
   // ==========================================
   const liveTimeText = document.getElementById('liveTimeText');
   function updateTime() {
@@ -245,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateTime, 30000);
 
   // ==========================================
-  // 5. Спокойная музыка Oneheart (Snowfall / Apathy)
+  // 6. Спокойная музыка Oneheart (Snowfall / Apathy)
   // ==========================================
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
@@ -311,10 +319,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Фоновая музыка запускается по первому взаимодействию
+  // Фоновая музыка и видео запускаются по первому взаимодействию
   const autoPlayTrigger = () => {
     if (!isPlaying) {
       playAudio();
+    }
+    if (bgVideo && bgVideo.paused) {
+      bgVideo.play().catch(() => {});
     }
     window.removeEventListener('click', autoPlayTrigger);
     window.removeEventListener('touchstart', autoPlayTrigger);
@@ -323,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('touchstart', autoPlayTrigger, { once: true });
 
   // ==========================================
-  // 6. Интерактивная 3D Луна
+  // 7. Интерактивная 3D Луна
   // ==========================================
   const interactiveMoon = document.getElementById('interactiveMoon');
   if (interactiveMoon) {
@@ -353,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 7. Ночной ритуал заботы (Ritual Cards)
+  // 8. Ночной ритуал заботы (Ritual Cards)
   // ==========================================
   const ritualCards = document.querySelectorAll('.ritual-card');
   const ritualStatusText = document.getElementById('ritualStatusText');
@@ -400,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
-  // 8. Spotlight подсветка и интерактив в Bento галерее
+  // 9. Spotlight подсветка и интерактив в Bento галерее
   // ==========================================
   document.querySelectorAll('.bento-card').forEach((card) => {
     card.addEventListener('mousemove', (e) => {
@@ -412,66 +423,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Осыпать лепестками роз
-  const sprayRoseBtn = document.getElementById('sprayRoseBtn');
-  if (sprayRoseBtn) {
-    sprayRoseBtn.addEventListener('click', (e) => {
+  // Кнопка: Погладить животик и согреть (Карточка 1)
+  const healTummyBtn = document.getElementById('healTummyBtn');
+  if (healTummyBtn) {
+    healTummyBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       triggerHaptic('medium');
-      const rect = sprayRoseBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🌹', '🌸', '✨', '💖']);
-      showToast('Комната наполнилась нежным ароматом роз 🌹✨', '🌸');
+      const rect = healTummyBtn.getBoundingClientRect();
+      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['☁️', '🌸', '💖', '✨']);
+      showToast('Животик укутан заботой и больше не болит! ☁️💖', '🌸');
     });
   }
 
-  // Скрытая записка
-  const secretQuoteBtn = document.getElementById('secretQuoteBtn');
-  const secretQuoteContent = document.getElementById('secretQuoteContent');
-  if (secretQuoteBtn && secretQuoteContent) {
-    secretQuoteBtn.addEventListener('click', (e) => {
+  // Кнопка: Зацеловать и погладить котика (Карточка 2)
+  const petKittenBtn = document.getElementById('petKittenBtn');
+  if (petKittenBtn) {
+    petKittenBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      triggerHaptic('light');
-      const isOpen = secretQuoteContent.classList.toggle('open');
-      secretQuoteBtn.setAttribute('aria-expanded', String(isOpen));
-      if (isOpen) {
-        const rect = secretQuoteBtn.getBoundingClientRect();
-        spawnBurst(rect.left + rect.width / 2, rect.top, ['🗝️', '🐱', '💖']);
-      }
-    });
-  }
-
-  // Интерактивная плашка :Р
-  const tongueBadge = document.getElementById('tongueBadge');
-  if (tongueBadge) {
-    tongueBadge.addEventListener('click', (e) => {
       triggerHaptic('medium');
-      const rect = tongueBadge.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🐱', ':Р', '🍑', '💖']);
-      showToast('Шкодный сонный котик передает нежный кусь :Р 🐱', '🍑');
+      const rect = petKittenBtn.getBoundingClientRect();
+      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🐱', '💋', '💖', '✨']);
+      showToast('Муррр! Сонный котик заглажен, зацелован и счастлив! 🐱💖', '💋');
     });
   }
 
-  // Звук видео
-  const coupleVideo = document.getElementById('coupleVideo');
-  const videoSoundBtn = document.getElementById('videoSoundBtn');
-  if (coupleVideo && videoSoundBtn) {
-    videoSoundBtn.addEventListener('click', (e) => {
+  // Кнопка: Поймать волну дзена (Карточка 3)
+  const zenWaveBtn = document.getElementById('zenWaveBtn');
+  if (zenWaveBtn) {
+    zenWaveBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      triggerHaptic('light');
-      coupleVideo.muted = !coupleVideo.muted;
-      if (!coupleVideo.muted) {
-        coupleVideo.play().catch(() => {});
-        videoSoundBtn.textContent = '🔊 Звук включен';
-        showToast('Звук видео включен! 🔊', '🎬');
-      } else {
-        videoSoundBtn.textContent = '🔇 Включить звук';
-        showToast('Видео без звука 🔇', '🎬');
-      }
+      triggerHaptic('medium');
+      const rect = zenWaveBtn.getBoundingClientRect();
+      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🧘‍♂️', '🌌', '💫', '✨']);
+      showToast('Режим максимального ночного дзена и сваги активирован! 🧘‍♂️✨', '🌌');
+    });
+  }
+
+  // Кнопка: Осыпать лепестками сакуры (Карточка 4)
+  const sakuraSprayBtn = document.getElementById('sakuraSprayBtn');
+  if (sakuraSprayBtn) {
+    sakuraSprayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerHaptic('medium');
+      const rect = sakuraSprayBtn.getBoundingClientRect();
+      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🌸', '✨', '🗡️', '💖']);
+      showToast('Нежные лепестки сакуры укрыли тебя сном... 🌸✨', '🌸');
     });
   }
 
   // ==========================================
-  // 9. Модальное окно Lightbox для просмотра фото
+  // 10. Модальное окно Lightbox для просмотра фото
   // ==========================================
   const lightboxModal = document.getElementById('lightboxModal');
   const lightboxImg = document.getElementById('lightboxImg');
@@ -508,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
 
   // ==========================================
-  // 10. Созвездия сладких снов (Генератор пожеланий)
+  // 11. Созвездия сладких снов (Генератор пожеланий)
   // ==========================================
   const nextNoteBtn = document.getElementById('nextNoteBtn');
   const noteText = document.getElementById('noteText');
@@ -541,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 11. Кнопка ночных согревающих обнимашек
+  // 12. Кнопка ночных согревающих обнимашек
   // ==========================================
   const hugBtn = document.getElementById('hugBtn');
   if (hugBtn) {
@@ -554,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 12. Плавающий док быстрой навигации (Floating Dock)
+  // 13. Плавающий док быстрой навигации (Floating Dock)
   // ==========================================
   const dockItems = document.querySelectorAll('.dock-item');
   const dockSections = [
@@ -598,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
   dockSections.forEach((sec) => dockObserver.observe(sec));
 
   // ==========================================
-  // 13. Плавное появление секций при скролле (Scroll Reveal)
+  // 14. Плавное появление секций при скролле (Scroll Reveal)
   // ==========================================
   const revealElements = document.querySelectorAll('.scroll-reveal');
   const revealObserver = new IntersectionObserver((entries, observer) => {
