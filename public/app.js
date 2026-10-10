@@ -344,30 +344,7 @@
   }
 
   // ==========================================
-  // 8. Сургучная печать и любовное письмо
-  // ==========================================
-  const waxSealBtn = document.getElementById('waxSealBtn');
-  const poetryQuoteBox = document.getElementById('poetryQuoteBox');
-
-  if (waxSealBtn && poetryQuoteBox) {
-    waxSealBtn.addEventListener('click', (e) => {
-      triggerHaptic('medium');
-      spawnBlossomBurst(e.clientX, e.clientY);
-      const isCollapsed = poetryQuoteBox.classList.contains('collapsed');
-      if (isCollapsed) {
-        poetryQuoteBox.classList.remove('collapsed');
-        waxSealBtn.setAttribute('aria-expanded', 'true');
-        showToast('Письмо любви раскрыто! 💌✨', '🪶');
-      } else {
-        poetryQuoteBox.classList.add('collapsed');
-        waxSealBtn.setAttribute('aria-expanded', 'false');
-        showToast('Письмо аккуратно запечатано 💌', '✉️');
-      }
-    });
-  }
-
-  // ==========================================
-  // 9. Модальное окно Lightbox для просмотра фото
+  // 8. Модальное окно Lightbox для просмотра фото
   // ==========================================
   const lightboxModal = document.getElementById('lightboxModal');
   const lightboxImg = document.getElementById('lightboxImg');
@@ -405,15 +382,15 @@
   if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
 
   // ==========================================
-  // 10. Плавающий док быстрой навигации (Floating Dock)
+  // 9. Плавающий док быстрой навигации (Floating Dock)
   // ==========================================
   const dockItems = document.querySelectorAll('.dock-item');
   const dockSections = [
     document.getElementById('heroSection'),
     document.getElementById('breakfastSection'),
     document.getElementById('gallerySection'),
-    document.getElementById('poetrySection'),
-    document.getElementById('wishesSection')
+    document.getElementById('wishesSection'),
+    document.getElementById('finaleSection')
   ].filter(Boolean);
 
   dockItems.forEach((btn) => {
