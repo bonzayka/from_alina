@@ -50,7 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const bgVideo = document.getElementById('bgVideo');
   if (bgVideo) {
-    bgVideo.play().catch(() => {});
+    bgVideo.muted = true;
+    bgVideo.defaultMuted = true;
+    bgVideo.setAttribute('muted', '');
+    bgVideo.setAttribute('playsinline', '');
+    bgVideo.setAttribute('webkit-playsinline', '');
+
+    const startBgVideo = () => {
+      bgVideo.play().catch(() => {});
+    };
+
+    startBgVideo();
+    window.addEventListener('click', startBgVideo, { once: true });
+    window.addEventListener('touchstart', startBgVideo, { once: true });
+    window.addEventListener('scroll', startBgVideo, { once: true });
   }
 
   // ==========================================

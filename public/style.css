@@ -62,13 +62,14 @@ html {
 body {
   position: relative;
   min-height: 100vh;
-  background-color: var(--bg-canvas);
+  background: #040612 url('photo/background-poster.jpg') no-repeat center center fixed;
+  background-size: cover;
   overflow-x: hidden;
   line-height: 1.6;
 }
 
 /* ====================================================
-   Атмосферный видео-фон с мягким блюром (Background Video)
+   Атмосферный фон с мягким блюром (Background Video & Poster)
    ==================================================== */
 .ambient-video-bg {
   position: fixed;
@@ -78,21 +79,35 @@ body {
   overflow: hidden;
   z-index: 0;
   pointer-events: none;
+  background-color: #040612;
 }
 
-.bg-video-element {
+.bg-poster-fallback {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(8px) brightness(0.42) saturate(125%);
-  transform: scale(1.08);
+  filter: blur(5px) brightness(0.7) saturate(115%);
+  transform: scale(1.06);
+  display: block;
+}
+
+.bg-video-element {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(5px) brightness(0.7) saturate(115%);
+  transform: scale(1.06);
   display: block;
 }
 
 .bg-video-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 25%, rgba(4, 6, 18, 0.35) 0%, rgba(4, 6, 18, 0.82) 100%);
+  background: radial-gradient(circle at 50% 30%, rgba(4, 6, 18, 0.2) 0%, rgba(4, 6, 18, 0.6) 100%);
 }
 
 /* ====================================================

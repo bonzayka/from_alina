@@ -22,9 +22,10 @@
   <!-- Индикатор прогресса чтения страницы -->
   <div class="scroll-progress-bar" id="scrollProgressBar"></div>
 
-  <!-- Видео-фон с мягким блюром (Ambient Blurred Video Background) -->
+  <!-- Атмосферный фон с мягким размытием (видео + резервный постер) -->
   <div class="ambient-video-bg" aria-hidden="true">
-    <video class="bg-video-element" id="bgVideo" src="photo/background.mp4" playsinline autoplay loop muted></video>
+    <img class="bg-poster-fallback" src="photo/background-poster.jpg" alt="">
+    <video class="bg-video-element" id="bgVideo" src="photo/background.mp4" poster="photo/background-poster.jpg" playsinline webkit-playsinline autoplay loop muted preload="auto"></video>
     <div class="bg-video-overlay"></div>
   </div>
 
