@@ -1,15 +1,18 @@
-// Интерактивная логика портала сладких снов
+// ============================================================
+// Интерактивная логика ночного портала
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
+// Используются только стандартные дефисы (-).
+// ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Telegram WebApp инициализация
+  // 1. Telegram WebApp инициализация
   const tg = window.Telegram?.WebApp;
   if (tg) {
     try {
       tg.ready();
       tg.expand();
-      if (tg.setHeaderColor) tg.setHeaderColor('#040612');
-      if (tg.setBackgroundColor) tg.setBackgroundColor('#040612');
+      if (tg.setHeaderColor) tg.setHeaderColor('#060810');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#060810');
     } catch (e) {
       console.warn('Telegram WebApp setup warning:', e);
     }
@@ -30,9 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==========================================
-  // 1. Всплывающие уведомления (Toast)
-  // ==========================================
+  // Всплывающие уведомления (Toast)
   const toastContainer = document.getElementById('toastContainer');
   function showToast(text, icon = '🌙') {
     if (!toastContainer) return;
@@ -45,9 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3000);
   }
 
-  // ==========================================
-  // 2. Фоновое видео (Ambient Background Video)
-  // ==========================================
+  // 2. Фоновое видео (Ambient Video Background)
   const bgVideo = document.getElementById('bgVideo');
   if (bgVideo) {
     bgVideo.muted = true;
@@ -63,568 +62,543 @@ document.addEventListener('DOMContentLoaded', () => {
     startBgVideo();
     window.addEventListener('click', startBgVideo, { once: true });
     window.addEventListener('touchstart', startBgVideo, { once: true });
-    window.addEventListener('scroll', startBgVideo, { once: true });
   }
 
-  // ==========================================
-  // 3. Интерактивный ночной холст: звезды, метеоры, космическая пыль
-  // ==========================================
-  const canvas = document.getElementById('celestialCanvas');
-  const ctx = canvas ? canvas.getContext('2d') : null;
-
-  let width = 0;
-  let height = 0;
-  let animationFrameId = null;
-
-  const stars = [];
-  const meteors = [];
-  const burstParticles = [];
-
-  const STAR_COUNT = 90;
-
-  function initStars() {
-    stars.length = 0;
-    for (let i = 0; i < STAR_COUNT; i++) {
-      stars.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 1.5 + 0.4,
-        alpha: Math.random() * 0.8 + 0.2,
-        twinkleSpeed: Math.random() * 0.02 + 0.006,
-        color: Math.random() > 0.3 ? '#fffdf0' : (Math.random() > 0.5 ? '#818cf8' : '#fde047')
-      });
-    }
-  }
-
-  function resizeCanvas() {
-    if (!canvas || !ctx) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
-    ctx.scale(dpr, dpr);
-    initStars();
-  }
-
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  function spawnMeteor(startX, startY) {
-    const x = startX !== undefined ? startX : Math.random() * width * 0.8;
-    const y = startY !== undefined ? startY : Math.random() * (height * 0.35);
-    const speed = Math.random() * 7 + 9;
-    const length = Math.random() * 80 + 90;
-    const angle = (Math.PI / 4) + (Math.random() * 0.2 - 0.1);
-
-    meteors.push({
-      x,
-      y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      length,
-      opacity: 1,
-      fade: Math.random() * 0.015 + 0.012
-    });
-  }
-
-  function spawnBurst(x, y, symbols = ['✨', '🌙', '💖', '💫']) {
-    for (let i = 0; i < 18; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 4.5 + 1.5;
-      burstParticles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 1.2,
-        symbol: symbols[Math.floor(Math.random() * symbols.length)],
-        opacity: 1,
-        size: Math.random() * 10 + 14,
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 8
-      });
-    }
-  }
-
-  // Периодический мягкий метеор
-  setInterval(() => {
-    if (Math.random() > 0.35) {
-      spawnMeteor();
-    }
-  }, 4500);
-
-  function renderCelestial() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, width, height);
-
-    // 1. Отрисовка мерцающих звезд
-    for (let i = 0; i < stars.length; i++) {
-      const s = stars[i];
-      s.alpha += s.twinkleSpeed;
-      if (s.alpha > 1 || s.alpha < 0.2) {
-        s.twinkleSpeed = -s.twinkleSpeed;
-      }
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.fillStyle = s.color;
-      ctx.globalAlpha = Math.max(0.1, Math.min(1, s.alpha));
-      ctx.shadowBlur = s.radius * 3;
-      ctx.shadowColor = s.color;
-      ctx.fill();
-    }
-    ctx.shadowBlur = 0;
-
-    // 2. Отрисовка метеоров
-    for (let i = meteors.length - 1; i >= 0; i--) {
-      const m = meteors[i];
-      m.x += m.vx;
-      m.y += m.vy;
-      m.opacity -= m.fade;
-
-      if (m.opacity <= 0 || m.x > width + 100 || m.y > height + 100) {
-        meteors.splice(i, 1);
-        continue;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, m.opacity);
-      const grad = ctx.createLinearGradient(
-        m.x, m.y,
-        m.x - m.vx * (m.length / 10),
-        m.y - m.vy * (m.length / 10)
-      );
-      grad.addColorStop(0, '#fde047');
-      grad.addColorStop(0.3, '#818cf8');
-      grad.addColorStop(1, 'transparent');
-
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.moveTo(m.x, m.y);
-      ctx.lineTo(m.x - m.vx * 3.5, m.y - m.vy * 3.5);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // 3. Отрисовка взрывных искр и символов
-    for (let i = burstParticles.length - 1; i >= 0; i--) {
-      const p = burstParticles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.08; // Гравитация
-      p.opacity -= 0.02;
-      p.rotation += p.rotationSpeed;
-
-      if (p.opacity <= 0) {
-        burstParticles.splice(i, 1);
-        continue;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, p.opacity);
-      ctx.font = `${p.size}px serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.translate(p.x, p.y);
-      ctx.rotate((p.rotation * Math.PI) / 180);
-      ctx.fillText(p.symbol, 0, 0);
-      ctx.restore();
-    }
-
-    ctx.globalAlpha = 1;
-    animationFrameId = requestAnimationFrame(renderCelestial);
-  }
-
-  renderCelestial();
-
-  // ==========================================
-  // 4. Индикатор прогресса скролла
-  // ==========================================
+  // 3. Индикатор скролла
   const scrollProgressBar = document.getElementById('scrollProgressBar');
   window.addEventListener('scroll', () => {
-    const total = document.documentElement.scrollHeight - window.innerHeight;
-    if (total > 0 && scrollProgressBar) {
-      const percent = (window.scrollY / total) * 100;
-      scrollProgressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
-    }
+    if (!scrollProgressBar) return;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    scrollProgressBar.style.width = `${progress}%`;
   }, { passive: true });
 
-  // ==========================================
-  // 5. Часы в верхней панели (Live Time)
-  // ==========================================
-  const liveTimeText = document.getElementById('liveTimeText');
-  function updateTime() {
-    if (!liveTimeText) return;
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const mins = String(now.getMinutes()).padStart(2, '0');
-    liveTimeText.textContent = `Тихая ночь ${hours}:${mins}`;
-  }
-  updateTime();
-  setInterval(updateTime, 30000);
-
-  // ==========================================
-  // 6. Спокойная музыка Oneheart (Snowfall / Apathy)
-  // ==========================================
+  // 4. Фоновая музыка (Oneheart, Antent, Dean Korso - Stardome)
+  // И логика авто-приглушения звука на 70% при воспроизведении видео
   const bgMusic = document.getElementById('bgMusic');
   const audioToggleBtn = document.getElementById('audioToggleBtn');
-  const audioSwitchBtn = document.getElementById('audioSwitchBtn');
-  const audioIcon = document.getElementById('audioIcon');
-  const audioLabel = document.getElementById('audioLabel');
+  const musicCapsule = document.getElementById('musicCapsule');
+  const duckingBadge = document.getElementById('duckingBadge');
 
-  const playlist = [
-    { name: 'Snowfall', file: 'snowfall.mp3' },
-    { name: 'Apathy', file: 'oneheart.mp3' }
-  ];
-  let currentTrackIdx = 0;
-  let isPlaying = false;
+  let isMusicPlaying = false;
+  let baseMusicVolume = 1.0;
+  let isDucked = false;
+  let volumeFadeInterval = null;
 
-  function updateTrackDisplay() {
-    if (audioLabel) audioLabel.textContent = playlist[currentTrackIdx].name;
-    if (bgMusic) bgMusic.src = playlist[currentTrackIdx].file;
+  // Плавный фейд громкости фоновой музыки
+  function fadeMusicVolume(targetVolume, duration = 350) {
+    if (!bgMusic) return;
+    if (volumeFadeInterval) clearInterval(volumeFadeInterval);
+
+    const startVolume = bgMusic.volume;
+    const diff = targetVolume - startVolume;
+    const steps = 18;
+    const stepTime = duration / steps;
+    let stepCount = 0;
+
+    volumeFadeInterval = setInterval(() => {
+      stepCount++;
+      const current = startVolume + (diff * (stepCount / steps));
+      bgMusic.volume = Math.max(0, Math.min(1, current));
+
+      if (stepCount >= steps) {
+        clearInterval(volumeFadeInterval);
+        bgMusic.volume = Math.max(0, Math.min(1, targetVolume));
+      }
+    }, stepTime);
   }
 
-  function playAudio() {
+  // Приглушение музыки на 70% (остается 30% громкости)
+  function applyAudioDucking() {
+    if (!isDucked) {
+      isDucked = true;
+      fadeMusicVolume(baseMusicVolume * 0.3, 300);
+      if (duckingBadge) duckingBadge.classList.add('active');
+    }
+  }
+
+  // Восстановление нормальной громкости
+  function removeAudioDucking() {
+    if (isDucked) {
+      isDucked = false;
+      fadeMusicVolume(baseMusicVolume, 350);
+      if (duckingBadge) duckingBadge.classList.remove('active');
+    }
+  }
+
+  function playMusic() {
     if (!bgMusic) return;
     bgMusic.play().then(() => {
-      isPlaying = true;
-      if (audioToggleBtn) audioToggleBtn.classList.add('playing');
-      if (audioIcon) audioIcon.textContent = '⏸️';
-      showToast(`Музыка: Oneheart - ${playlist[currentTrackIdx].name}`, '🎵');
-    }).catch((err) => {
-      console.log('Autoplay prevented:', err);
+      isMusicPlaying = true;
+      if (musicCapsule) musicCapsule.classList.add('playing');
+    }).catch(() => {
+      isMusicPlaying = false;
+      if (musicCapsule) musicCapsule.classList.remove('playing');
     });
   }
 
-  function pauseAudio() {
+  function pauseMusic() {
     if (!bgMusic) return;
     bgMusic.pause();
-    isPlaying = false;
-    if (audioToggleBtn) audioToggleBtn.classList.remove('playing');
-    if (audioIcon) audioIcon.textContent = '🎵';
+    isMusicPlaying = false;
+    if (musicCapsule) musicCapsule.classList.remove('playing');
   }
 
   if (audioToggleBtn) {
     audioToggleBtn.addEventListener('click', () => {
       triggerHaptic('light');
-      if (isPlaying) {
-        pauseAudio();
+      if (isMusicPlaying) {
+        pauseMusic();
+        showToast('Музыка на паузе', '⏸');
       } else {
-        playAudio();
+        playMusic();
+        showToast('Oneheart - Stardome играет', '🎵');
       }
     });
   }
 
-  if (audioSwitchBtn) {
-    audioSwitchBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      triggerHaptic('medium');
-      currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
-      updateTrackDisplay();
-      if (isPlaying) {
-        bgMusic.play().catch(() => {});
-        showToast(`Включен трек: ${playlist[currentTrackIdx].name}`, '🔄');
-      } else {
-        showToast(`Выбран трек: ${playlist[currentTrackIdx].name}`, '🌙');
-      }
-    });
-  }
-
-  // Фоновая музыка и видео запускаются по первому взаимодействию
-  const autoPlayTrigger = () => {
-    if (!isPlaying) {
-      playAudio();
+  // Автозапуск музыки при первом взаимодействии
+  const autoPlayMusicOnce = () => {
+    if (!isMusicPlaying && bgMusic) {
+      playMusic();
     }
-    if (bgVideo && bgVideo.paused) {
-      bgVideo.play().catch(() => {});
-    }
-    window.removeEventListener('click', autoPlayTrigger);
-    window.removeEventListener('touchstart', autoPlayTrigger);
+    window.removeEventListener('click', autoPlayMusicOnce);
+    window.removeEventListener('touchstart', autoPlayMusicOnce);
   };
-  window.addEventListener('click', autoPlayTrigger, { once: true });
-  window.addEventListener('touchstart', autoPlayTrigger, { once: true });
+  window.addEventListener('click', autoPlayMusicOnce, { once: true });
+  window.addEventListener('touchstart', autoPlayMusicOnce, { once: true });
 
-  // ==========================================
-  // 7. Интерактивная 3D Луна
-  // ==========================================
-  const interactiveMoon = document.getElementById('interactiveMoon');
-  if (interactiveMoon) {
-    interactiveMoon.addEventListener('click', (e) => {
-      triggerHaptic('medium');
-      const rect = interactiveMoon.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+  // 5. Видео-карусель (Swipable Video Feed)
+  const videoCarousel = document.getElementById('videoCarousel');
+  const carouselViewport = document.getElementById('carouselViewport');
+  const carouselTrack = document.getElementById('carouselTrack');
+  const slides = Array.from(document.querySelectorAll('.video-slide'));
+  const dots = Array.from(document.querySelectorAll('.carousel-dots .dot'));
+  const prevVideoBtn = document.getElementById('prevVideoBtn');
+  const nextVideoBtn = document.getElementById('nextVideoBtn');
+  const slideCounter = document.getElementById('slideCounter');
 
-      spawnBurst(centerX, centerY, ['🌙', '✨', '💫', '💖']);
-      spawnMeteor(centerX, centerY);
+  let currentSlideIndex = 0;
+  const totalSlides = slides.length;
 
-      showToast('Лунное тепло укутало тебя нежностью ✨🌙', '🌙');
-    });
-  }
+  // Инициализация видеоплееров внутри слайдов
+  slides.forEach((slide, index) => {
+    const video = slide.querySelector('.carousel-video');
+    const playBox = slide.querySelector('.video-player-box');
+    const centerPlayBtn = slide.querySelector('.center-play-btn');
+    const soundBtn = slide.querySelector('.video-sound-btn');
+    const soundIcon = soundBtn ? soundBtn.querySelector('.sound-icon') : null;
+    const progressFill = slide.querySelector('.video-progress-fill');
+    const timeTrack = slide.querySelector('.video-time-track');
+    const fullscreenBtn = slide.querySelector('.video-fullscreen-btn');
 
-  // Кнопка быстрого звездопада
-  const starShowerBtn = document.getElementById('starShowerBtn');
-  if (starShowerBtn) {
-    starShowerBtn.addEventListener('click', () => {
-      triggerHaptic('medium');
-      for (let i = 0; i < 4; i++) {
-        setTimeout(() => spawnMeteor(), i * 220);
+    if (!video) return;
+
+    // Включаем звук по умолчанию при запуске клипа
+    video.muted = false;
+
+    // Обновление прогресс-бара
+    video.addEventListener('timeupdate', () => {
+      if (video.duration && progressFill) {
+        const percent = (video.currentTime / video.duration) * 100;
+        progressFill.style.width = `${percent}%`;
       }
-      showToast('Загадывай самое сокровенное желание... 💫✨', '⭐');
     });
-  }
 
-  // ==========================================
-  // 8. Ночной ритуал заботы (Ritual Cards)
-  // ==========================================
-  const ritualCards = document.querySelectorAll('.ritual-card');
-  const ritualStatusText = document.getElementById('ritualStatusText');
-  const collectedItems = new Set();
+    // Перемотка по клику на полосу прогресса
+    if (timeTrack) {
+      timeTrack.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const rect = timeTrack.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+        if (video.duration) {
+          video.currentTime = ratio * video.duration;
+        }
+      });
+    }
 
-  const ritualToasts = {
-    tea: 'Выпит чашечка лавандового чая с мёдом! Спокойствие разлилось по телу 🫖✨',
-    blanket: 'Ты бережно укутана в самое мягкое шелковое облачко ☁️💤',
-    story: 'Волшебная звездная сказка зазвучала в ночной тишине 📖🌙',
-    kiss: 'Нежный сонный поцелуй в носик пойман! Самых сладких снов 💋💖'
-  };
-
-  ritualCards.forEach((card) => {
-    card.addEventListener('click', (e) => {
+    // Воспроизведение / Пауза
+    const toggleVideoPlayback = (e) => {
+      if (e) e.stopPropagation();
       triggerHaptic('light');
-      const itemKey = card.getAttribute('data-item');
-      const checkBadge = document.getElementById(`check-${itemKey}`);
 
-      if (collectedItems.has(itemKey)) {
-        collectedItems.delete(itemKey);
-        card.classList.remove('collected');
-        if (checkBadge) checkBadge.textContent = '○';
+      if (video.paused || video.ended) {
+        // Останавливаем остальные видео
+        slides.forEach((otherSlide, otherIdx) => {
+          if (otherIdx !== index) {
+            const otherVid = otherSlide.querySelector('.carousel-video');
+            const otherBox = otherSlide.querySelector('.video-player-box');
+            if (otherVid && !otherVid.paused) {
+              otherVid.pause();
+              if (otherBox) otherBox.classList.remove('playing');
+            }
+          }
+        });
+
+        video.play().then(() => {
+          if (playBox) playBox.classList.add('playing');
+        }).catch(() => {
+          // Если браузер заблокировал со звуком, пробуем с muted
+          video.muted = true;
+          if (soundIcon) soundIcon.textContent = '🔇';
+          video.play().then(() => {
+            if (playBox) playBox.classList.add('playing');
+          }).catch(() => {});
+        });
       } else {
-        collectedItems.add(itemKey);
-        card.classList.add('collected');
-        if (checkBadge) checkBadge.textContent = '✓';
-
-        const rect = card.getBoundingClientRect();
-        spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['☁️', '✨', '💤', '🌙']);
-        showToast(ritualToasts[itemKey] || 'Ритуал выполнен! ✨', '✨');
+        video.pause();
+        if (playBox) playBox.classList.remove('playing');
       }
+    };
 
-      const count = collectedItems.size;
-      if (ritualStatusText) {
-        if (count === 4) {
-          ritualStatusText.textContent = 'Все ритуалы заботы собраны на 100%! Самых сладких снов, любимая 💖';
-          triggerHaptic('success');
-          showToast('Атмосфера идеального сна готова на все 100%! 💤💖', '🎉');
+    if (centerPlayBtn) centerPlayBtn.addEventListener('click', toggleVideoPlayback);
+    if (playBox) playBox.addEventListener('click', toggleVideoPlayback);
+
+    // Управление звуком клипа
+    if (soundBtn) {
+      soundBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic('light');
+        video.muted = !video.muted;
+        if (soundIcon) soundIcon.textContent = video.muted ? '🔇' : '🔊';
+        showToast(video.muted ? 'Звук клипа выключен' : 'Звук клипа включен', video.muted ? '🔇' : '🔊');
+      });
+    }
+
+    // Полноэкранный режим
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic('light');
+        if (video.requestFullscreen) {
+          video.requestFullscreen();
+        } else if (video.webkitRequestFullscreen) {
+          video.webkitRequestFullscreen();
+        }
+      });
+    }
+
+    // Логика Audio Ducking (приглушение фоновой музыки на 70%)
+    video.addEventListener('play', () => {
+      applyAudioDucking();
+      if (playBox) playBox.classList.add('playing');
+    });
+
+    video.addEventListener('pause', () => {
+      checkAllVideosPaused();
+      if (playBox) playBox.classList.remove('playing');
+    });
+
+    video.addEventListener('ended', () => {
+      checkAllVideosPaused();
+      if (playBox) playBox.classList.remove('playing');
+      if (progressFill) progressFill.style.width = '0%';
+    });
+  });
+
+  // Проверка, играет ли сейчас хотя бы одно видео
+  function checkAllVideosPaused() {
+    const anyPlaying = slides.some(slide => {
+      const vid = slide.querySelector('.carousel-video');
+      return vid && !vid.paused && !vid.ended;
+    });
+
+    if (!anyPlaying) {
+      removeAudioDucking();
+    }
+  }
+
+  // Переключение слайда видеокарусели
+  function goToSlide(targetIndex) {
+    if (targetIndex < 0) targetIndex = totalSlides - 1;
+    if (targetIndex >= totalSlides) targetIndex = 0;
+
+    // Пауза видео на текущем слайде перед переключением
+    const currentVideo = slides[currentSlideIndex]?.querySelector('.carousel-video');
+    const currentBox = slides[currentSlideIndex]?.querySelector('.video-player-box');
+    if (currentVideo && !currentVideo.paused) {
+      currentVideo.pause();
+      if (currentBox) currentBox.classList.remove('playing');
+    }
+
+    currentSlideIndex = targetIndex;
+
+    // Сдвиг трека
+    if (carouselTrack) {
+      carouselTrack.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+    }
+
+    // Обновление классов активности
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === currentSlideIndex);
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentSlideIndex);
+    });
+
+    if (slideCounter) {
+      slideCounter.textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
+    }
+
+    checkAllVideosPaused();
+  }
+
+  if (prevVideoBtn) {
+    prevVideoBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      goToSlide(currentSlideIndex - 1);
+    });
+  }
+
+  if (nextVideoBtn) {
+    nextVideoBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      goToSlide(currentSlideIndex + 1);
+    });
+  }
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      triggerHaptic('light');
+      goToSlide(index);
+    });
+  });
+
+  // Жесты свайпа для мобильных устройств
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  if (carouselViewport) {
+    carouselViewport.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    carouselViewport.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].screenX - touchStartX;
+      const diffY = e.changedTouches[0].screenY - touchStartY;
+
+      // Если горизонтальный свайп преобладает над вертикальным скроллом
+      if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+        triggerHaptic('light');
+        if (diffX < 0) {
+          goToSlide(currentSlideIndex + 1); // свайп влево -> следующее видео
         } else {
-          ritualStatusText.textContent = `Собрано элементов: ${count} из 4 (${count === 0 ? 'Нажимай на карточки!' : 'Отличный ночной ритуал!'})`;
+          goToSlide(currentSlideIndex - 1); // свайп вправо -> предыдущее видео
         }
       }
-    });
-  });
-
-  // ==========================================
-  // 9. Spotlight подсветка и интерактив в Bento галерее
-  // ==========================================
-  document.querySelectorAll('.bento-card').forEach((card) => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
-    });
-  });
-
-  // Кнопка: Погладить животик и согреть (Карточка 1)
-  const healTummyBtn = document.getElementById('healTummyBtn');
-  if (healTummyBtn) {
-    healTummyBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      triggerHaptic('medium');
-      const rect = healTummyBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['☁️', '🌸', '💖', '✨']);
-      showToast('Животик укутан заботой и больше не болит! ☁️💖', '🌸');
-    });
+    }, { passive: true });
   }
 
-  // Кнопка: Зацеловать и погладить котика (Карточка 2)
-  const petKittenBtn = document.getElementById('petKittenBtn');
-  if (petKittenBtn) {
-    petKittenBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      triggerHaptic('medium');
-      const rect = petKittenBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🐱', '💋', '💖', '✨']);
-      showToast('Муррр! Сонный котик заглажен, зацелован и счастлив! 🐱💖', '💋');
-    });
-  }
-
-  // Кнопка: Поймать волну дзена (Карточка 3)
-  const zenWaveBtn = document.getElementById('zenWaveBtn');
-  if (zenWaveBtn) {
-    zenWaveBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      triggerHaptic('medium');
-      const rect = zenWaveBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🧘‍♂️', '🌌', '💫', '✨']);
-      showToast('Режим максимального ночного дзена и сваги активирован! 🧘‍♂️✨', '🌌');
-    });
-  }
-
-  // Кнопка: Осыпать лепестками сакуры (Карточка 4)
-  const sakuraSprayBtn = document.getElementById('sakuraSprayBtn');
-  if (sakuraSprayBtn) {
-    sakuraSprayBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      triggerHaptic('medium');
-      const rect = sakuraSprayBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🌸', '✨', '🗡️', '💖']);
-      showToast('Нежные лепестки сакуры укрыли тебя сном... 🌸✨', '🌸');
-    });
-  }
-
-  // ==========================================
-  // 10. Модальное окно Lightbox для просмотра фото
-  // ==========================================
+  // 6. Пронумерованная галерея картинок и Lightbox модал
+  const galleryCards = Array.from(document.querySelectorAll('.gallery-card'));
   const lightboxModal = document.getElementById('lightboxModal');
+  const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+  const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+  const lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
+  const lightboxNextBtn = document.getElementById('lightboxNextBtn');
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxCaption = document.getElementById('lightboxCaption');
-  const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
-  const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+  const lightboxCounter = document.getElementById('lightboxCounter');
 
-  function openLightbox(src, caption) {
-    if (!lightboxModal || !lightboxImg) return;
+  let currentPhotoIndex = 0;
+  const photosData = galleryCards.map((card, i) => {
+    const src = card.getAttribute('data-src') || '';
+    const tag = card.querySelector('.card-tag')?.textContent || `Кадр ${i + 1}`;
+    return { src, tag };
+  });
+
+  function openLightbox(index) {
+    if (index < 0) index = photosData.length - 1;
+    if (index >= photosData.length) index = 0;
+
+    currentPhotoIndex = index;
+    const item = photosData[currentPhotoIndex];
+
+    if (lightboxImg) lightboxImg.src = item.src;
+    if (lightboxCaption) lightboxCaption.textContent = item.tag;
+    if (lightboxCounter) lightboxCounter.textContent = `${currentPhotoIndex + 1} / ${photosData.length}`;
+
+    if (lightboxModal) {
+      lightboxModal.classList.add('active');
+      lightboxModal.setAttribute('aria-hidden', 'false');
+    }
+    document.body.style.overflow = 'hidden';
     triggerHaptic('light');
-    lightboxImg.src = src;
-    lightboxImg.alt = caption || '';
-    if (lightboxCaption) lightboxCaption.textContent = caption || '';
-    lightboxModal.classList.add('open');
-    lightboxModal.setAttribute('aria-hidden', 'false');
   }
 
   function closeLightbox() {
-    if (!lightboxModal) return;
-    lightboxModal.classList.remove('open');
-    lightboxModal.setAttribute('aria-hidden', 'true');
+    if (lightboxModal) {
+      lightboxModal.classList.remove('active');
+      lightboxModal.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
   }
 
-  document.querySelectorAll('.photo-wrapper').forEach((wrap) => {
-    wrap.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      const src = wrap.getAttribute('data-src') || (wrap.querySelector('img') ? wrap.querySelector('img').src : null);
-      const caption = wrap.getAttribute('data-caption') || '';
-      if (src) openLightbox(src, caption);
+  galleryCards.forEach((card, index) => {
+    card.addEventListener('click', () => {
+      openLightbox(index);
     });
   });
 
   if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
   if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
 
-  // ==========================================
-  // 11. Созвездия сладких снов (Генератор пожеланий)
-  // ==========================================
-  const nextNoteBtn = document.getElementById('nextNoteBtn');
-  const noteText = document.getElementById('noteText');
-  const noteCounter = document.getElementById('noteCounter');
-  const wishesList = window.WISHES_DATABASE || [];
-
-  let currentWishIdx = 0;
-
-  if (nextNoteBtn && wishesList.length > 0) {
-    nextNoteBtn.addEventListener('click', (e) => {
-      triggerHaptic('light');
-      currentWishIdx = (currentWishIdx + 1) % wishesList.length;
-      const wish = wishesList[currentWishIdx];
-
-      if (noteText) {
-        noteText.style.opacity = '0';
-        setTimeout(() => {
-          noteText.textContent = wish.text;
-          noteText.style.opacity = '1';
-        }, 200);
-      }
-
-      if (noteCounter) {
-        noteCounter.textContent = `Созвездие ${currentWishIdx + 1} из ${wishesList.length}`;
-      }
-
-      const rect = nextNoteBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top, ['🌙', '✨', '💫']);
+  if (lightboxPrevBtn) {
+    lightboxPrevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(currentPhotoIndex - 1);
     });
   }
 
-  // ==========================================
-  // 12. Кнопка ночных согревающих обнимашек
-  // ==========================================
-  const hugBtn = document.getElementById('hugBtn');
-  if (hugBtn) {
-    hugBtn.addEventListener('click', (e) => {
-      triggerHaptic('heavy');
-      const rect = hugBtn.getBoundingClientRect();
-      spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, ['🫂', '💖', '🌙', '☁️', '💤']);
-      showToast('Крепко-крепко прижал тебя к себе и поцеловал! 🫂💖', '🫂');
+  if (lightboxNextBtn) {
+    lightboxNextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(currentPhotoIndex + 1);
     });
   }
 
-  // ==========================================
-  // 13. Плавающий док быстрой навигации (Floating Dock)
-  // ==========================================
-  const dockItems = document.querySelectorAll('.dock-item');
-  const dockSections = [
-    document.getElementById('heroSection'),
-    document.getElementById('ritualSection'),
-    document.getElementById('gallerySection'),
-    document.getElementById('wishesSection'),
-    document.getElementById('finaleSection')
-  ].filter(Boolean);
-
-  dockItems.forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      triggerHaptic('light');
-      const targetSel = btn.getAttribute('data-target');
-      const targetEl = document.querySelector(targetSel);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
+  // Управление с клавиатуры (Esc, стрелки)
+  window.addEventListener('keydown', (e) => {
+    if (lightboxModal && lightboxModal.classList.contains('active')) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') openLightbox(currentPhotoIndex - 1);
+      if (e.key === 'ArrowRight') openLightbox(currentPhotoIndex + 1);
+    }
   });
 
-  // Отслеживание активной секции в доке
-  const dockObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const id = '#' + entry.target.id;
-        dockItems.forEach((item) => {
-          if (item.getAttribute('data-target') === id) {
-            item.classList.add('active');
-          } else {
-            item.classList.remove('active');
-          }
-        });
+  // 7. Секция "Спокойной ночи" и интерактивная кнопка загадать сладкий сон
+  const wishStarBtn = document.getElementById('wishStarBtn');
+  const wishHint = document.getElementById('wishHint');
+
+  const nightWishes = [
+    'Сладких снов, моя любимая девочка! 🌙✨',
+    'Пусть приснятся самые чудесные и теплые сны! 💫',
+    'Укутываю тебя нежностью и крепко целую на ночь! ☁️',
+    'Отдыхай сладко, набирайся сил к завтрашнему дню! 🌸',
+    'Ты самое прекрасное, что есть в этом мире. Спи крепко! 💖'
+  ];
+  let wishClickCount = 0;
+
+  if (wishStarBtn) {
+    wishStarBtn.addEventListener('click', () => {
+      triggerHaptic('success');
+      wishClickCount++;
+
+      const phrase = nightWishes[wishClickCount % nightWishes.length];
+      showToast(phrase, '✨');
+
+      if (wishHint) {
+        wishHint.textContent = 'Звездопад снов отправлен прямо к твоей подушке ✨';
+        wishHint.style.color = '#fef08a';
       }
+
+      // Запуск салюта звезд на холсте
+      createStarDustBurst(window.innerWidth / 2, window.innerHeight * 0.75);
     });
-  }, {
-    threshold: 0.35
-  });
+  }
 
-  dockSections.forEach((sec) => dockObserver.observe(sec));
+  // 8. Интерактивный ночной холст (звезды и метеоры)
+  const canvas = document.getElementById('celestialCanvas');
+  const ctx = canvas ? canvas.getContext('2d') : null;
 
-  // ==========================================
-  // 14. Плавное появление секций при скролле (Scroll Reveal)
-  // ==========================================
-  const revealElements = document.querySelectorAll('.scroll-reveal');
-  const revealObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
+  let width = 0;
+  let height = 0;
+  const stars = [];
+  const burstParticles = [];
+
+  function resizeCanvas() {
+    if (!canvas || !ctx) return;
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    initStars();
+  }
+
+  function initStars() {
+    stars.length = 0;
+    const count = Math.min(80, Math.floor(width / 16));
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.4 + 0.4,
+        alpha: Math.random() * 0.7 + 0.3,
+        twinkleSpeed: Math.random() * 0.015 + 0.005,
+        color: Math.random() > 0.4 ? '#ffffff' : (Math.random() > 0.5 ? '#fef08a' : '#c7d2fe')
+      });
+    }
+  }
+
+  function createStarDustBurst(originX, originY) {
+    for (let i = 0; i < 45; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 4 + 1.5;
+      burstParticles.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1.5,
+        radius: Math.random() * 2.5 + 1,
+        alpha: 1,
+        life: 1,
+        decay: Math.random() * 0.02 + 0.012,
+        color: Math.random() > 0.3 ? '#fef08a' : '#818cf8'
+      });
+    }
+  }
+
+  function renderCelestial() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+
+    // Отрисовка мерцающих звезд
+    for (let i = 0; i < stars.length; i++) {
+      const s = stars[i];
+      s.alpha += s.twinkleSpeed;
+      if (s.alpha > 0.95 || s.alpha < 0.2) {
+        s.twinkleSpeed = -s.twinkleSpeed;
       }
-    });
-  }, {
-    threshold: 0.1
-  });
 
-  revealElements.forEach((el) => revealObserver.observe(el));
+      ctx.save();
+      ctx.globalAlpha = Math.max(0.1, Math.min(1, s.alpha));
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Отрисовка частиц взрыва снов
+    for (let i = burstParticles.length - 1; i >= 0; i--) {
+      const p = burstParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.04; // мягкая гравитация
+      p.life -= p.decay;
+
+      if (p.life <= 0) {
+        burstParticles.splice(i, 1);
+        continue;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    requestAnimationFrame(renderCelestial);
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  renderCelestial();
 });
