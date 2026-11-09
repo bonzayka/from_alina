@@ -38,18 +38,6 @@
   }
 
   // ----------------------------------------------------------
-  // Иконки
-  // ----------------------------------------------------------
-  const STROKE = 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
-  const ICON = {
-    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>',
-    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.2"/><rect x="14" y="4" width="4" height="16" rx="1.2"/></svg>',
-    soundOn: `<svg viewBox="0 0 24 24" ${STROKE}><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>`,
-    soundOff: `<svg viewBox="0 0 24 24" ${STROKE}><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/></svg>`,
-    full: `<svg viewBox="0 0 24 24" ${STROKE}><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>`
-  };
-
-  // ----------------------------------------------------------
   // Уведомления
   // ----------------------------------------------------------
   const toastsEl = $('#toasts');
@@ -106,17 +94,14 @@
   }
 
   // ----------------------------------------------------------
-  // Музыка + приглушение на 70% во время видео
-  // Web Audio GainNode работает и на iPhone (там audio.volume не меняется)
+  // Фоновая музыка (Stardome) с плавным входом
   // ----------------------------------------------------------
   const music = $('#bgMusic');
   const player = $('#player');
   const BASE = 1;
-  const DUCK = 0.3; // 30% громкости = тише на 70%
 
   let actx = null;
   let gain = null;
-  let ducked = false;
   let fadeRaf = 0;
 
   function setupAudioGraph() {
@@ -173,13 +158,6 @@
     music.addEventListener('pause', () => setMusicUI(false));
   }
 
-  function duck(on) {
-    if (ducked === on) return;
-    ducked = on;
-    setLevel(on ? BASE * DUCK : BASE, on ? 450 : 1100);
-    if (player) player.classList.toggle('is-ducked', on);
-  }
-
   const playerBtn = $('#playerBtn');
   if (playerBtn) {
     playerBtn.addEventListener('click', () => {
@@ -204,7 +182,7 @@
     if (gain) gain.gain.value = 0;
     else if (music) music.volume = 0;
     playMusic();
-    setLevel(ducked ? BASE * DUCK : BASE, 2600);
+    setLevel(BASE, 2600);
 
     startBgVideo();
     if (intro) intro.classList.add('is-gone');
@@ -383,188 +361,6 @@
   }, { passive: true });
 
   // ----------------------------------------------------------
-  // 02. Видео-карусель
-  // ----------------------------------------------------------
-  const CLIPS = ['video/video1.mp4', 'video/video2.mp4', 'video/video3.mp4'];
-  const stage = $('#reelsStage');
-  const dotsWrap = $('#reelDots');
-  let cur = 0;
-  let suppressClick = false;
-
-  const reels = CLIPS.map((src, i) => {
-    const el = document.createElement('div');
-    el.className = 'reel';
-    el.innerHTML = `
-      <video src="${src}#t=0.1" playsinline webkit-playsinline preload="metadata"></video>
-      <div class="reel-ui">
-        <div class="reel-top">
-          <span class="reel-num">${pad(i + 1)} / ${pad(CLIPS.length)}</span>
-          <button class="reel-icon reel-full" type="button" aria-label="На весь экран">${ICON.full}</button>
-        </div>
-        <button class="reel-play" type="button" aria-label="Смотреть">${ICON.play}</button>
-        <div class="reel-bar">
-          <button class="reel-icon reel-sound" type="button" aria-label="Звук видео"><span class="s-on">${ICON.soundOn}</span><span class="s-off">${ICON.soundOff}</span></button>
-          <div class="reel-progress" aria-label="Перемотка"><i></i></div>
-          <button class="reel-icon reel-pp" type="button" aria-label="Пауза"><span class="p-play">${ICON.play}</span><span class="p-pause">${ICON.pause}</span></button>
-        </div>
-      </div>`;
-    stage.appendChild(el);
-
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.setAttribute('aria-label', `Видео ${i + 1}`);
-    dot.addEventListener('click', () => { haptic(); go(i); });
-    dotsWrap.appendChild(dot);
-
-    return el;
-  });
-
-  const videoOf = (el) => el.querySelector('video');
-
-  function syncDuck() {
-    duck(reels.some((el) => {
-      const v = videoOf(el);
-      return !v.paused && !v.ended;
-    }));
-  }
-
-  function playReel(el) {
-    const v = videoOf(el);
-    reels.forEach((o) => { if (o !== el && !videoOf(o).paused) videoOf(o).pause(); });
-    const p = v.play();
-    if (p && p.catch) {
-      p.catch(() => {
-        // Браузер не дал включить со звуком: пробуем без звука
-        v.muted = true;
-        el.classList.add('is-muted');
-        v.play().catch(() => {});
-      });
-    }
-  }
-
-  reels.forEach((el, i) => {
-    const v = videoOf(el);
-    const bar = el.querySelector('.reel-progress i');
-    const track = el.querySelector('.reel-progress');
-
-    const toggle = () => {
-      if (v.paused || v.ended) playReel(el);
-      else v.pause();
-    };
-
-    el.addEventListener('click', (e) => {
-      if (suppressClick) return;
-      if (i !== cur) { haptic(); go(i); return; }
-      if (e.target.closest('.reel-icon, .reel-progress')) return;
-      haptic();
-      toggle();
-    });
-
-    el.querySelector('.reel-pp').addEventListener('click', (e) => { e.stopPropagation(); haptic(); toggle(); });
-
-    el.querySelector('.reel-sound').addEventListener('click', (e) => {
-      e.stopPropagation();
-      haptic();
-      v.muted = !v.muted;
-      el.classList.toggle('is-muted', v.muted);
-    });
-
-    el.querySelector('.reel-full').addEventListener('click', (e) => {
-      e.stopPropagation();
-      haptic();
-      if (v.requestFullscreen) {
-        const r = v.requestFullscreen();
-        if (r && r.catch) r.catch(() => {});
-      } else if (v.webkitEnterFullscreen) {
-        v.webkitEnterFullscreen();
-      } else if (v.webkitRequestFullscreen) {
-        v.webkitRequestFullscreen();
-      }
-      if (v.paused) playReel(el);
-    });
-
-    track.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const r = track.getBoundingClientRect();
-      if (v.duration) v.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * v.duration;
-    });
-
-    v.addEventListener('timeupdate', () => {
-      if (v.duration) bar.style.transform = `scaleX(${v.currentTime / v.duration})`;
-    });
-
-    v.addEventListener('play', () => { el.classList.add('is-playing'); syncDuck(); });
-    v.addEventListener('pause', () => { el.classList.remove('is-playing'); syncDuck(); });
-    v.addEventListener('ended', () => {
-      el.classList.remove('is-playing');
-      syncDuck();
-      // Как в рилсах: сразу следующий клип
-      if (i === cur && cur < reels.length - 1) setTimeout(() => go(cur + 1, true), 450);
-    });
-  });
-
-  function layout() {
-    const n = reels.length;
-    reels.forEach((el, i) => {
-      let o = i - cur;
-      if (o > n / 2) o -= n;
-      if (o < -n / 2) o += n;
-      const a = Math.abs(o);
-      el.classList.toggle('is-active', o === 0);
-      el.style.zIndex = String(10 - a);
-      el.style.opacity = a > 1 ? '0' : a === 1 ? '0.5' : '1';
-      el.style.filter = a ? 'brightness(0.55) saturate(0.8)' : 'none';
-      el.style.pointerEvents = a > 1 ? 'none' : 'auto';
-      el.style.transform = `translateX(${o * 74}%) scale(${a ? 0.8 : 1}) rotateY(${o * -14}deg)`;
-    });
-    $$('button', dotsWrap).forEach((d, i) => d.classList.toggle('is-active', i === cur));
-  }
-
-  function go(i, autoplay) {
-    const n = reels.length;
-    const next = (i + n) % n;
-    if (next !== cur) {
-      const v = videoOf(reels[cur]);
-      if (!v.paused) v.pause();
-    }
-    cur = next;
-    layout();
-    if (autoplay) {
-      const v = videoOf(reels[cur]);
-      v.currentTime = 0;
-      playReel(reels[cur]);
-    }
-  }
-
-  $('#reelPrev').addEventListener('click', () => { haptic(); go(cur - 1); });
-  $('#reelNext').addEventListener('click', () => { haptic(); go(cur + 1); });
-
-  let sx = 0;
-  let sy = 0;
-  stage.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
-  stage.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - sx;
-    const dy = e.changedTouches[0].clientY - sy;
-    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      haptic();
-      go(cur + (dx < 0 ? 1 : -1));
-      suppressClick = true;
-      setTimeout(() => { suppressClick = false; }, 350);
-    }
-  }, { passive: true });
-
-  // Ушла со страницы видео: ставим на паузу
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) reels.forEach((el) => { const v = videoOf(el); if (!v.paused) v.pause(); });
-      });
-    }, { threshold: 0.15 }).observe($('#reels'));
-  }
-
-  layout();
-
-  // ----------------------------------------------------------
   // Небо: звезды, падающие звезды, искры
   // ----------------------------------------------------------
   const cv = $('#sky');
@@ -695,7 +491,7 @@
   requestAnimationFrame(frame);
 
   // ----------------------------------------------------------
-  // 03. Поймать сладкий сон
+  // 02. Поймать сладкий сон
   // ----------------------------------------------------------
   const WISHES = [
     'Сладких снов, моя хорошая 🌙',
