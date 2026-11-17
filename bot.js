@@ -8,6 +8,11 @@ const { WISHES } = require('./wishes-data');
 function initBot() {
   const bot = new Telegraf(config.BOT_TOKEN);
 
+  // Глобальный перехват ошибок Telegraf, чтобы процесс не падал
+  bot.catch((err, ctx) => {
+    console.error(`Ошибка Telegraf (${ctx ? ctx.updateType : 'unknown'}):`, err.message);
+  });
+
   // Команда /start
   bot.start(async (ctx) => {
     const welcomeText = `☀️ С добрым утром, моё любимое солнышко!\n\n` +
@@ -64,7 +69,7 @@ function initBot() {
           return;
         }
 
-        if (parsed.type === 'wish_shared') {
+        if (parsed.type === 'wish_shared' || parsed.type === 'morning_kiss') {
           const replyText = `☀️ *Утренний лучик сохранён*\n\n` +
             `«${parsed.text}»\n\n` +
             `_Пусть весь твой день будет согрет любовью!_ 💖`;
@@ -97,22 +102,40 @@ function initBot() {
     }
   }
 
-  // Запуск бота с обработкой ошибок
-  async function start() {
+  // Запуск бота с авто-повтором при перезапуске контейнера (409 Conflict / сеть)
+  let stopped = false;
+
+  async function launchWithRetry(attempt = 1) {
+    if (stopped) return;
     try {
+      await bot.telegram.deleteWebhook({ drop_pending_updates: true });
       await configureMenuButton();
-      bot.launch({
+      console.log(`Запуск Telegram-бота (попытка ${attempt})...`);
+      await bot.launch({
         dropPendingUpdates: true
       });
-      console.log('Telegram-бот успешно запущен в режиме polling');
     } catch (err) {
-      console.error('Ошибка при запуске Telegram-бота:', err.message);
+      if (stopped) return;
+      const delaySec = Math.min(15, attempt * 4);
+      console.error(`Ошибка запуска polling (${err.message}). Повтор через ${delaySec} сек...`);
+      setTimeout(() => launchWithRetry(attempt + 1), delaySec * 1000);
     }
   }
 
+  function start() {
+    launchWithRetry(1);
+  }
+
   // Корректная остановка
-  process.once('SIGINT', () => bot.stop('SIGINT'));
-  process.once('SIGTERM', () => bot.stop('SIGTERM'));
+  const shutdown = (signal) => {
+    stopped = true;
+    try {
+      bot.stop(signal);
+    } catch (e) { /* бот ещё не был запущен */ }
+  };
+
+  process.once('SIGINT', () => shutdown('SIGINT'));
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
 
   return { bot, start };
 }
