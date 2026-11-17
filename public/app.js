@@ -1,6 +1,6 @@
 // ============================================================
-// С добрым утром, моё солнышко | Главный клиентский движок
-// WebGL шейдер рассвета + физика лепестков сакуры + студия Oneheart
+// Доброе утро, солнышко | Главный интерактивный движок
+// WebGL GLSL шейдер рассвета + Сакура + Плеер Oneheart + Lenis/GSAP
 // Правило: только обычные дефисы (-), без длинных тире.
 // ============================================================
 
@@ -16,23 +16,16 @@
   const body = document.body;
 
   // ----------------------------------------------------------
-  // 1. Интеграция с Telegram WebApp и тактильный отклик
+  // 1. Интеграция Telegram WebApp
   // ----------------------------------------------------------
   const tg = window.Telegram && window.Telegram.WebApp;
-  function syncTelegramColors(hex) {
-    if (!tg) return;
-    try {
-      if (tg.setHeaderColor) tg.setHeaderColor(hex);
-      if (tg.setBackgroundColor) tg.setBackgroundColor(hex);
-    } catch (e) { /* безопасно игнорируем */ }
-  }
-
   if (tg) {
     try {
       tg.ready();
       tg.expand();
-      syncTelegramColors('#160a14');
-    } catch (e) { /* безопасно игнорируем */ }
+      if (tg.setHeaderColor) tg.setHeaderColor('#150a13');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#150a13');
+    } catch (e) { /* вне Telegram не критично */ }
   }
 
   function haptic(type = 'light') {
@@ -41,13 +34,13 @@
         if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
         else tg.HapticFeedback.impactOccurred(type);
       } else if (navigator.vibrate) {
-        navigator.vibrate(type === 'success' ? [12, 36, 14] : 8);
+        navigator.vibrate(type === 'success' ? [12, 36, 12] : 8);
       }
-    } catch (e) { /* не критично */ }
+    } catch (e) { /* игнор */ }
   }
 
   // ----------------------------------------------------------
-  // 2. Всплывающие тосты и сердечки
+  // 2. Уведомления (Тосты)
   // ----------------------------------------------------------
   const toastsEl = $('#toasts');
   function toast(text) {
@@ -56,21 +49,11 @@
     el.className = 'toast';
     el.textContent = text;
     toastsEl.appendChild(el);
-    setTimeout(() => el.remove(), 3600);
-  }
-
-  function spawnHeart(x, y) {
-    const el = document.createElement('div');
-    el.className = 'float-heart';
-    el.textContent = '♥';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1200);
+    setTimeout(() => el.remove(), 3500);
   }
 
   // ----------------------------------------------------------
-  // 3. Живые дата, время и переключение света неба
+  // 3. Дата, живые часы и переключатель оттенка рассвета
   // ----------------------------------------------------------
   const now = new Date();
   const introDate = $('#introDate');
@@ -81,9 +64,8 @@
 
   const issueNo = $('#issueNo');
   if (issueNo) {
-    const startOfYear = new Date(now.getFullYear(), 0, 0);
-    const dayOfYear = Math.floor((now - startOfYear) / 86400000);
-    issueNo.textContent = pad(dayOfYear, 3);
+    const start = new Date(now.getFullYear(), 0, 0);
+    issueNo.textContent = pad(Math.floor((now - start) / 86400000), 3);
   }
 
   const heroTime = $('#heroTime');
@@ -95,37 +77,41 @@
   tickClock();
   setInterval(tickClock, 15000);
 
-  let targetWarmth = 0.0;
-  let currentWarmth = 0.0;
+  // Переключение световой палитры: Розовый рассвет <-> Золотое утро
+  let isSunlitMood = false;
   const moodToggle = $('#moodToggle');
   const moodLabel = $('#moodLabel');
   if (moodToggle) {
     moodToggle.addEventListener('click', () => {
       haptic('light');
-      const isGolden = root.getAttribute('data-theme') === 'golden-silk';
-      const nextTheme = isGolden ? 'rose-dawn' : 'golden-silk';
-      root.setAttribute('data-theme', nextTheme);
-      targetWarmth = isGolden ? 0.0 : 1.0;
-      if (moodLabel) moodLabel.textContent = isGolden ? 'Розовый свет' : 'Золотой шёлк';
-      syncTelegramColors(isGolden ? '#160a14' : '#1d1115');
-      toast(isGolden ? 'Включён нежный розовый рассвет' : 'Включён тёплый солнечный шёлк');
+      isSunlitMood = !isSunlitMood;
+      if (isSunlitMood) {
+        root.setAttribute('data-mood', 'sunlit');
+        if (moodLabel) moodLabel.textContent = 'Золотое утро';
+        toast('Включено тёплое золотое солнце');
+      } else {
+        root.removeAttribute('data-mood');
+        if (moodLabel) moodLabel.textContent = 'Розовый рассвет';
+        toast('Включён нежный розовый рассвет');
+      }
     });
   }
 
   // ----------------------------------------------------------
-  // 4. Плавный скролл Lenis + GSAP ScrollTrigger (Golden Loop)
+  // 4. Плавный инерционный скролл Lenis + GSAP Golden Loop
   // ----------------------------------------------------------
   let lenis = null;
-  function initSmoothScroll() {
-    if (reduceMotion || lenis) return;
-    if (typeof window.Lenis === 'function') {
+
+  function initSmoothMotion() {
+    if (reduceMotion) return;
+
+    if (window.Lenis) {
       try {
         lenis = new window.Lenis({
-          duration: 1.15,
+          duration: 1.18,
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
-          syncTouch: false,
-          wheelMultiplier: 1.0
+          syncTouch: false
         });
 
         if (window.gsap && window.ScrollTrigger) {
@@ -147,148 +133,138 @@
       }
     }
 
-    // Плавный переход по якорным ссылкам
+    // Плавная навигация по якорным ссылкам через Lenis
     $$('a[href^="#"]').forEach((link) => {
       link.addEventListener('click', (e) => {
         const id = link.getAttribute('href');
         if (!id || id === '#') return;
         const target = $(id);
-        if (!target) return;
-        e.preventDefault();
-        if (lenis) lenis.scrollTo(target, { offset: -68 });
-        else target.scrollIntoView({ behavior: 'smooth' });
+        if (target && lenis) {
+          e.preventDefault();
+          lenis.scrollTo(target, { offset: -24 });
+        }
       });
     });
   }
 
-  // ----------------------------------------------------------
-  // 5. Магнитные кнопки и 3D-карточки с прожектором
-  // ----------------------------------------------------------
+  window.addEventListener('load', initSmoothMotion);
+
+  // Магнитное притяжение кнопок (MagneticButton из interactive-motion)
   if (finePointer && !reduceMotion) {
     $$('.magnetic').forEach((btn) => {
-      const strength = parseFloat(btn.dataset.strength || '0.24');
       btn.addEventListener('pointermove', (e) => {
         const r = btn.getBoundingClientRect();
-        const dx = (e.clientX - (r.left + r.width / 2)) * strength;
-        const dy = (e.clientY - (r.top + r.height / 2)) * strength;
-        btn.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0)`;
+        const x = (e.clientX - (r.left + r.width / 2)) * 0.24;
+        const y = (e.clientY - (r.top + r.height / 2)) * 0.24;
+        btn.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
       });
       btn.addEventListener('pointerleave', () => {
         btn.style.transform = '';
       });
     });
+  }
 
-    const attachTilt = (el, maxDeg = 4.5) => {
-      el.addEventListener('pointermove', (e) => {
-        const r = el.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width;
-        const py = (e.clientY - r.top) / r.height;
-        el.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`);
-        el.style.setProperty('--my', `${(py * 100).toFixed(1)}%`);
-        el.style.setProperty('--ry', `${((px - 0.5) * maxDeg).toFixed(2)}deg`);
-        el.style.setProperty('--rx', `${((0.5 - py) * maxDeg).toFixed(2)}deg`);
+  // Spotlight свечение и легкий 3D-наклон для карточек Bento
+  if (finePointer) {
+    $$('.bento-card').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        card.style.setProperty('--mx', `${x}px`);
+        card.style.setProperty('--my', `${y}px`);
+        if (!reduceMotion) {
+          const px = x / r.width - 0.5;
+          const py = y / r.height - 0.5;
+          card.style.setProperty('--ry', `${(px * 3.5).toFixed(2)}deg`);
+          card.style.setProperty('--rx', `${(-py * 3.5).toFixed(2)}deg`);
+        }
       });
-      el.addEventListener('pointerleave', () => {
-        el.style.setProperty('--rx', '0deg');
-        el.style.setProperty('--ry', '0deg');
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
       });
-    };
-
-    $$('.tilt-card').forEach((card) => attachTilt(card, 3.6));
-
-    // Мягкое свечение за курсором
-    const glow = $('#cursorGlow');
-    let tx = window.innerWidth / 2;
-    let ty = window.innerHeight / 2;
-    let cx = tx;
-    let cy = ty;
-    window.addEventListener('pointermove', (e) => {
-      tx = e.clientX;
-      ty = e.clientY;
-    }, { passive: true });
-    const glowLoop = () => {
-      cx += (tx - cx) * 0.09;
-      cy += (ty - cy) * 0.09;
-      if (glow) glow.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
-      requestAnimationFrame(glowLoop);
-    };
-    requestAnimationFrame(glowLoop);
+    });
   }
 
   // ----------------------------------------------------------
-  // 6. Плейлист в стиле Oneheart + Web Audio Спектр + Природа
+  // 5. Музыкальная студия в стиле Oneheart + FFT-визуализатор
   // ----------------------------------------------------------
-  const TRACKS = [
+  const PLAYLIST = [
     {
-      src: 'morning-ambient.mp3',
-      title: 'Horizon (Morning Ambient)',
-      short: 'Horizon',
-      artist: 'StimiBeats • спокойный рассвет в духе Oneheart',
-      shortArtist: 'calm dawn pad',
-      dur: '04:55'
-    },
-    {
-      src: 'dawn-dreamscape.mp3',
-      title: 'Cylinder Four (Dreamscape)',
-      short: 'Cylinder IV',
-      artist: 'Chris Zabriskie • тёплый аналоговый эмбиент',
-      shortArtist: 'warm tape pad',
-      dur: '02:57'
-    },
-    {
-      src: 'eternity-dawn.mp3',
+      id: 'eternity',
+      src: 'eternity.mp3',
+      short: '01 • Eternity',
       title: 'Eternity (Dawn Reprise)',
-      short: 'Eternity',
-      artist: 'Stellardrone • невесомое утреннее небо',
-      shortArtist: 'celestial dawn',
-      dur: '03:33'
+      artist: 'Stellardrone • рассветный эмбиент в стиле Oneheart',
+      durHint: '03:33'
     },
     {
-      src: 'snowfall.mp3',
-      title: 'Snowfall',
-      short: 'Snowfall',
-      artist: 'Oneheart, Reidenshi • культовая нежность',
-      shortArtist: 'oneheart, reidenshi',
-      dur: '02:03'
+      id: 'reverie',
+      src: 'reverie.mp3',
+      short: '02 • Reverie',
+      title: 'Reverie',
+      artist: 'Scott Buckley • нежное утреннее пианино и синтезаторы',
+      durHint: '03:43'
     },
     {
+      id: 'stardome',
       src: 'stardome.mp3',
+      short: '03 • Stardome',
       title: 'Stardome',
-      short: 'Stardome',
-      artist: 'Oneheart, Antent, Dean Korso • звёздная дымка',
-      shortArtist: 'oneheart, antent',
-      dur: '03:39'
+      artist: 'Oneheart, Antent, Dean Korso',
+      durHint: '03:38'
+    },
+    {
+      id: 'snowfall',
+      src: 'snowfall.mp3',
+      short: '04 • Snowfall',
+      title: 'Snowfall',
+      artist: 'Oneheart x Reidenshi',
+      durHint: '02:03'
+    },
+    {
+      id: 'apathy',
+      src: 'oneheart.mp3',
+      short: '05 • Warm Glow',
+      title: 'Apathy (Warm Tape)',
+      artist: 'Oneheart • мягкое обволакивающее утро',
+      durHint: '02:23'
+    },
+    {
+      id: 'horizon',
+      src: 'morning-ambient.mp3',
+      short: '06 • Horizon',
+      title: 'Horizon',
+      artist: 'StimiBeats • тихая утренняя гармония',
+      durHint: '04:55'
     }
   ];
 
   const music = $('#bgMusic');
   const navPlayer = $('#navPlayer');
   const navPlayBtn = $('#navPlayBtn');
-  const navNextBtn = $('#navNextBtn');
-  const navTrackTitle = $('#navTrackTitle');
-  const navTrackArtist = $('#navTrackArtist');
-
-  const vinylWrap = $('#vinylWrap');
-  const studioTitle = $('#studioTrackTitle');
-  const studioArtist = $('#studioTrackArtist');
   const studioPlayBtn = $('#studioPlayBtn');
-  const studioPrevBtn = $('#studioPrevBtn');
-  const studioNextBtn = $('#studioNextBtn');
-  const playlistEl = $('#playlist');
-  const seekBar = $('#seekBar');
-  const seekFill = $('#seekFill');
-  const timeCurrent = $('#timeCurrent');
-  const timeTotal = $('#timeTotal');
-  const specCanvas = $('#audioSpectrum');
-  const specCtx = specCanvas ? specCanvas.getContext('2d') : null;
+  const vinylWrap = $('#vinylWrap');
+  const npTitle = $('#npTitle');
+  const npArtist = $('#npArtist');
+  const studioTitle = $('#studioTitle');
+  const studioArtist = $('#studioArtist');
+  const scrubBar = $('#scrubBar');
+  const scrubFill = $('#scrubFill');
+  const timeCur = $('#timeCur');
+  const timeDur = $('#timeDur');
+  const trackPillsEl = $('#trackPills');
+  const spectrumCv = $('#audioSpectrum');
+  const spectrumCtx = spectrumCv ? spectrumCv.getContext('2d') : null;
 
   let trackIndex = 0;
   let actx = null;
   let gainNode = null;
   let analyser = null;
   let freqData = null;
-  let fadeRaf = 0;
   let audioEnergy = 0;
+  let fadeRaf = 0;
 
   function formatTime(sec) {
     if (!Number.isFinite(sec) || sec < 0) return '00:00';
@@ -305,12 +281,12 @@
       actx = new AC();
       const src = actx.createMediaElementSource(music);
       analyser = actx.createAnalyser();
-      analyser.fftSize = 128;
+      analyser.fftSize = 64;
       analyser.smoothingTimeConstant = 0.84;
       freqData = new Uint8Array(analyser.frequencyBinCount);
 
       gainNode = actx.createGain();
-      gainNode.gain.value = 1;
+      gainNode.gain.value = 0.92;
 
       src.connect(analyser);
       analyser.connect(gainNode);
@@ -322,7 +298,7 @@
     }
   }
 
-  function fadeVolume(target, ms) {
+  function fadeMusicTo(target, ms) {
     if (gainNode && actx) {
       const t = actx.currentTime;
       gainNode.gain.cancelScheduledValues(t);
@@ -332,14 +308,14 @@
     }
     if (!music) return;
     cancelAnimationFrame(fadeRaf);
-    const startVol = music.volume;
+    const from = music.volume;
     const t0 = performance.now();
-    const tick = (t) => {
+    const step = (t) => {
       const k = Math.min(1, (t - t0) / ms);
-      music.volume = Math.max(0, Math.min(1, startVol + (target - startVol) * k));
-      if (k < 1) fadeRaf = requestAnimationFrame(tick);
+      music.volume = Math.max(0, Math.min(1, from + (target - from) * k));
+      if (k < 1) fadeRaf = requestAnimationFrame(step);
     };
-    fadeRaf = requestAnimationFrame(tick);
+    fadeRaf = requestAnimationFrame(step);
   }
 
   function syncPlayerUI(playing) {
@@ -348,41 +324,32 @@
     if (vinylWrap) vinylWrap.classList.toggle('is-spinning', playing);
   }
 
-  function renderPlaylist() {
-    if (!playlistEl) return;
-    playlistEl.innerHTML = '';
-    TRACKS.forEach((tr, idx) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `track-item${idx === trackIndex ? ' is-active' : ''}`;
-      btn.setAttribute('role', 'option');
+  function renderTrackMeta() {
+    const tr = PLAYLIST[trackIndex];
+    if (npTitle) npTitle.textContent = tr.title;
+    if (npArtist) npArtist.textContent = tr.artist;
+    if (studioTitle) studioTitle.textContent = tr.title;
+    if (studioArtist) studioArtist.textContent = tr.artist;
+    if (timeDur) timeDur.textContent = tr.durHint;
+
+    $$('.track-pill', trackPillsEl).forEach((btn, idx) => {
+      btn.classList.toggle('is-active', idx === trackIndex);
       btn.setAttribute('aria-selected', idx === trackIndex ? 'true' : 'false');
-      btn.innerHTML = `
-        <span class="track-info">
-          <span class="track-name">${pad(idx + 1)}. ${tr.short}</span>
-          <span class="track-sub">${tr.shortArtist}</span>
-        </span>
-        <span class="track-dur">${tr.dur}</span>
-      `;
-      btn.addEventListener('click', () => {
-        haptic('light');
-        loadTrack(idx, true);
-      });
-      playlistEl.appendChild(btn);
     });
   }
 
-  function updateTrackLabels() {
-    const tr = TRACKS[trackIndex];
-    if (navTrackTitle) navTrackTitle.textContent = tr.short;
-    if (navTrackArtist) navTrackArtist.textContent = tr.shortArtist;
-    if (studioTitle) studioTitle.textContent = tr.title;
-    if (studioArtist) studioArtist.textContent = tr.artist;
-    if (timeTotal) timeTotal.textContent = tr.dur;
-    $$('.track-item', playlistEl || document).forEach((el, i) => {
-      el.classList.toggle('is-active', i === trackIndex);
-      el.setAttribute('aria-selected', i === trackIndex ? 'true' : 'false');
-    });
+  function loadTrack(idx, autoplay = true) {
+    trackIndex = (idx + PLAYLIST.length) % PLAYLIST.length;
+    const tr = PLAYLIST[trackIndex];
+    renderTrackMeta();
+    if (!music) return;
+    music.src = tr.src;
+    music.load();
+    if (scrubFill) scrubFill.style.width = '0%';
+    if (timeCur) timeCur.textContent = '00:00';
+    if (autoplay) {
+      playMusic();
+    }
   }
 
   function playMusic() {
@@ -392,155 +359,174 @@
       actx.resume().catch(() => {});
     }
     const p = music.play();
-    if (p && p.catch) p.catch(() => syncPlayerUI(false));
-  }
-
-  function loadTrack(idx, autoPlay = true) {
-    trackIndex = (idx + TRACKS.length) % TRACKS.length;
-    const tr = TRACKS[trackIndex];
-    updateTrackLabels();
-    if (!music) return;
-    music.src = tr.src;
-    music.load();
-    if (seekFill) seekFill.style.width = '0%';
-    if (timeCurrent) timeCurrent.textContent = '00:00';
-    if (autoPlay) playMusic();
+    if (p && p.catch) {
+      p.catch(() => syncPlayerUI(false));
+    }
   }
 
   function toggleMusic() {
     haptic('light');
     if (!music) return;
-    if (!music.paused) music.pause();
-    else playMusic();
+    if (!music.paused) {
+      music.pause();
+    } else {
+      playMusic();
+    }
   }
 
-  renderPlaylist();
-  updateTrackLabels();
+  // Рендер кнопок плейлиста
+  if (trackPillsEl) {
+    PLAYLIST.forEach((tr, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `track-pill${idx === 0 ? ' is-active' : ''}`;
+      btn.setAttribute('role', 'tab');
+      btn.textContent = tr.short;
+      btn.addEventListener('click', () => {
+        haptic('light');
+        loadTrack(idx, true);
+      });
+      trackPillsEl.appendChild(btn);
+    });
+  }
+  renderTrackMeta();
 
   if (music) {
     music.addEventListener('play', () => syncPlayerUI(true));
     music.addEventListener('pause', () => syncPlayerUI(false));
     music.addEventListener('ended', () => loadTrack(trackIndex + 1, true));
     music.addEventListener('loadedmetadata', () => {
-      if (timeTotal && Number.isFinite(music.duration) && music.duration > 0) {
-        timeTotal.textContent = formatTime(music.duration);
+      if (timeDur && Number.isFinite(music.duration)) {
+        timeDur.textContent = formatTime(music.duration);
       }
     });
     music.addEventListener('timeupdate', () => {
-      if (!music.duration) return;
-      const pct = Math.min(100, (music.currentTime / music.duration) * 100);
-      if (seekFill) seekFill.style.width = `${pct.toFixed(2)}%`;
-      if (seekBar) seekBar.setAttribute('aria-valuenow', String(Math.round(pct)));
-      if (timeCurrent) timeCurrent.textContent = formatTime(music.currentTime);
+      if (!Number.isFinite(music.duration) || music.duration <= 0) return;
+      const pct = (music.currentTime / music.duration) * 100;
+      if (scrubFill) scrubFill.style.width = `${pct.toFixed(2)}%`;
+      if (timeCur) timeCur.textContent = formatTime(music.currentTime);
+      if (scrubBar) scrubBar.setAttribute('aria-valuenow', String(Math.round(pct)));
     });
   }
 
   if (navPlayBtn) navPlayBtn.addEventListener('click', toggleMusic);
   if (studioPlayBtn) studioPlayBtn.addEventListener('click', toggleMusic);
-  if (navNextBtn) navNextBtn.addEventListener('click', () => { haptic(); loadTrack(trackIndex + 1, true); });
-  if (studioNextBtn) studioNextBtn.addEventListener('click', () => { haptic(); loadTrack(trackIndex + 1, true); });
-  if (studioPrevBtn) studioPrevBtn.addEventListener('click', () => { haptic(); loadTrack(trackIndex - 1, true); });
+  if ($('#prevTrackBtn')) $('#prevTrackBtn').addEventListener('click', () => { haptic(); loadTrack(trackIndex - 1, true); });
+  if ($('#nextTrackBtn')) $('#nextTrackBtn').addEventListener('click', () => { haptic(); loadTrack(trackIndex + 1, true); });
 
-  if (seekBar && music) {
-    const seekFromClientX = (clientX) => {
-      if (!music.duration) return;
-      const r = seekBar.getBoundingClientRect();
-      const k = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
-      music.currentTime = k * music.duration;
-    };
-    seekBar.addEventListener('click', (e) => seekFromClientX(e.clientX));
-    seekBar.addEventListener('keydown', (e) => {
-      if (!music.duration) return;
-      if (e.key === 'ArrowRight') music.currentTime = Math.min(music.duration, music.currentTime + 5);
-      if (e.key === 'ArrowLeft') music.currentTime = Math.max(0, music.currentTime - 5);
+  if (scrubBar && music) {
+    scrubBar.addEventListener('click', (e) => {
+      if (!Number.isFinite(music.duration) || music.duration <= 0) return;
+      const r = scrubBar.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      music.currentTime = ratio * music.duration;
     });
   }
 
-  // Переключатели живой утренней природы (поверх музыки)
-  const natureChips = $$('#natureChips .chip');
-  natureChips.forEach((chip) => {
+  // Переключение дополнительных звуковых слоев природы (MorningAudioEngine)
+  $$('.layer-chip').forEach((chip) => {
     chip.addEventListener('click', () => {
       haptic('light');
-      if (!window.MorningAudio) return;
-      const preset = chip.dataset.preset;
-      const active = window.MorningAudio.togglePreset(preset);
-      natureChips.forEach((c) => c.classList.toggle('is-active', c.dataset.preset === active));
-      if (active) {
-        const labels = {
-          breeze: 'Добавлено пение утренних птиц и ветерок',
-          chimes: 'Добавлены солнечные колокольчики',
-          dew: 'Добавлен шёпот утренней росы',
-          vinyl: 'Добавлен уют тёплого винила'
-        };
-        toast(labels[active] || 'Фоновая атмосфера включена');
-      } else {
-        toast('Фоновый звук природы выключен');
+      const preset = chip.dataset.layer || 'off';
+      $$('.layer-chip').forEach((c) => c.classList.toggle('is-active', c === chip));
+      if (window.MorningAudio) {
+        window.MorningAudio.play(preset);
       }
+      const names = {
+        off: 'Чистое звучание музыки',
+        birds: 'Добавлено пение птиц в утреннем саду',
+        chimes: 'Добавлен перезвон хрустальной росы',
+        tape: 'Добавлен тёплый виниловый аккорд'
+      };
+      if (names[preset]) toast(names[preset]);
     });
   });
 
-  // Отрисовка спектра музыки
+  // Отрисовка спектрального визуализатора в реальном времени
   function drawSpectrum(t) {
-    if (specCtx && specCanvas) {
-      const w = specCanvas.width;
-      const h = specCanvas.height;
-      specCtx.clearRect(0, 0, w, h);
+    if (spectrumCtx && spectrumCv) {
+      const w = spectrumCv.width;
+      const h = spectrumCv.height;
+      spectrumCtx.clearRect(0, 0, w, h);
 
-      const bars = 36;
+      const bars = 28;
       const gap = 5;
-      const barW = (w - gap * (bars - 1)) / bars;
+      const barW = (w - gap * (bars + 1)) / bars;
       const playing = music && !music.paused;
 
-      let sumEnergy = 0;
-      let hasRealFFT = false;
-      if (playing && analyser && freqData) {
+      if (analyser && freqData && playing) {
         analyser.getByteFrequencyData(freqData);
-        for (let k = 0; k < 24; k++) {
-          if (freqData[k] > 0) { hasRealFFT = true; break; }
-        }
+        let sum = 0;
+        for (let i = 0; i < 12; i++) sum += freqData[i];
+        audioEnergy = sum / (12 * 255);
+      } else {
+        audioEnergy *= 0.92;
       }
 
       for (let i = 0; i < bars; i++) {
-        let val = 0.12;
-        if (playing) {
-          if (hasRealFFT && freqData) {
-            const bin = Math.min(freqData.length - 1, Math.floor(i * 1.15));
-            val = Math.max(0.1, (freqData[bin] / 255) * 0.94);
-          } else {
-            // Мягкая органическая волна, если браузер ограничивает чтение буфера
-            val = 0.22 + 0.52 * (0.5 + 0.5 * Math.sin(t * 0.0032 + i * 0.36)) * (0.6 + 0.4 * Math.cos(t * 0.0019 - i * 0.2));
-          }
+        let norm = 0.14;
+        if (analyser && freqData && playing) {
+          const bin = Math.min(freqData.length - 1, Math.floor((i / bars) * 20));
+          norm = Math.max(0.12, (freqData[bin] / 255) * 0.92);
+        } else if (playing) {
+          norm = 0.18 + 0.35 * (0.5 + 0.5 * Math.sin(t * 0.003 + i * 0.45));
         }
-        sumEnergy += val;
 
-        const bh = Math.max(4, val * (h - 8));
-        const x = i * (barW + gap);
-        const y = h - bh;
+        const bh = Math.max(5, norm * (h - 14));
+        const x = gap + i * (barW + gap);
+        const y = (h - bh) / 2;
 
-        const grad = specCtx.createLinearGradient(0, y, 0, h);
-        grad.addColorStop(0, 'rgba(255, 224, 175, 0.95)');
-        grad.addColorStop(1, 'rgba(255, 158, 187, 0.45)');
-        specCtx.fillStyle = grad;
+        const grad = spectrumCtx.createLinearGradient(0, y, 0, y + bh);
+        grad.addColorStop(0, isSunlitMood ? 'rgba(253, 230, 138, 0.92)' : 'rgba(249, 168, 212, 0.92)');
+        grad.addColorStop(1, isSunlitMood ? 'rgba(251, 113, 133, 0.55)' : 'rgba(253, 230, 138, 0.55)');
 
-        specCtx.beginPath();
-        if (specCtx.roundRect) specCtx.roundRect(x, y, barW, bh, 4);
-        else specCtx.rect(x, y, barW, bh);
-        specCtx.fill();
+        spectrumCtx.fillStyle = grad;
+        spectrumCtx.beginPath();
+        if (spectrumCtx.roundRect) {
+          spectrumCtx.roundRect(x, y, barW, bh, 4);
+        } else {
+          spectrumCtx.rect(x, y, barW, bh);
+        }
+        spectrumCtx.fill();
       }
-
-      const avg = sumEnergy / bars;
-      audioEnergy += (avg - audioEnergy) * 0.08;
     }
     requestAnimationFrame(drawSpectrum);
   }
   requestAnimationFrame(drawSpectrum);
 
   // ----------------------------------------------------------
-  // 7. Открытие интро-вуали и старт страницы
+  // 6. Кинематографичный вход (Интро)
   // ----------------------------------------------------------
   const intro = $('#intro');
   requestAnimationFrame(() => setTimeout(() => intro && intro.classList.add('in'), 70));
 
+  function enterMorningPortal() {
+    if (body.classList.contains('is-ready')) return;
+    haptic('medium');
+
+    setupAudioGraph();
+    if (gainNode) gainNode.gain.value = 0;
+    else if (music) music.volume = 0;
+    playMusic();
+    fadeMusicTo(0.92, 2800);
+
+    if (intro) intro.classList.add('is-gone');
+    body.classList.remove('is-locked');
+    body.classList.add('is-ready');
+
+    spawnPetalBurst(window.innerWidth / 2, window.innerHeight * 0.42, 42);
+    setTimeout(startReveals, 200);
+  }
+
+  const introBtn = $('#introBtn');
+  if (introBtn) introBtn.addEventListener('click', enterMorningPortal);
+  if (new URLSearchParams(window.location.search).get('open') === '1') {
+    setTimeout(enterMorningPortal, 120);
+  }
+
+  // ----------------------------------------------------------
+  // 7. Появление секций и прогресс скролла
+  // ----------------------------------------------------------
   function startReveals() {
     const els = $$('.reveal, main .lines');
     if (!('IntersectionObserver' in window)) {
@@ -558,195 +544,173 @@
     els.forEach((el) => io.observe(el));
   }
 
-  function enterDawn() {
-    if (body.classList.contains('is-ready')) return;
-    haptic('medium');
-
-    setupAudioGraph();
-    if (gainNode) gainNode.gain.value = 0;
-    else if (music) music.volume = 0;
-    playMusic();
-    fadeVolume(1, 2800);
-
-    if (intro) intro.classList.add('is-gone');
-    body.classList.remove('is-locked');
-    body.classList.add('is-ready');
-
-    initSmoothScroll();
-    petalBurst(window.innerWidth / 2, window.innerHeight * 0.45, 36);
-    setTimeout(startReveals, 220);
-  }
-
-  const introBtn = $('#introBtn');
-  if (introBtn) introBtn.addEventListener('click', enterDawn);
-  else enterDawn();
-
-  // ----------------------------------------------------------
-  // 8. Индикатор скролла и шапка
-  // ----------------------------------------------------------
   const nav = $('#nav');
   const progress = $('#progress');
-  let scrollTicking = false;
+  let scrollTick = false;
 
-  function onScroll() {
+  function updateScrollProgress() {
     const y = window.scrollY || root.scrollTop;
-    const max = Math.max(1, root.scrollHeight - window.innerHeight);
-    const p = Math.min(1, Math.max(0, y / max));
+    const max = root.scrollHeight - window.innerHeight;
+    const p = max > 0 ? Math.min(1, y / max) : 0;
     if (progress) progress.style.transform = `scaleX(${p.toFixed(4)})`;
     root.style.setProperty('--sp', p.toFixed(3));
     if (nav) nav.classList.toggle('is-scrolled', y > 36);
-    scrollTicking = false;
+    scrollTick = false;
   }
 
   window.addEventListener('scroll', () => {
-    if (!scrollTicking) {
-      scrollTicking = true;
-      requestAnimationFrame(onScroll);
+    if (!scrollTick) {
+      scrollTick = true;
+      requestAnimationFrame(updateScrollProgress);
     }
   }, { passive: true });
-  onScroll();
+  updateScrollProgress();
 
-  // ----------------------------------------------------------
-  // 9. Утренний чек-лист заботы (#habitList)
-  // ----------------------------------------------------------
-  const habitBtns = $$('#habitList .habit-item');
-  const habitScore = $('#habitScore');
-  const savedHabits = new Set();
-
-  try {
-    const raw = sessionStorage.getItem('morning_habits_done');
-    if (raw) JSON.parse(raw).forEach((k) => savedHabits.add(String(k)));
-  } catch (e) { /* не критично */ }
-
-  function renderHabits() {
-    habitBtns.forEach((btn) => {
-      btn.classList.toggle('is-done', savedHabits.has(btn.dataset.habit));
-    });
-    if (habitScore) habitScore.textContent = `${savedHabits.size} / ${habitBtns.length}`;
+  // Мягкое свечение за курсором
+  if (finePointer && !reduceMotion) {
+    const glow = $('#cursorGlow');
+    let tx = window.innerWidth / 2;
+    let ty = window.innerHeight / 2;
+    let cx = tx;
+    let cy = ty;
+    window.addEventListener('pointermove', (e) => {
+      tx = e.clientX;
+      ty = e.clientY;
+    }, { passive: true });
+    const moveGlow = () => {
+      cx += (tx - cx) * 0.09;
+      cy += (ty - cy) * 0.09;
+      if (glow) glow.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
+      requestAnimationFrame(moveGlow);
+    };
+    moveGlow();
   }
 
-  habitBtns.forEach((btn) => {
+  // ----------------------------------------------------------
+  // 8. Утренний ритуал заботы (интерактивный чек-лист) + Комплименты
+  // ----------------------------------------------------------
+  const ritualItems = $$('.ritual-item');
+  const ritualCount = $('#ritualCount');
+  let completedCelebrated = false;
+
+  function updateRituals() {
+    const done = ritualItems.filter((item) => item.classList.contains('is-done')).length;
+    if (ritualCount) ritualCount.textContent = `${done} / ${ritualItems.length}`;
+    if (done === ritualItems.length && !completedCelebrated) {
+      completedCelebrated = true;
+      haptic('success');
+      spawnPetalBurst(window.innerWidth / 2, window.innerHeight / 2, 65);
+      toast('Умничка моя любимая! Теперь этот день точно будет волшебным');
+    } else if (done < ritualItems.length) {
+      completedCelebrated = false;
+    }
+  }
+
+  ritualItems.forEach((btn) => {
     btn.addEventListener('click', (e) => {
-      const id = btn.dataset.habit;
-      if (savedHabits.has(id)) {
-        savedHabits.delete(id);
-        haptic('light');
-      } else {
-        savedHabits.add(id);
-        haptic('success');
+      haptic('light');
+      btn.classList.toggle('is-done');
+      if (btn.classList.contains('is-done')) {
         const r = btn.getBoundingClientRect();
-        petalBurst(e.clientX || (r.left + 30), e.clientY || (r.top + r.height / 2), 16);
-        if (savedHabits.size === habitBtns.length) {
-          petalBurst(window.innerWidth / 2, window.innerHeight * 0.4, 55);
-          toast('Умничка моя любимая! Идеальное утро началось');
-        }
+        spawnPetalBurst(e.clientX || (r.left + 24), e.clientY || (r.top + 20), 14);
       }
-      try {
-        sessionStorage.setItem('morning_habits_done', JSON.stringify(Array.from(savedHabits)));
-      } catch (err) { /* не критично */ }
-      renderHabits();
+      updateRituals();
     });
   });
-  renderHabits();
+
+  const COMPLIMENTS = [
+    '«Ты - самое светлое, что есть в каждом моём утре»',
+    '«У тебя самая очаровательная сонная улыбка на свете»',
+    '«Даже миллион цветущих сакур не сравнится с твоей нежностью»',
+    '«Ты моя гордость, моё вдохновение и моё любимое чудо»',
+    '«Когда я думаю о тебе, внутри сразу наступает весна»',
+    '«Ты справишься со всем на свете, я верю в тебя безоговорочно»'
+  ];
+  let compIdx = 0;
+  const complimentText = $('#complimentText');
+  const nextComplimentBtn = $('#nextComplimentBtn');
+  if (nextComplimentBtn && complimentText) {
+    nextComplimentBtn.addEventListener('click', () => {
+      haptic('light');
+      compIdx = (compIdx + 1) % COMPLIMENTS.length;
+      complimentText.style.opacity = '0';
+      setTimeout(() => {
+        complimentText.textContent = COMPLIMENTS[compIdx];
+        complimentText.style.transition = 'opacity 0.4s ease';
+        complimentText.style.opacity = '1';
+      }, 180);
+    });
+  }
 
   // ----------------------------------------------------------
-  // 10. Галерея из 8 открыток + лайки + Lightbox
+  // 9. Галерея 08 утренних открыток (без обрезки текста мемов!)
   // ----------------------------------------------------------
   const CARDS = [
-    {
-      src: 'photo/1.jpg',
-      tag: 'БУКЕТ С УТРА',
-      caption: 'Первые цветы этого рассвета - только для тебя'
-    },
-    {
-      src: 'photo/2.jpg',
-      tag: 'ЛЮБИМОЕ ДЕЛО',
-      caption: 'С самой первой секунды после пробуждения'
-    },
-    {
-      src: 'photo/3.jpg',
-      tag: 'ВЕРА В ТЕБЯ',
-      caption: 'Твой главный талисман: у тебя сегодня всё получится!'
-    },
-    {
-      src: 'photo/4.jpg',
-      tag: 'НЕЖНОСТЬ',
-      caption: 'Осторожно: повышенная вероятность утренних поцелуев'
-    },
-    {
-      src: 'photo/5.jpg',
-      tag: 'ЗАВТРАК',
-      caption: 'Самый сладкий солнечный котик (не кусать!)'
-    },
-    {
-      src: 'photo/6.jpg',
-      tag: 'УЛЫБКА',
-      caption: 'Зато решение любить тебя - самое гениальное в жизни'
-    },
-    {
-      src: 'photo/7.jpg',
-      tag: 'ВАЖНЫЙ ВОПРОС',
-      caption: 'Серьёзное утреннее предложение с весомым аргументом'
-    },
-    {
-      src: 'photo/8.jpg',
-      tag: 'САМОЕ ГЛАВНОЕ',
-      caption: 'В моём сердце всегда и без очереди - только Ты'
-    }
+    { src: 'photo/1.jpg', title: 'Утренний букетик для тебя', likes: 14 },
+    { src: 'photo/2.jpg', title: 'Моё любимое утреннее дело', likes: 27 },
+    { src: 'photo/3.jpg', title: 'Главная вера в тебя', likes: 31 },
+    { src: 'photo/4.jpg', title: 'Нежные сонные поцелуи', likes: 22 },
+    { src: 'photo/5.jpg', title: 'Солнечный чизбургер к завтраку', likes: 19 },
+    { src: 'photo/6.jpg', title: 'Минутка утренней самоиронии', likes: 25 },
+    { src: 'photo/7.jpg', title: 'Официальное предложение', likes: 38 },
+    { src: 'photo/8.jpg', title: 'Главное признание сердца', likes: 99 }
   ];
 
-  let cardLikes = {};
-  try {
-    cardLikes = JSON.parse(localStorage.getItem('morning_card_likes') || '{}');
-  } catch (e) { cardLikes = {}; }
-
   const gallery = $('#gallery');
+  const viewGridBtn = $('#viewGridBtn');
+  const viewLargeBtn = $('#viewLargeBtn');
+
+  if (viewGridBtn && viewLargeBtn && gallery) {
+    viewGridBtn.addEventListener('click', () => {
+      haptic('light');
+      gallery.classList.remove('is-large');
+      viewGridBtn.classList.add('is-active');
+      viewLargeBtn.classList.remove('is-active');
+    });
+    viewLargeBtn.addEventListener('click', () => {
+      haptic('light');
+      gallery.classList.add('is-large');
+      viewLargeBtn.classList.add('is-active');
+      viewGridBtn.classList.remove('is-active');
+    });
+  }
+
+  function spawnFloatingHeart(x, y) {
+    const el = document.createElement('span');
+    el.className = 'floating-heart';
+    el.innerHTML = '&#10084;';
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1100);
+  }
+
   if (gallery) {
-    CARDS.forEach((item, i) => {
-      const count = cardLikes[i] || 1;
-      const isLiked = Boolean(cardLikes[`liked_${i}`]);
+    CARDS.forEach((card, i) => {
       const fig = document.createElement('figure');
       fig.className = 'pic reveal';
-      fig.style.setProperty('--d', `${(i % 4) * 0.06}s`);
+      fig.style.setProperty('--d', `${(i % 4) * 0.07}s`);
 
       fig.innerHTML = `
-        <div class="pic-frame" tabindex="0" role="button" aria-label="Открыть открытку ${pad(i + 1)}: ${item.caption}">
-          <span class="pic-badge">${item.tag}</span>
-          <img class="pic-bg" src="${item.src}" alt="" aria-hidden="true" loading="lazy" decoding="async">
-          <img class="pic-img" src="${item.src}" alt="${item.caption}" loading="lazy" decoding="async">
-          <button type="button" class="pic-like${isLiked ? ' is-liked' : ''}" aria-label="Поставить сердечко открытке">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            </svg>
-            <span class="like-num">${count}</span>
-          </button>
+        <div class="pic-frame" tabindex="0" role="button" aria-label="Открыть открытку ${pad(i + 1)}: ${card.title}">
+          <img class="pic-bg" src="${card.src}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+          <img class="pic-img" src="${card.src}" alt="${card.title}" loading="lazy" decoding="async">
         </div>
-        <figcaption class="pic-meta">
-          <div class="pic-row">
+        <figcaption class="pic-caption">
+          <div class="pic-meta">
             <span class="pic-num">${pad(i + 1)}</span>
-            <span class="pic-line"></span>
+            <span class="pic-title">${card.title}</span>
           </div>
-          <p class="pic-caption">${item.caption}</p>
+          <button class="like-btn" type="button" aria-label="Поставить сердечко открытке ${pad(i + 1)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <span class="like-num">${card.likes}</span>
+          </button>
         </figcaption>
       `;
 
       const frame = $('.pic-frame', fig);
-      const likeBtn = $('.pic-like', fig);
+      const likeBtn = $('.like-btn', fig);
       const likeNum = $('.like-num', fig);
-
-      likeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        haptic('success');
-        cardLikes[i] = (cardLikes[i] || 1) + 1;
-        cardLikes[`liked_${i}`] = true;
-        likeBtn.classList.add('is-liked');
-        likeNum.textContent = String(cardLikes[i]);
-        spawnHeart(e.clientX, e.clientY);
-        petalBurst(e.clientX, e.clientY, 12);
-        try {
-          localStorage.setItem('morning_card_likes', JSON.stringify(cardLikes));
-        } catch (err) { /* не критично */ }
-      });
 
       frame.addEventListener('click', () => openLb(i));
       frame.addEventListener('keydown', (e) => {
@@ -754,6 +718,16 @@
           e.preventDefault();
           openLb(i);
         }
+      });
+
+      likeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        haptic('success');
+        const liked = likeBtn.classList.toggle('is-liked');
+        card.likes += liked ? 1 : -1;
+        likeNum.textContent = String(card.likes);
+        const r = likeBtn.getBoundingClientRect();
+        spawnFloatingHeart(r.left + r.width / 2, r.top);
       });
 
       if (finePointer && !reduceMotion) {
@@ -779,9 +753,8 @@
   // Lightbox
   const lb = $('#lb');
   const lbImg = $('#lbImg');
-  const lbCount = $('#lbCount');
-  const lbTag = $('#lbTag');
   const lbCaption = $('#lbCaption');
+  const lbCount = $('#lbCount');
   let lbIndex = 0;
 
   function showLb(i) {
@@ -792,13 +765,12 @@
     const pre = new Image();
     pre.onload = pre.onerror = () => {
       lbImg.src = item.src;
-      lbImg.alt = item.caption;
+      lbImg.alt = item.title;
+      if (lbCaption) lbCaption.textContent = item.title;
       requestAnimationFrame(() => lbImg.classList.remove('is-switching'));
     };
     pre.src = item.src;
     if (lbCount) lbCount.textContent = `${pad(lbIndex + 1)} / ${pad(CARDS.length)}`;
-    if (lbTag) lbTag.textContent = `ОТКРЫТКА ${pad(lbIndex + 1)} • ${item.tag}`;
-    if (lbCaption) lbCaption.textContent = item.caption;
   }
 
   function openLb(i) {
@@ -844,184 +816,119 @@
       const dx = e.changedTouches[0].clientX - sx;
       const dy = e.changedTouches[0].clientY - sy;
       if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
-        haptic('light');
+        haptic();
         showLb(lbIndex + (dx < 0 ? 1 : -1));
-      } else if (dy > 90 && Math.abs(dy) > Math.abs(dx)) {
+      } else if (dy > 85 && Math.abs(dy) > Math.abs(dx)) {
         closeLb();
       }
     }, { passive: true });
   }
 
   // ----------------------------------------------------------
-  // 11. Шкатулка утренних пожеланий и обратная весточка
+  // 10. Шкатулка утренних пожеланий (API + локальная база)
   // ----------------------------------------------------------
-  let categories = window.CATEGORIES_DATABASE || [];
-  let wishes = window.WISHES_DATABASE || [];
+  let categoriesData = window.CATEGORIES_DATABASE || [];
+  let wishesData = window.WISHES_DATABASE || [];
   let activeCategory = 'all';
-  let wishPool = wishes.slice();
-  let wishIdx = 0;
+  let currentWish = wishesData[0] || null;
 
   const wishCatsEl = $('#wishCategories');
-  const wishBody = $('#wishBody');
-  const wishTagEl = $('#wishTag');
+  const wishBody = $('#wishCardBody');
   const wishTitleEl = $('#wishTitle');
   const wishTextEl = $('#wishText');
   const wishAuthorEl = $('#wishAuthor');
-  const wishCounterEl = $('#wishCounter');
-  const nextWishBtn = $('#nextWishBtn');
-  const shareWishBtn = $('#shareWishBtn');
+  const wishTagsEl = $('#wishTags');
 
-  function rebuildWishPool() {
-    wishPool = activeCategory === 'all'
-      ? wishes.slice()
-      : wishes.filter((w) => w.category === activeCategory);
-    if (wishPool.length === 0) wishPool = wishes.slice();
-    wishIdx = 0;
+  function getFilteredWishes() {
+    if (activeCategory === 'all') return wishesData;
+    const list = wishesData.filter((w) => w.category === activeCategory);
+    return list.length ? list : wishesData;
   }
 
-  function renderWish(animate = false) {
-    if (!wishPool.length) return;
-    const item = wishPool[wishIdx % wishPool.length];
+  function renderWish(wish, animate = true) {
+    if (!wish || !wishBody) return;
+    currentWish = wish;
     const apply = () => {
-      if (wishTagEl) wishTagEl.textContent = (item.tags || ['утро', 'любовь']).join(' • ').toUpperCase();
-      if (wishTitleEl) wishTitleEl.textContent = item.title;
-      if (wishTextEl) wishTextEl.textContent = item.text;
-      if (wishAuthorEl) wishAuthorEl.textContent = item.author;
-      if (wishCounterEl) wishCounterEl.textContent = `${pad((wishIdx % wishPool.length) + 1)} / ${pad(wishPool.length)}`;
+      if (wishTitleEl) wishTitleEl.textContent = wish.title;
+      if (wishTextEl) wishTextEl.textContent = wish.text;
+      if (wishAuthorEl) wishAuthorEl.textContent = wish.author;
+      if (wishTagsEl) {
+        wishTagsEl.innerHTML = (wish.tags || [])
+          .map((tag) => `<span class="wish-tag">#${tag}</span>`)
+          .join('');
+      }
     };
 
-    if (!animate || !wishBody) {
+    if (!animate) {
       apply();
       return;
     }
-    wishBody.classList.add('is-fading');
+    wishBody.classList.add('is-switching');
     setTimeout(() => {
       apply();
-      wishBody.classList.remove('is-fading');
-    }, 220);
+      wishBody.classList.remove('is-switching');
+    }, 240);
   }
 
-  function renderWishCategories() {
+  function renderCategoryButtons() {
     if (!wishCatsEl) return;
     wishCatsEl.innerHTML = '';
-    categories.forEach((cat) => {
+    categoriesData.forEach((cat) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `cat-btn${cat.id === activeCategory ? ' is-active' : ''}`;
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', cat.id === activeCategory ? 'true' : 'false');
+      btn.className = `cat-pill${cat.id === activeCategory ? ' is-active' : ''}`;
       btn.textContent = cat.name;
       btn.addEventListener('click', () => {
         haptic('light');
         activeCategory = cat.id;
-        $$('.cat-btn', wishCatsEl).forEach((b) => {
-          const on = b === btn;
-          b.classList.toggle('is-active', on);
-          b.setAttribute('aria-selected', on ? 'true' : 'false');
-        });
-        rebuildWishPool();
-        renderWish(true);
+        $$('.cat-pill', wishCatsEl).forEach((b) => b.classList.toggle('is-active', b === btn));
+        const pool = getFilteredWishes();
+        renderWish(pool[0], true);
       });
       wishCatsEl.appendChild(btn);
     });
   }
 
-  renderWishCategories();
-  rebuildWishPool();
-  renderWish(false);
+  renderCategoryButtons();
+  if (currentWish) renderWish(currentWish, false);
 
-  // Подгружаем свежие данные с сервера, если он активен
+  // Подгрузка свежих данных с сервера /api/wishes (если запущен backend)
   fetch('/api/wishes')
     .then((r) => (r.ok ? r.json() : null))
     .then((data) => {
-      if (data && Array.isArray(data.wishes) && data.wishes.length > 0) {
-        wishes = data.wishes;
-        rebuildWishPool();
-        renderWish(false);
+      if (data && Array.isArray(data.wishes) && data.wishes.length) {
+        wishesData = data.wishes;
       }
     })
-    .catch(() => { /* используем локальную базу */ });
+    .catch(() => {});
 
+  const nextWishBtn = $('#nextWishBtn');
   if (nextWishBtn) {
     nextWishBtn.addEventListener('click', (e) => {
-      haptic('light');
-      wishIdx = (wishIdx + 1) % Math.max(1, wishPool.length);
-      renderWish(true);
+      haptic('medium');
+      const pool = getFilteredWishes();
+      if (!pool.length) return;
+      let candidates = pool.filter((w) => !currentWish || w.id !== currentWish.id);
+      if (!candidates.length) candidates = pool;
+      const next = candidates[Math.floor(Math.random() * candidates.length)];
+      renderWish(next, true);
       const r = nextWishBtn.getBoundingClientRect();
-      petalBurst(e.clientX || (r.left + r.width / 2), e.clientY || r.top, 18);
+      spawnPetalBurst(e.clientX || (r.left + r.width / 2), e.clientY || r.top, 22);
     });
   }
 
-  if (shareWishBtn) {
-    shareWishBtn.addEventListener('click', (e) => {
+  const sendKissBtn = $('#sendKissBtn');
+  if (sendKissBtn) {
+    sendKissBtn.addEventListener('click', (e) => {
       haptic('success');
-      const current = wishPool[wishIdx % Math.max(1, wishPool.length)];
-      if (!current) return;
-      petalBurst(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2, 24);
-
-      if (tg && tg.initData) {
-        try {
-          tg.sendData(JSON.stringify({
-            type: 'wish_shared',
-            text: `${current.title}. ${current.text}`
-          }));
-          toast('Утренний лучик сохранён в чат');
-          return;
-        } catch (err) { /* fallback ниже */ }
-      }
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(`«${current.text}»`).catch(() => {});
-      }
-      toast('Тёплое пожелание бережно сохранено в сердечко');
-    });
-  }
-
-  // Быстрые реакции и форма ответной весточки
-  const replyInput = $('#replyInput');
-  const replyForm = $('#replyForm');
-
-  $$('#quickReactions .reaction-pill').forEach((pill) => {
-    pill.addEventListener('click', (e) => {
-      haptic('light');
-      const msg = pill.dataset.msg || '';
-      if (replyInput) {
-        replyInput.value = msg;
-        replyInput.focus();
-      }
-      spawnHeart(e.clientX, e.clientY);
-    });
-  });
-
-  if (replyForm) {
-    replyForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = replyInput ? replyInput.value.trim() : '';
-      if (!text) {
-        toast('Напиши хотя бы пару нежных слов или выбери кнопку выше');
-        return;
-      }
-      haptic('success');
-      const r = replyForm.getBoundingClientRect();
-      petalBurst(r.left + r.width / 2, r.top + 30, 46);
-
-      if (tg && tg.initData) {
-        try {
-          tg.sendData(JSON.stringify({
-            type: 'custom_wish',
-            recipient: 'Любимого',
-            text
-          }));
-        } catch (err) { /* безопасно продолжаем */ }
-      }
-
-      if (replyInput) replyInput.value = '';
-      toast('Твоя утренняя весточка улетела с лепестками сакуры!');
+      const r = sendKissBtn.getBoundingClientRect();
+      spawnPetalBurst(e.clientX || (r.left + r.width / 2), e.clientY || r.top, 36);
+      toast('Утренний лучик сохранён в сердечке!');
     });
   }
 
   // ----------------------------------------------------------
-  // 12. WebGL GLSL Шейдер рассветных лучей (#dawnShader)
+  // 11. Raw WebGL GLSL Шейдер утренних солнечных лучей (webgl-3d-canvas)
   // ----------------------------------------------------------
   function initDawnShader() {
     const canvas = $('#dawnShader');
@@ -1030,64 +937,59 @@
     if (!gl) return;
 
     const vertSrc = `
-      attribute vec2 a_pos;
+      attribute vec2 position;
       void main() {
-        gl_Position = vec4(a_pos, 0.0, 1.0);
+        gl_Position = vec4(position, 0.0, 1.0);
       }
     `;
 
     const fragSrc = `
       precision mediump float;
       uniform float u_time;
-      uniform vec2 u_res;
+      uniform vec2 u_resolution;
       uniform vec2 u_mouse;
-      uniform float u_warmth;
       uniform float u_audio;
+      uniform float u_sunlit;
 
-      vec3 permute(vec3 x) { return mod(((x * 34.0) + 1.0) * x, 289.0); }
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+      }
 
-      float snoise(vec2 v) {
-        const vec4 C = vec4(0.211324865, 0.366025403, -0.577350269, 0.024390243);
-        vec2 i = floor(v + dot(v, C.yy));
-        vec2 x0 = v - i + dot(i, C.xx);
-        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-        vec4 x12 = x0.xyxy + C.xxzz;
-        x12.xy -= i1;
-        i = mod(i, 289.0);
-        vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
-        vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
-        m = m * m;
-        m = m * m;
-        vec3 x = 2.0 * fract(p * C.www) - 1.0;
-        vec3 h = abs(x) - 0.5;
-        vec3 ox = floor(x + 0.5);
-        vec3 a0 = x - ox;
-        m *= 1.7928429 - 0.8537347 * (a0 * a0 + h * h);
-        vec3 g;
-        g.x = a0.x * x0.x + h.x * x0.y;
-        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-        return 130.0 * dot(m, g);
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(
+          mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+          u.y
+        );
       }
 
       void main() {
-        vec2 uv = gl_FragCoord.xy / u_res.xy;
-        float t = u_time * 0.16;
-        vec2 mOff = (uv - u_mouse) * 0.18;
+        vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+        float t = u_time * 0.18;
 
-        // Диагональные солнечные лучи сверху слева
-        float rayCoord = (uv.x * 0.85 + (1.0 - uv.y) * 0.45) * 4.2;
-        float rays = snoise(vec2(rayCoord - t * 0.35, uv.y * 0.9 + t * 0.18));
-        rays = smoothstep(-0.2, 0.85, rays) * smoothstep(0.05, 0.95, uv.y);
+        // Диагональные солнечные лучи рассвета сверху
+        vec2 rayCoord = vec2(uv.x * 2.6 - uv.y * 1.1 + (u_mouse.x - 0.5) * 0.25, t * 0.5);
+        float rays = noise(rayCoord * 2.4) * 0.65 + noise(rayCoord * 5.2 - t) * 0.35;
+        float topMask = smoothstep(0.05, 0.98, uv.y);
+        float sunGlow = pow(max(0.0, 1.0 - length(uv - vec2(0.32 + (u_mouse.x - 0.5) * 0.12, 0.92))), 2.2);
 
         // Шёлковая утренняя дымка
-        float silk = snoise(uv * 2.1 + vec2(t * 0.25, -t * 0.15) + mOff);
-        float glow = smoothstep(-0.35, 0.8, silk);
+        float mist = noise(uv * 3.0 + vec2(t * 0.4, -t * 0.25));
 
-        vec3 roseColor = mix(vec3(0.98, 0.58, 0.74), vec3(1.0, 0.76, 0.58), u_warmth);
-        vec3 sunColor = mix(vec3(1.0, 0.86, 0.68), vec3(1.0, 0.9, 0.62), u_warmth);
+        vec3 roseDawn = vec3(0.96, 0.54, 0.74);
+        vec3 goldSun  = vec3(1.00, 0.84, 0.56);
+        vec3 warmCoral = vec3(0.98, 0.62, 0.52);
 
-        vec3 col = roseColor * glow * 0.42 + sunColor * rays * (0.44 + u_audio * 0.28);
-        gl_FragColor = vec4(col, 0.85);
+        vec3 tintA = mix(roseDawn, goldSun, u_sunlit * 0.65);
+        vec3 tintB = mix(goldSun, warmCoral, u_sunlit * 0.5);
+
+        float intensity = (rays * topMask * 0.32 + sunGlow * 0.42 + mist * 0.10) * (1.0 + u_audio * 0.45);
+        vec3 col = mix(tintA, tintB, smoothstep(0.2, 0.85, uv.y + mist * 0.2)) * intensity;
+
+        gl_FragColor = vec4(col, clamp(intensity, 0.0, 0.75));
       }
     `;
 
@@ -1118,24 +1020,24 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
 
-    const posLoc = gl.getAttribLocation(prog, 'a_pos');
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+    const pos = gl.getAttribLocation(prog, 'position');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
 
     const uTime = gl.getUniformLocation(prog, 'u_time');
-    const uRes = gl.getUniformLocation(prog, 'u_res');
+    const uRes = gl.getUniformLocation(prog, 'u_resolution');
     const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-    const uWarmth = gl.getUniformLocation(prog, 'u_warmth');
     const uAudio = gl.getUniformLocation(prog, 'u_audio');
+    const uSunlit = gl.getUniformLocation(prog, 'u_sunlit');
 
-    let mx = 0.35;
-    let my = 0.75;
+    let mx = 0.5;
+    let my = 0.7;
+    let curSunlit = 0;
+
     window.addEventListener('pointermove', (e) => {
       mx = e.clientX / Math.max(1, window.innerWidth);
       my = 1.0 - e.clientY / Math.max(1, window.innerHeight);
     }, { passive: true });
-
-    canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false);
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
@@ -1150,181 +1052,158 @@
     resize();
     window.addEventListener('resize', resize);
 
-    const tStart = performance.now();
-    const renderShader = () => {
-      requestAnimationFrame(renderShader);
+    const t0 = performance.now();
+    const render = () => {
+      requestAnimationFrame(render);
       if (document.hidden) return;
-      currentWarmth += (targetWarmth - currentWarmth) * 0.04;
-      const elapsed = (performance.now() - tStart) * 0.001;
+      const elapsed = (performance.now() - t0) * 0.001;
+      curSunlit += ((isSunlitMood ? 1 : 0) - curSunlit) * 0.04;
+
       gl.uniform1f(uTime, elapsed);
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform2f(uMouse, mx, my);
-      gl.uniform1f(uWarmth, currentWarmth);
       gl.uniform1f(uAudio, audioEnergy);
+      gl.uniform1f(uSunlit, curSunlit);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
-    requestAnimationFrame(renderShader);
+    requestAnimationFrame(render);
   }
   initDawnShader();
 
   // ----------------------------------------------------------
-  // 13. Холст лепестков сакуры и солнечных пылинок (#petalsCanvas)
+  // 12. 2D Физика лепестков сакуры и солнечной пыльцы
   // ----------------------------------------------------------
-  const pCanvas = $('#petalsCanvas');
-  const pCtx = pCanvas ? pCanvas.getContext('2d') : null;
-  let W = window.innerWidth;
-  let H = window.innerHeight;
+  const pCv = $('#petalsCanvas');
+  const pCtx = pCv ? pCv.getContext('2d') : null;
+  let PW = 0;
+  let PH = 0;
   const ambientPetals = [];
   const burstParticles = [];
-  const dewMotes = [];
   let windX = 0;
-  let lastPX = W / 2;
+  let lastPX = null;
 
   window.addEventListener('pointermove', (e) => {
-    const dx = e.clientX - lastPX;
+    if (lastPX !== null) {
+      windX = Math.max(-2.4, Math.min(2.4, windX + (e.clientX - lastPX) * 0.015));
+    }
     lastPX = e.clientX;
-    windX = Math.max(-2.4, Math.min(2.4, windX + dx * 0.015));
   }, { passive: true });
 
   function resizePetals() {
-    if (!pCtx || !pCanvas) return;
+    if (!pCtx || !pCv) return;
     const dpr = Math.min(1.75, window.devicePixelRatio || 1);
-    W = window.innerWidth;
-    H = window.innerHeight;
-    pCanvas.width = Math.round(W * dpr);
-    pCanvas.height = Math.round(H * dpr);
-    pCanvas.style.width = `${W}px`;
-    pCanvas.style.height = `${H}px`;
+    PW = window.innerWidth;
+    PH = window.innerHeight;
+    pCv.width = Math.round(PW * dpr);
+    pCv.height = Math.round(PH * dpr);
+    pCv.style.width = `${PW}px`;
+    pCv.style.height = `${PH}px`;
     pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     ambientPetals.length = 0;
-    const pCount = reduceMotion ? 10 : Math.min(34, Math.max(16, Math.round((W * H) / 42000)));
-    for (let i = 0; i < pCount; i++) {
+    if (reduceMotion) return;
+    const count = Math.round(Math.min(44, Math.max(18, (PW * PH) / 36000)));
+    for (let i = 0; i < count; i++) {
       ambientPetals.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        size: 5.5 + Math.random() * 6.5,
+        x: Math.random() * PW,
+        y: Math.random() * PH,
+        size: 4.5 + Math.random() * 6.5,
         vy: 0.38 + Math.random() * 0.65,
-        vx: -0.25 + Math.random() * 0.55,
+        vx: -0.25 + Math.random() * 0.5,
         rot: Math.random() * Math.PI * 2,
         vRot: (Math.random() - 0.5) * 0.022,
         sway: Math.random() * Math.PI * 2,
-        swaySpeed: 0.008 + Math.random() * 0.014,
-        alpha: 0.35 + Math.random() * 0.45,
-        tint: Math.random() < 0.68 ? 'sakura' : 'gold'
-      });
-    }
-
-    dewMotes.length = 0;
-    const mCount = reduceMotion ? 18 : Math.min(55, Math.round((W * H) / 24000));
-    for (let i = 0; i < mCount; i++) {
-      dewMotes.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        r: 0.6 + Math.random() * 1.6,
-        phase: Math.random() * Math.PI * 2,
-        speed: 0.6 + Math.random() * 1.3
+        isMote: Math.random() < 0.42,
+        alpha: 0.32 + Math.random() * 0.45
       });
     }
   }
 
-  function petalBurst(x, y, count = 36) {
+  function spawnPetalBurst(x, y, count = 48) {
     if (!pCtx || reduceMotion) return;
     for (let i = 0; i < count; i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const spd = 1.4 + Math.random() * 5.6;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.4 + Math.random() * 6.2;
       burstParticles.push({
         x,
         y,
-        vx: Math.cos(ang) * spd,
-        vy: Math.sin(ang) * spd - 1.9,
-        size: 4.5 + Math.random() * 6,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2.2,
+        size: 4 + Math.random() * 6.5,
         rot: Math.random() * Math.PI * 2,
-        vRot: (Math.random() - 0.5) * 0.12,
+        vRot: (Math.random() - 0.5) * 0.09,
         life: 1,
-        decay: 0.009 + Math.random() * 0.011,
-        isPetal: Math.random() < 0.68
+        decay: 0.008 + Math.random() * 0.011,
+        isGold: Math.random() < 0.45
       });
     }
   }
 
-  function drawSakuraPetal(ctx, size, alpha, tint) {
+  function drawPetalShape(ctx, x, y, size, rot, color, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(0, -size);
-    ctx.bezierCurveTo(size * 0.85, -size * 0.75, size * 0.9, size * 0.45, 0, size);
-    ctx.bezierCurveTo(-size * 0.9, size * 0.45, -size * 0.85, -size * 0.75, 0, -size);
-    ctx.closePath();
-    if (tint === 'gold') {
-      ctx.fillStyle = `rgba(255, 224, 172, ${alpha.toFixed(3)})`;
-    } else {
-      ctx.fillStyle = `rgba(255, 182, 206, ${alpha.toFixed(3)})`;
-    }
+    ctx.bezierCurveTo(size * 0.85, -size * 0.55, size * 0.75, size * 0.65, 0, size);
+    ctx.bezierCurveTo(-size * 0.75, size * 0.65, -size * 0.85, -size * 0.55, 0, -size);
     ctx.fill();
+    ctx.restore();
   }
 
   function animatePetals(t) {
-    if (pCtx && !document.hidden) {
-      pCtx.clearRect(0, 0, W, H);
+    if (!pCtx) return;
+    if (!document.hidden) {
+      pCtx.clearRect(0, 0, PW, PH);
       windX *= 0.96;
 
-      // Сияющие утренние пылинки света
-      for (const m of dewMotes) {
-        const a = 0.16 + 0.54 * (0.5 + 0.5 * Math.sin(t * 0.0012 * m.speed + m.phase));
-        pCtx.fillStyle = `rgba(255, 236, 205, ${a.toFixed(3)})`;
-        pCtx.beginPath();
-        pCtx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
-        pCtx.fill();
-      }
+      for (const p of ambientPetals) {
+        p.sway += 0.016;
+        p.x += p.vx + Math.sin(p.sway) * 0.42 + windX * 0.45;
+        p.y += p.vy;
+        p.rot += p.vRot;
 
-      // Парящие лепестки сакуры
-      if (!reduceMotion) {
-        for (const p of ambientPetals) {
-          p.sway += p.swaySpeed;
-          p.x += p.vx + Math.sin(p.sway) * 0.42 + windX * 0.35;
-          p.y += p.vy;
-          p.rot += p.vRot;
+        if (p.y > PH + 20) {
+          p.y = -18;
+          p.x = Math.random() * PW;
+        }
+        if (p.x > PW + 20) p.x = -18;
+        if (p.x < -20) p.x = PW + 18;
 
-          if (p.y > H + 24) {
-            p.y = -20;
-            p.x = Math.random() * W;
-          }
-          if (p.x > W + 24) p.x = -20;
-          if (p.x < -24) p.x = W + 20;
-
-          pCtx.save();
-          pCtx.translate(p.x, p.y);
-          pCtx.rotate(p.rot);
-          pCtx.scale(1, 0.65 + 0.35 * Math.abs(Math.cos(p.sway)));
-          drawSakuraPetal(pCtx, p.size, p.alpha, p.tint);
-          pCtx.restore();
+        if (p.isMote) {
+          const pulse = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t * 0.002 + p.sway));
+          pCtx.fillStyle = `rgba(253, 230, 138, ${(p.alpha * pulse).toFixed(3)})`;
+          pCtx.beginPath();
+          pCtx.arc(p.x, p.y, p.size * 0.26, 0, Math.PI * 2);
+          pCtx.fill();
+        } else {
+          const col = isSunlitMood ? '#fed7aa' : '#fbcfe8';
+          drawPetalShape(pCtx, p.x, p.y, p.size, p.rot, col, p.alpha);
         }
       }
 
-      // Праздничные вспышки лепестков и солнечных искр
       for (let i = burstParticles.length - 1; i >= 0; i--) {
         const b = burstParticles[i];
         b.x += b.vx;
         b.y += b.vy;
         b.vx *= 0.985;
-        b.vy = b.vy * 0.985 + 0.045;
+        b.vy = b.vy * 0.985 + 0.065;
         b.rot += b.vRot;
         b.life -= b.decay;
         if (b.life <= 0) {
           burstParticles.splice(i, 1);
           continue;
         }
-        pCtx.save();
-        pCtx.translate(b.x, b.y);
-        pCtx.rotate(b.rot);
-        if (b.isPetal) {
-          drawSakuraPetal(pCtx, b.size * (0.5 + b.life * 0.5), b.life * 0.9, 'sakura');
-        } else {
-          pCtx.fillStyle = `rgba(255, 224, 165, ${b.life.toFixed(3)})`;
+        if (b.isGold) {
+          pCtx.fillStyle = `rgba(253, 230, 138, ${b.life.toFixed(3)})`;
           pCtx.beginPath();
-          pCtx.arc(0, 0, b.size * 0.36, 0, Math.PI * 2);
+          pCtx.arc(b.x, b.y, b.size * 0.36, 0, Math.PI * 2);
           pCtx.fill();
+        } else {
+          drawPetalShape(pCtx, b.x, b.y, b.size, b.rot, '#f9a8d4', b.life);
         }
-        pCtx.restore();
       }
     }
     requestAnimationFrame(animatePetals);
@@ -1335,38 +1214,35 @@
   requestAnimationFrame(animatePetals);
 
   // ----------------------------------------------------------
-  // 14. Финал: Солнечный поцелуй (#sunKissBtn)
+  // 13. Финальная кнопка: Поймать солнечный поцелуй
   // ----------------------------------------------------------
-  const SUN_KISSES = [
-    'Лови самый тёплый утренний поцелуй в сонную щёчку!',
-    'Улыбнись, моё солнышко - сегодня всё сложится чудесно',
-    'Ты моя самая большая гордость и любимая умничка',
-    'Крепко-крепко обнимаю и делюсь с тобой всем своим теплом',
-    'Моё любимое дело с самого утра - думать только о тебе',
-    'Пусть каждая минута этого дня радует тебя так же, как ты меня!'
+  const KISS_TOASTS = [
+    'Солнечный поцелуй уже приземлился на твою щёчку!',
+    'Крепко-крепко обнимаю тебя и желаю лучшего дня!',
+    'Ты самая любимая, нежная и чудесная девочка на свете!',
+    'Улыбнись прямо сейчас - я мысленно рядышком с тобой!',
+    'Пусть всё задуманное сегодня сбудется легко и красиво!'
   ];
-  let kissCounter = 0;
+  let kissIdx = 0;
 
   const sunKissBtn = $('#sunKissBtn');
-  const sunKissHint = $('#sunKissHint');
+  const sunHint = $('#sunHint');
   if (sunKissBtn) {
     sunKissBtn.addEventListener('click', (e) => {
       haptic('success');
       const r = sunKissBtn.getBoundingClientRect();
       const cx = e.clientX || (r.left + r.width / 2);
       const cy = e.clientY || (r.top + r.height / 2);
+      spawnPetalBurst(cx, cy, 85);
+      setTimeout(() => spawnPetalBurst(PW * 0.25, PH * 0.35, 36), 180);
+      setTimeout(() => spawnPetalBurst(PW * 0.75, PH * 0.35, 36), 340);
 
-      petalBurst(cx, cy, 64);
-      setTimeout(() => petalBurst(window.innerWidth * 0.25, window.innerHeight * 0.35, 28), 180);
-      setTimeout(() => petalBurst(window.innerWidth * 0.75, window.innerHeight * 0.35, 28), 340);
+      toast(KISS_TOASTS[kissIdx % KISS_TOASTS.length]);
+      kissIdx++;
 
-      spawnHeart(cx, cy - 12);
-      toast(SUN_KISSES[kissCounter % SUN_KISSES.length]);
-      kissCounter++;
-
-      if (sunKissHint) {
-        sunKissHint.textContent = 'солнечный поцелуй пойман и уже греет твои щёчки';
-        sunKissHint.classList.add('is-done');
+      if (sunHint) {
+        sunHint.textContent = 'поцелуй пойман и согревает тебя весь сегодняшний день';
+        sunHint.classList.add('is-done');
       }
     });
   }

@@ -1,12 +1,12 @@
 // Процедурный генератор утренней атмосферы на Web Audio API
-// Можно включать поверх основной музыки в стиле Oneheart (сад, роса, винил)
+// Включается поверх основной музыки в стиле Oneheart (сад, колокольчики, роса, винил)
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 class MorningAudioEngine {
   constructor() {
     this.ctx = null;
     this.isPlaying = false;
-    this.currentPreset = 'off';
+    this.currentPreset = null;
     this.volume = 0.24;
     this.masterGain = null;
     this.activeNodes = [];
@@ -55,7 +55,16 @@ class MorningAudioEngine {
   stop() {
     this.stopAll();
     this.isPlaying = false;
-    this.currentPreset = 'off';
+    this.currentPreset = null;
+  }
+
+  togglePreset(presetName) {
+    if (this.isPlaying && this.currentPreset === presetName) {
+      this.stop();
+      return null;
+    }
+    const ok = this.play(presetName);
+    return ok ? this.currentPreset : null;
   }
 
   play(presetName) {
@@ -71,12 +80,17 @@ class MorningAudioEngine {
     this.isPlaying = true;
 
     switch (presetName) {
+      case 'breeze':
       case 'birds':
-        this.playMorningGarden();
+        this.playMorningGarden(presetName);
         break;
       case 'chimes':
         this.playDewChimes();
         break;
+      case 'dew':
+        this.playMorningDew();
+        break;
+      case 'vinyl':
       case 'tape':
         this.playWarmTapePad();
         break;
@@ -105,7 +119,7 @@ class MorningAudioEngine {
   }
 
   // Пресет 1: Утренний сад (тёплый ветерок в лепестках + пение птиц)
-  playMorningGarden() {
+  playMorningGarden(tag) {
     const breezeBuffer = this.createPinkNoiseBuffer(5);
     const breeze = this.ctx.createBufferSource();
     breeze.buffer = breezeBuffer;
@@ -135,7 +149,7 @@ class MorningAudioEngine {
     this.activeNodes.push(breeze, filter, lfo, lfoGain, gain);
 
     const singNote = (delay, fStart, fEnd, dur) => {
-      if (!this.isPlaying || this.currentPreset !== 'birds') return;
+      if (!this.isPlaying || this.currentPreset !== tag) return;
       const t = this.ctx.currentTime + delay;
       const osc = this.ctx.createOscillator();
       const g = this.ctx.createGain();
@@ -145,7 +159,7 @@ class MorningAudioEngine {
       osc.frequency.exponentialRampToValueAtTime(fEnd, t + dur);
 
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(0.055, t + dur * 0.25);
+      g.gain.linearRampToValueAtTime(0.052, t + dur * 0.25);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 
       osc.connect(g);
@@ -155,7 +169,7 @@ class MorningAudioEngine {
     };
 
     const birdPhrase = () => {
-      if (!this.isPlaying || this.currentPreset !== 'birds') return;
+      if (!this.isPlaying || this.currentPreset !== tag) return;
       const base = 2100 + Math.random() * 900;
       const count = 2 + Math.floor(Math.random() * 3);
       for (let i = 0; i < count; i++) {
@@ -165,20 +179,20 @@ class MorningAudioEngine {
       }
     };
 
-    const t1 = setTimeout(birdPhrase, 700);
+    const t1 = setTimeout(birdPhrase, 600);
     const iv = setInterval(() => {
       if (Math.random() > 0.28) birdPhrase();
-    }, 3400);
+    }, 3200);
     this.timers.push(t1, iv);
   }
 
-  // Пресет 2: Хрустальная утренняя роса (пентатонические колокольчики)
+  // Пресет 2: Солнечные колокольчики
   playDewChimes() {
     const padOsc = this.ctx.createOscillator();
     const padGain = this.ctx.createGain();
     padOsc.type = 'sine';
     padOsc.frequency.setValueAtTime(216, this.ctx.currentTime);
-    padGain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+    padGain.gain.setValueAtTime(0.045, this.ctx.currentTime);
     padOsc.connect(padGain);
     padGain.connect(this.masterGain);
     padOsc.start();
@@ -196,7 +210,7 @@ class MorningAudioEngine {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(root * mult, now);
 
-        const amp = (0.075 / (idx + 1)) * (0.75 + Math.random() * 0.35);
+        const amp = (0.072 / (idx + 1)) * (0.75 + Math.random() * 0.35);
         g.gain.setValueAtTime(0.0001, now);
         g.gain.linearRampToValueAtTime(amp, now + 0.02);
         g.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
@@ -215,13 +229,62 @@ class MorningAudioEngine {
         const t2 = setTimeout(strike, 420);
         this.timers.push(t2);
       }
-    }, 3200);
+    }, 3100);
     this.timers.push(iv);
   }
 
-  // Пресет 3: Тёплый виниловый эмбиент-пэд в духе Oneheart
+  // Пресет 3: Шёпот утренней росы
+  playMorningDew() {
+    const mistBuffer = this.createPinkNoiseBuffer(5);
+    const mist = this.ctx.createBufferSource();
+    mist.buffer = mistBuffer;
+    mist.loop = true;
+
+    const lp = this.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(780, this.ctx.currentTime);
+
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.24, this.ctx.currentTime);
+
+    mist.connect(lp);
+    lp.connect(g);
+    g.connect(this.masterGain);
+    mist.start();
+    this.activeNodes.push(mist, lp, g);
+
+    const drop = () => {
+      if (!this.isPlaying || this.currentPreset !== 'dew') return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const dg = this.ctx.createGain();
+      osc.type = 'sine';
+      const f0 = 900 + Math.random() * 650;
+      osc.frequency.setValueAtTime(f0, now);
+      osc.frequency.exponentialRampToValueAtTime(340, now + 0.075);
+
+      dg.gain.setValueAtTime(0.04, now);
+      dg.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+      osc.connect(dg);
+      dg.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    };
+
+    const iv = setInterval(() => {
+      drop();
+      if (Math.random() > 0.5) {
+        const t = setTimeout(drop, 110);
+        this.timers.push(t);
+      }
+    }, 520);
+    this.timers.push(iv);
+  }
+
+  // Пресет 4: Тёплый виниловый эмбиент-пэд в духе Oneheart
   playWarmTapePad() {
-    const chord = [130.81, 164.81, 196.0, 246.94, 293.66]; // Cmaj9 в мягком строе
+    const chord = [130.81, 164.81, 196.0, 246.94, 293.66];
     chord.forEach((freq, idx) => {
       const osc = this.ctx.createOscillator();
       const filter = this.ctx.createBiquadFilter();
@@ -234,7 +297,7 @@ class MorningAudioEngine {
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(480, this.ctx.currentTime);
 
-      const amp = 0.055 / (1 + idx * 0.28);
+      const amp = 0.052 / (1 + idx * 0.28);
       g.gain.setValueAtTime(amp, this.ctx.currentTime);
 
       osc.connect(filter);
@@ -245,7 +308,6 @@ class MorningAudioEngine {
       this.activeNodes.push(osc, filter, g);
     });
 
-    // Мягкий шорох аналоговой кассеты
     const tapeBuffer = this.createPinkNoiseBuffer(4);
     const tape = this.ctx.createBufferSource();
     tape.buffer = tapeBuffer;
