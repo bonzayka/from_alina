@@ -1,4 +1,4 @@
-// Модуль Telegram-бота для проекта "Спокойной ночи, котеночек мой любимый!"
+// Модуль Telegram-бота для проекта "С добрым утром, солнышко!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 const { Telegraf, Markup } = require('telegraf');
@@ -10,13 +10,16 @@ function initBot() {
 
   // Команда /start
   bot.start(async (ctx) => {
-    const welcomeText = `🌙 Спокойной ночи, моё любимое сокровище!\n\n` +
-      `Я создал для тебя этот сказочный ночной уголок, чтобы ты засыпала в тепле, уюте, под волшебную музыку Oneheart и сияние созвездий.\n\n` +
-      `Закрывай глазки, моё чудо. Самых сладких и прекрасных тебе снов! ✨💖`;
+    const welcomeText = `☀️ С добрым утром, моё любимое солнышко!\n\n` +
+      `Я приготовил для тебя этот нежный рассветный уголок с открытками, утренними письмами и спокойной атмосферной музыкой в стиле Oneheart, чтобы твой день начался с самой тёплой улыбки.\n\n` +
+      `Открывай скорее, прекрасного тебе дня, моя умничка! 🌸💖`;
 
     const keyboard = Markup.inlineKeyboard([
       [
-        Markup.button.webApp('🌙 Открыть портал сладких снов', config.WEBAPP_URL)
+        Markup.button.webApp('☀️ Открыть утреннее послание', config.WEBAPP_URL)
+      ],
+      [
+        Markup.button.callback('🌸 Случайный лучик нежности', 'random_wish')
       ]
     ]);
 
@@ -29,16 +32,16 @@ function initBot() {
     const randomIndex = Math.floor(Math.random() * WISHES.length);
     const wish = WISHES[randomIndex];
 
-    const messageText = `🌙 *${wish.title}*\n\n` +
+    const messageText = `☀️ *${wish.title}*\n\n` +
       `«${wish.text}»\n\n` +
-      `_Автор: ${wish.author}_`;
+      `_${wish.author}_`;
 
     const keyboard = Markup.inlineKeyboard([
       [
-        Markup.button.callback('🔄 Еще одно пожелание', 'random_wish')
+        Markup.button.callback('🔄 Ещё одно пожелание', 'random_wish')
       ],
       [
-        Markup.button.webApp('✨ Открыть в WebApp', config.WEBAPP_URL)
+        Markup.button.webApp('🌸 Открыть утренний портал', config.WEBAPP_URL)
       ]
     ]);
 
@@ -53,18 +56,18 @@ function initBot() {
         const parsed = JSON.parse(rawData);
 
         if (parsed.type === 'custom_wish') {
-          const replyText = `💌 *Получено персональное пожелание для: ${parsed.recipient}*\n\n` +
+          const replyText = `💌 *Утренний ответ от моего солнышка (${parsed.recipient || 'любимая'})*\n\n` +
             `«${parsed.text}»\n\n` +
-            `_Сладких и уютных снов!_ ✨`;
+            `_Пусть это утро будет самым счастливым!_ ☀️🌸`;
 
           await ctx.reply(replyText, { parse_mode: 'Markdown' });
           return;
         }
 
         if (parsed.type === 'wish_shared') {
-          const replyText = `🌙 *Ночное пожелание*\n\n` +
+          const replyText = `☀️ *Утренний лучик сохранён*\n\n` +
             `«${parsed.text}»\n\n` +
-            `_Пусть эта ночь подарит тебе самый сладкий отдых!_ 💤`;
+            `_Пусть весь твой день будет согрет любовью!_ 💖`;
 
           await ctx.reply(replyText, { parse_mode: 'Markdown' });
           return;
@@ -82,7 +85,7 @@ function initBot() {
       await bot.telegram.setChatMenuButton({
         menu_button: {
           type: 'web_app',
-          text: '🌙 Спокойной ночи',
+          text: '☀️ С добрым утром',
           web_app: {
             url: config.WEBAPP_URL
           }

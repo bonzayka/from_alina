@@ -1,4 +1,4 @@
-// Главный сервер приложения "Спокойной ночи, котеночек мой любимый!"
+// Главный сервер приложения "С добрым утром, моё любимое солнышко!"
 // Внимание: строго запрещены длинные тире (em-dash / en-dash).
 
 const path = require('path');
@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'good-night-webapp',
+    service: 'good-morning-webapp',
     timestamp: new Date().toISOString(),
     port: config.PORT
   });
@@ -60,13 +60,15 @@ const server = app.listen(config.PORT, config.HOST, () => {
   console.log(`Сервер успешно запущен на http://${config.HOST}:${config.PORT}`);
   console.log(`WebApp URL: ${config.WEBAPP_URL}`);
 
-  // Инициализация и запуск Telegram-бота
-  const botInstance = initBot();
-  botInstance.start();
+  // Инициализация и запуск Telegram-бота (можно отключить локально через DISABLE_BOT=1)
+  if (!process.env.DISABLE_BOT) {
+    const botInstance = initBot();
+    botInstance.start();
+  }
 });
 
 // Обработка непредвиденных ошибок
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   console.error('Необработанная ошибка в Promise:', reason);
 });
 
