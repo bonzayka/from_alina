@@ -646,14 +646,14 @@
   // 9. Галерея 08 утренних открыток (без обрезки текста мемов!)
   // ----------------------------------------------------------
   const CARDS = [
-    { src: 'photo/1.jpg', title: 'Утренний букетик для тебя', likes: 14 },
-    { src: 'photo/2.jpg', title: 'Моё любимое утреннее дело', likes: 27 },
-    { src: 'photo/3.jpg', title: 'Главная вера в тебя', likes: 31 },
-    { src: 'photo/4.jpg', title: 'Нежные сонные поцелуи', likes: 22 },
-    { src: 'photo/5.jpg', title: 'Солнечный чизбургер к завтраку', likes: 19 },
-    { src: 'photo/6.jpg', title: 'Минутка утренней самоиронии', likes: 25 },
-    { src: 'photo/7.jpg', title: 'Официальное предложение', likes: 38 },
-    { src: 'photo/8.jpg', title: 'Главное признание сердца', likes: 99 }
+    { src: 'photo/1.jpg', title: 'Утренний букетик для тебя' },
+    { src: 'photo/2.jpg', title: 'Моё любимое утреннее дело' },
+    { src: 'photo/3.jpg', title: 'Главная вера в тебя' },
+    { src: 'photo/4.jpg', title: 'Нежные сонные поцелуи' },
+    { src: 'photo/5.jpg', title: 'Солнечный чизбургер к завтраку' },
+    { src: 'photo/6.jpg', title: 'Минутка утренней самоиронии' },
+    { src: 'photo/7.jpg', title: 'Официальное предложение' },
+    { src: 'photo/8.jpg', title: 'Главное признание сердца' }
   ];
 
   const gallery = $('#gallery');
@@ -675,16 +675,6 @@
     });
   }
 
-  function spawnFloatingHeart(x, y) {
-    const el = document.createElement('span');
-    el.className = 'floating-heart';
-    el.innerHTML = '&#10084;';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1100);
-  }
-
   if (gallery) {
     CARDS.forEach((card, i) => {
       const fig = document.createElement('figure');
@@ -701,16 +691,11 @@
             <span class="pic-num">${pad(i + 1)}</span>
             <span class="pic-title">${card.title}</span>
           </div>
-          <button class="like-btn" type="button" aria-label="Поставить сердечко открытке ${pad(i + 1)}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-            <span class="like-num">${card.likes}</span>
-          </button>
+          <span class="pic-of">/ ${pad(CARDS.length)}</span>
         </figcaption>
       `;
 
       const frame = $('.pic-frame', fig);
-      const likeBtn = $('.like-btn', fig);
-      const likeNum = $('.like-num', fig);
 
       frame.addEventListener('click', () => openLb(i));
       frame.addEventListener('keydown', (e) => {
@@ -718,16 +703,6 @@
           e.preventDefault();
           openLb(i);
         }
-      });
-
-      likeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        haptic('success');
-        const liked = likeBtn.classList.toggle('is-liked');
-        card.likes += liked ? 1 : -1;
-        likeNum.textContent = String(card.likes);
-        const r = likeBtn.getBoundingClientRect();
-        spawnFloatingHeart(r.left + r.width / 2, r.top);
       });
 
       if (finePointer && !reduceMotion) {

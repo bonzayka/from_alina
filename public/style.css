@@ -1547,55 +1547,11 @@ main {
   text-overflow: ellipsis;
 }
 
-.like-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.04);
+.pic-of {
   font-family: var(--mono);
   font-size: 11.5px;
-  color: var(--ink-2);
-  transition: all 0.3s var(--ease-spring);
-}
-
-.like-btn svg {
-  width: 14px;
-  height: 14px;
-  transition: transform 0.3s var(--ease-spring), color 0.3s;
-}
-
-.like-btn:hover {
-  border-color: var(--rose-400);
-  transform: scale(1.06);
-}
-
-.like-btn.is-liked {
-  background: rgba(244, 114, 182, 0.2);
-  border-color: var(--rose-400);
-  color: var(--ivory-50);
-}
-
-.like-btn.is-liked svg {
-  color: var(--rose-400);
-  fill: var(--rose-400);
-  transform: scale(1.18);
-}
-
-.floating-heart {
-  position: fixed;
-  z-index: 98;
-  pointer-events: none;
-  color: var(--rose-300);
-  font-size: 20px;
-  animation: heartFloat 1.1s var(--ease-out) forwards;
-}
-
-@keyframes heartFloat {
-  0% { opacity: 1; transform: translate(-50%, 0) scale(0.7); }
-  100% { opacity: 0; transform: translate(-50%, -68px) scale(1.35); }
+  color: var(--ink-3);
+  flex-shrink: 0;
 }
 
 /* ============================================================
