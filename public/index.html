@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#150a13">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Доброе утро, солнышко. Нежный рассвет, милые открытки и спокойная музыка в стиле Oneheart.">
-  <title>Доброе утро, солнышко</title>
+  <meta name="description" content="Доброе утро. Немного картинок и спокойная музыка.">
+  <title>Доброе утро</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -26,7 +26,7 @@
   <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
   <div class="scroll-progress" id="progress" aria-hidden="true"></div>
 
-  <!-- Многослойный фон: рассветное поле цветов + WebGL шейдер лучей + сакура -->
+  <!-- Многослойный фон: поле цветов + WebGL шейдер лучей + лепестки -->
   <div class="ambient" aria-hidden="true">
     <img class="ambient-bg" src="background/background.jpg" alt="">
     <canvas id="dawnShader"></canvas>
@@ -34,25 +34,25 @@
   </div>
   <canvas id="petalsCanvas" aria-hidden="true"></canvas>
 
-  <!-- Кинематографичное Интро: открывает портал утра и плавно запускает музыку -->
-  <div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Утреннее приветствие">
+  <!-- Интро: открывает страницу и включает музыку -->
+  <div class="intro" id="intro" role="dialog" aria-modal="true" aria-label="Доброе утро">
     <div class="intro-inner">
       <div class="intro-crest">
-        <img src="assets/morning-aura-seal.jpg" alt="Хрустальный цветок рассвета">
+        <img src="assets/morning-aura-seal.jpg" alt="">
       </div>
       <span class="pill">
         <span class="dot-dawn" aria-hidden="true"></span>
-        <span id="introDate">сегодня • доброе утро</span>
+        <span id="introDate">сегодня • утро</span>
       </span>
       <h1 class="intro-title lines">
-        <span class="line"><span>С добрым</span></span>
-        <span class="line"><span><em>утром,</em> солнышко</span></span>
+        <span class="line"><span>Доброе</span></span>
+        <span class="line"><span><em>утро</em></span></span>
       </h1>
-      <p class="intro-sub">сделай мягкий вдох, прибавь звук и улыбнись новому дню</p>
+      <p class="intro-sub">включи звук и просыпайся потихоньку</p>
       <div class="intro-actions">
         <button class="shimmer-btn magnetic" id="introBtn" type="button">
           <span class="shimmer-btn-inner">
-            <span>Впустить рассвет</span>
+            <span>Открыть</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </span>
         </button>
@@ -60,30 +60,30 @@
     </div>
   </div>
 
-  <!-- Плавающая стеклянная шапка -->
+  <!-- Плавающая шапка -->
   <header class="nav" id="nav">
     <div class="nav-left">
       <a href="#top" class="brand">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
         </span>
-        <span class="brand-text">для самой любимой</span>
+        <span class="brand-text">для тебя</span>
       </a>
 
-      <button class="mood-btn" id="moodToggle" type="button" aria-label="Переключить оттенок рассвета">
+      <button class="mood-btn" id="moodToggle" type="button" aria-label="Переключить свет">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        <span class="mood-label" id="moodLabel">Розовый рассвет</span>
+        <span class="mood-label" id="moodLabel">Розовый свет</span>
       </button>
     </div>
 
     <div class="nav-player" id="navPlayer">
-      <button class="np-toggle" id="navPlayBtn" type="button" aria-label="Воспроизвести или поставить на паузу">
+      <button class="np-toggle" id="navPlayBtn" type="button" aria-label="Музыка: играть или пауза">
         <svg class="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>
         <svg class="i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1.2"/><rect x="14" y="4" width="4" height="16" rx="1.2"/></svg>
       </button>
-      <a href="#rituals" class="np-meta" title="Перейти к музыкальной студии">
-        <span class="np-title" id="npTitle">Eternity (Dawn)</span>
-        <span class="np-artist" id="npArtist">Stellardrone • Oneheart vibe</span>
+      <a href="#rituals" class="np-meta" title="К плееру">
+        <span class="np-title" id="npTitle">Eternity</span>
+        <span class="np-artist" id="npArtist">Stellardrone</span>
       </a>
       <div class="np-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </div>
@@ -92,12 +92,12 @@
   </header>
 
   <main id="top">
-    <!-- 00. Hero -->
+    <!-- Hero -->
     <section class="hero">
       <div class="hero-top reveal">
         <span class="pill">
           <span class="dot-dawn" aria-hidden="true"></span>
-          <span>утренний выпуск №<span id="issueNo">001</span></span>
+          <span>выпуск №<span id="issueNo">001</span></span>
         </span>
         <span class="hero-clock">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -106,61 +106,79 @@
       </div>
 
       <h2 class="hero-title lines">
-        <span class="line"><span>Пусть это утро</span></span>
-        <span class="line"><span>начнётся с <em>улыбки</em></span></span>
+        <span class="line"><span>Для самого</span></span>
+        <span class="line"><span><em>доброго</em> утра</span></span>
       </h2>
 
       <div class="hero-bottom reveal">
-        <p class="hero-lead">Я собрал в этом рассветном уголке тёплый свет, спокойную обволакивающую музыку в духе Oneheart, восемь милых открыток и всю свою нежность к тебе.</p>
+        <p class="hero-lead">Немного великих картинок для настроения и спокойная музыка. Просыпайся, любимая.</p>
         <ul class="hero-stats">
-          <li><b>08</b><span>открыток</span></li>
-          <li><b>06</b><span>мелодий</span></li>
-          <li><b>100%</b><span>любви</span></li>
+          <li><b>08</b><span>картинок</span></li>
+          <li><b>06</b><span>треков</span></li>
         </ul>
       </div>
 
-      <a href="#rituals" class="scroll-cue" aria-label="Листать вниз"><span>листай</span><i></i></a>
+      <a href="#pics" class="scroll-cue" aria-label="Листать вниз"><span>листай</span><i></i></a>
     </section>
 
-    <!-- Бегущая лента -->
+    <!-- Бегущая строка -->
     <div class="marquee" aria-hidden="true">
       <div class="marquee-track">
-        <span>доброе утро, солнышко <b>✦</b> ты умничка моя любимая <b>✦</b> у тебя всё получится <b>✦</b> моё любимое дело - думать о тебе <b>✦</b> крепко обнимаю <b>✦</b>&nbsp;</span>
-        <span>доброе утро, солнышко <b>✦</b> ты умничка моя любимая <b>✦</b> у тебя всё получится <b>✦</b> моё любимое дело - думать о тебе <b>✦</b> крепко обнимаю <b>✦</b>&nbsp;</span>
+        <span>доброе утро <b>✦</b> просыпайся <b>✦</b> ты умничка <b>✦</b> у тебя всё получится <b>✦</b> люблю тебя <b>✦</b>&nbsp;</span>
+        <span>доброе утро <b>✦</b> просыпайся <b>✦</b> ты умничка <b>✦</b> у тебя всё получится <b>✦</b> люблю тебя <b>✦</b>&nbsp;</span>
       </div>
     </div>
 
-    <!-- 01. Утренние ритуалы и Музыкальная студия (Spotlight Bento Grid) -->
-    <section class="section" id="rituals">
+    <!-- 01. Картинки -->
+    <section class="section" id="pics">
       <header class="section-head reveal">
         <div class="section-head-main">
           <span class="section-index">01</span>
           <div>
-            <h3 class="section-title">Твоя <em>атмосфера</em> утра</h3>
-            <p class="section-note">переключай мелодии, добавляй пение птиц и отмечай маленькие шаги пробуждения</p>
+            <h3 class="section-title">О великие <em>картинки</em></h3>
+            <p class="section-note">по порядку. можно тыкать</p>
+          </div>
+        </div>
+        <div class="gallery-tools" role="group" aria-label="Вид галереи">
+          <button class="view-btn is-active" id="viewGridBtn" type="button">Сетка</button>
+          <button class="view-btn" id="viewLargeBtn" type="button">Крупно</button>
+        </div>
+      </header>
+
+      <div class="gallery" id="gallery"></div>
+    </section>
+
+    <!-- 02. Плеер и дела на утро -->
+    <section class="section" id="rituals">
+      <header class="section-head reveal">
+        <div class="section-head-main">
+          <span class="section-index">02</span>
+          <div>
+            <h3 class="section-title">Музыка <em>на утро</em></h3>
+            <p class="section-note">если захочется переключить трек</p>
           </div>
         </div>
       </header>
 
       <div class="bento-grid">
-        <!-- Карточка 1: Виниловая студия Oneheart-style -->
+        <!-- Плеер -->
         <article class="bento-card bento-music border-beam-wrap reveal" id="musicStudio">
           <div class="border-beam" aria-hidden="true"></div>
 
           <div>
             <span class="card-kicker">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-              <span>Утренний плейлист в стиле Oneheart</span>
+              <span>Плейлист</span>
             </span>
 
             <div class="studio-top" style="margin-top: 16px;">
               <div class="vinyl-wrap" id="vinylWrap">
-                <img class="vinyl-disc" src="assets/album-cover-dawn.jpg" alt="Обложка утреннего альбома">
+                <img class="vinyl-disc" src="assets/album-cover-dawn.jpg" alt="">
                 <span class="vinyl-hole" aria-hidden="true"></span>
               </div>
               <div class="studio-info">
-                <h4 class="studio-track-title" id="studioTitle">Eternity (Dawn Reprise)</h4>
-                <p class="studio-track-artist" id="studioArtist">Stellardrone • невесомый рассветный эмбиент</p>
+                <h4 class="studio-track-title" id="studioTitle">Eternity</h4>
+                <p class="studio-track-artist" id="studioArtist">Stellardrone</p>
               </div>
             </div>
           </div>
@@ -191,27 +209,27 @@
               </button>
             </div>
 
-            <div class="track-pills" id="trackPills" role="tablist" aria-label="Выбор мелодии"></div>
+            <div class="track-pills" id="trackPills" role="tablist" aria-label="Выбор трека"></div>
           </div>
 
           <div class="ambient-layers">
-            <span class="ambient-layers-label">Фоновый слой:</span>
-            <button class="layer-chip is-active" type="button" data-layer="off">Только музыка</button>
-            <button class="layer-chip" type="button" data-layer="birds">Птицы и сад</button>
-            <button class="layer-chip" type="button" data-layer="chimes">Хрустальная роса</button>
-            <button class="layer-chip" type="button" data-layer="tape">Тёплый винил</button>
+            <span class="ambient-layers-label">Фон:</span>
+            <button class="layer-chip is-active" type="button" data-layer="off">Выкл</button>
+            <button class="layer-chip" type="button" data-layer="birds">Птицы</button>
+            <button class="layer-chip" type="button" data-layer="chimes">Колокольчики</button>
+            <button class="layer-chip" type="button" data-layer="tape">Винил</button>
           </div>
         </article>
 
-        <!-- Карточка 2: Интерактивный чек-лист нежного пробуждения -->
+        <!-- Чек-лист на утро -->
         <article class="bento-card bento-checklist reveal">
           <div class="checklist-head">
             <div>
               <span class="card-kicker">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                <span>Ритуал пробуждения</span>
+                <span>На утро</span>
               </span>
-              <h4 class="card-heading">Четыре шага к чудесному дню</h4>
+              <h4 class="card-heading">План минимум</h4>
             </div>
             <span class="checklist-badge" id="ritualCount">0 / 4</span>
           </div>
@@ -221,162 +239,70 @@
               <span class="ritual-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span class="ritual-label">Сладко потянуться в тёплой кроватке</span>
+              <span class="ritual-label">Потянуться и вылезти из кровати</span>
             </button>
             <button class="ritual-item" type="button" data-ritual="1">
               <span class="ritual-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span class="ritual-label">Улыбнуться своему отражению</span>
+              <span class="ritual-label">Умыться и прийти в себя</span>
             </button>
             <button class="ritual-item" type="button" data-ritual="2">
               <span class="ritual-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span class="ritual-label">Выпить водички или вкусный тёплый чай</span>
+              <span class="ritual-label">Попить чай или кофе и поесть</span>
             </button>
             <button class="ritual-item" type="button" data-ritual="3">
               <span class="ritual-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span class="ritual-label">Вспомнить, как безумно тебя любят</span>
+              <span class="ritual-label">Помнить, что у тебя всё получится</span>
             </button>
           </div>
         </article>
-
-        <!-- Карточка 3: Персональный прогноз на сегодня -->
-        <article class="bento-card bento-forecast reveal">
-          <div class="forecast-copy">
-            <span class="card-kicker">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4"/><path d="m4.93 10.93 2.83 2.83"/><path d="M2 18h20"/><path d="m19.07 10.93-2.83 2.83"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
-              <span>Метеосводка нежности</span>
-            </span>
-            <h4 class="card-heading">Прогноз на твой сегодняшний день</h4>
-            <p>Ожидается повышенная концентрация комплиментов, лёгкое решение всех задач и тёплые мысли о тебе каждую минуту.</p>
-            <div class="compliment-box">
-              <span class="compliment-text" id="complimentText">«Ты - самое светлое, что есть в каждом моём утре»</span>
-              <button class="glass-btn" id="nextComplimentBtn" type="button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-                <span>Ещё комплимент</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="forecast-metrics">
-            <div class="metric-tile">
-              <span class="metric-val">100%</span>
-              <span class="metric-lbl">Очарование</span>
-            </div>
-            <div class="metric-tile">
-              <span class="metric-val">999+</span>
-              <span class="metric-lbl">Поцелуев в запасе</span>
-            </div>
-            <div class="metric-tile">
-              <span class="metric-val">0%</span>
-              <span class="metric-lbl">Поводов грустить</span>
-            </div>
-          </div>
-        </article>
       </div>
     </section>
 
-    <!-- 02. Галерея 08 открыток -->
-    <section class="section" id="pics">
-      <header class="section-head reveal">
-        <div class="section-head-main">
-          <span class="section-index">02</span>
-          <div>
-            <h3 class="section-title">Утренние <em>открытки</em> и котики</h3>
-            <p class="section-note">все восемь картинок целиком без обрезки - нажимай на любую, чтобы рассмотреть поближе</p>
-          </div>
-        </div>
-        <div class="gallery-tools" role="group" aria-label="Режим отображения галереи">
-          <button class="view-btn is-active" id="viewGridBtn" type="button">Сетка 4x2</button>
-          <button class="view-btn" id="viewLargeBtn" type="button">Крупно 2x4</button>
-        </div>
-      </header>
-
-      <div class="gallery" id="gallery"></div>
-    </section>
-
-    <!-- 03. Шкатулка утренних лучиков (/api/wishes) -->
-    <section class="section" id="wishesSection">
-      <header class="section-head reveal">
-        <div class="section-head-main">
-          <span class="section-index">03</span>
-          <div>
-            <h3 class="section-title">Шкатулка <em>тёплых</em> слов</h3>
-            <p class="section-note">выбирай настроение утра и вытягивай новое послание</p>
-          </div>
-        </div>
-      </header>
-
-      <div class="wishes-cats reveal" id="wishCategories" role="tablist" aria-label="Категории пожеланий"></div>
-
-      <div class="wish-stage border-beam-wrap reveal">
-        <div class="border-beam" aria-hidden="true"></div>
-        <div class="wish-card-body" id="wishCardBody">
-          <h4 class="wish-title" id="wishTitle">Доброе утро, моё любимое солнышко</h4>
-          <p class="wish-text" id="wishText">Открывай свои прекрасные глазки и сладко-сладко потягивайся. Пусть этот рассвет окутает тебя мягким розовым светом, нежностью лепестков и ощущением тихого счастья.</p>
-          <div class="wish-author" id="wishAuthor">Первая мысль о тебе</div>
-          <div class="wish-tags" id="wishTags"></div>
-        </div>
-        <div class="wish-actions">
-          <button class="shimmer-btn magnetic" id="nextWishBtn" type="button">
-            <span class="shimmer-btn-inner">
-              <span>Следующий лучик тепла</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-            </span>
-          </button>
-          <button class="glass-btn" id="sendKissBtn" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-            <span>Сохранить в сердечке</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 04. Рассветный Финал -->
+    <!-- 03. Финал -->
     <section class="section finale" id="sunrise">
       <div class="sun-orb reveal" aria-hidden="true"><div class="sun-core"></div></div>
-      <span class="section-index reveal">04</span>
+      <span class="section-index reveal">03</span>
       <h3 class="finale-title lines">
-        <span class="line"><span>Сияй сегодня,</span></span>
-        <span class="line"><span><em>моё сокровище</em></span></span>
+        <span class="line"><span>Хорошего дня,</span></span>
+        <span class="line"><span><em>моё солнышко</em></span></span>
       </h3>
-      <p class="finale-text reveal">Улыбайся чаще, береги себя и помни каждую секунду: в моём сердце только ты. Пусть этот день обнимет тебя теплом, лёгкостью и сотней маленьких чудес.</p>
+      <p class="finale-text reveal">Просыпайся потихоньку, вкусно завтракай и ни о чём не переживай. Ты у меня самая лучшая, и сегодня у тебя всё получится. Люблю тебя.</p>
       <div class="reveal">
         <button class="shimmer-btn magnetic" id="sunKissBtn" type="button">
           <span class="shimmer-btn-inner">
-            <span>Поймать солнечный поцелуй</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <span>✦ Обнимаю</span>
           </span>
         </button>
       </div>
-      <p class="finale-hint" id="sunHint">нажми, чтобы рассыпать лепестки сакуры и солнечные искры</p>
+      <p class="finale-hint" id="sunHint">нажми, полетят лепестки</p>
     </section>
   </main>
 
   <footer class="footer">
-    <span>сделано с бесконечной нежностью</span>
-    <span><em>прекрасного тебе дня, любимая</em></span>
+    <span>✦ сделано с любовью</span>
+    <span><em>хорошего дня</em></span>
   </footer>
 
-  <!-- Lightbox для полноразмерного просмотра открытки -->
-  <div class="lb" id="lb" aria-hidden="true" role="dialog" aria-label="Просмотр открытки">
-    <button class="round-btn lb-close" id="lbClose" type="button" aria-label="Закрыть просмотр">
+  <!-- Просмотр картинки -->
+  <div class="lb" id="lb" aria-hidden="true" role="dialog" aria-label="Просмотр картинки">
+    <button class="round-btn lb-close" id="lbClose" type="button" aria-label="Закрыть">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
     <div class="lb-stage" id="lbStage">
       <img class="lb-img" id="lbImg" alt="">
-      <div class="lb-caption" id="lbCaption"></div>
     </div>
     <div class="lb-nav">
-      <button class="round-btn" id="lbPrev" type="button" aria-label="Предыдущая открытка">
+      <button class="round-btn" id="lbPrev" type="button" aria-label="Предыдущая">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
       </button>
       <span class="lb-count" id="lbCount">01 / 08</span>
-      <button class="round-btn" id="lbNext" type="button" aria-label="Следующая открытка">
+      <button class="round-btn" id="lbNext" type="button" aria-label="Следующая">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </button>
     </div>
@@ -384,12 +310,11 @@
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
-  <!-- Библиотеки плавного скролла и хореографии (с мягким fallback при офлайне) -->
+  <!-- Библиотеки плавного скролла и анимаций -->
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
 
-  <!-- Локальные модули данных, звука и интерактивной сцены -->
   <script src="wishes.js"></script>
   <script src="audio.js"></script>
   <script src="app.js"></script>

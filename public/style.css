@@ -1518,33 +1518,37 @@ main {
 .pic-caption {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 0 4px;
-}
-
-.pic-meta {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  min-width: 0;
+  gap: 14px;
+  margin-top: 14px;
 }
 
 .pic-num {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--accent-primary);
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1;
+  color: var(--ink);
 }
 
-.pic-title {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 19px;
-  color: var(--ink);
-  white-space: nowrap;
+.pic-line {
+  position: relative;
+  flex: 1;
+  height: 1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  background: var(--line);
+}
+
+.pic-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.8s var(--ease-out);
+}
+
+.pic:hover .pic-line::after {
+  transform: scaleX(1);
 }
 
 .pic-of {
